@@ -28,16 +28,18 @@ function handler(req, res){
 	}else{
 		filename = "404.html";
 	}
-	fs.readFile(__dirname + filename,
-		function (err, data) {
-			if (err) {
-			  console.log(err);
-			  res.writeHead(500);
-			  return res.end('Error loading page');
-			}
-			res.writeHead(200);
-			res.end(data);
-		  });
+	if(filename!=undefined){
+		fs.readFile(__dirname + filename,
+			function (err, data) {
+				if (err) {
+				  console.log(err);
+				  res.writeHead(500);
+				  return res.end('Error loading page');
+				}
+				res.writeHead(200);
+				res.end(data);
+		 	 });
+	}
 }
 
 io.on('connection',function(socket){
