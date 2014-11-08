@@ -96,48 +96,60 @@ string savefile = "stls/";
 void writeSTLfromArray(){
 	out.open(savefile.c_str(),ios_base::binary);
 
-	int tc = 0;
+	uint32_t triangleCount = 3042;		//number of facets in a void-free model [ (width-1)*(height-1)*2 ]
 
 	if(out.good()){
 		for(int i = 0; i < 80; i++){
 			out.write("t",1);
 		}
-
-		uint32_t numFacets = 3042;//(width-1)*(height-1)*2;
-		out.write((char *)&numFacets,4);
-		
+		//write a placeholder number
+		out.write((char *)&triangleCount,4);
 		for(int c = 1; c < width; c++){
-			vertex a = createVertex(c, 0,hList[c]);
-			vertex b = createVertex(c-1, 0,hList[c-1]);
-			vertex d = createVertex(c-1, 1,hList[c+width-1]);
-			addTriangle(createTriangle(a,d,b));
-			tc++;
+			if((int)hList[c]!=-100 & (int)hList[c-1]!=-100 & (int)hList[c+width-1]!=-100 ){
+				vertex a = createVertex(c, 0,hList[c]);
+				vertex b = createVertex(c-1, 0,hList[c-1]);
+				vertex d = createVertex(c-1, 1,hList[c+width-1]);
+				addTriangle(createTriangle(a,d,b));
+			}else{
+				triangleCount--;
+			}
 		}
 		for(int y = 1; y < height-1; y++){
 			for(int x = 1; x < width; x++){
-				vertex a = createVertex(x,y,hList[y*width+x]);
-				vertex b = createVertex(x,y-1,hList[(y-1)*width+x]);
-				vertex c = createVertex(x-1,y,hList[y*width+x-1]);
-				addTriangle(createTriangle(a,c,b));
-				tc++;
+				if((int)hList[y*width+x]!=-100 & (int)hList[(y-1)*width+x]!=-100 & (int)hList[y*width+x-1]!=-100 ){
+					vertex a = createVertex(x,y,hList[y*width+x]);
+					vertex b = createVertex(x,y-1,hList[(y-1)*width+x]);
+					vertex c = createVertex(x-1,y,hList[y*width+x-1]);
+					addTriangle(createTriangle(a,c,b));
+				}else{
+					triangleCount--;
+				}
 			}
 			for(int x = 1; x < width; x++){
-				vertex a = createVertex(x,y,hList[y*width+x]);		//same
-				vertex b = createVertex(x-1,y,hList[y*width+x-1]);
-				vertex c = createVertex(x-1,y+1,hList[(y+1)*width+x-1]);
-				addTriangle(createTriangle(a,c,b));
-				tc++;
+				if((int)hList[y*width+x]!=-100 & (int)hList[y*width+x-1]!=-100 & (int)hList[(y+1)*width+x-1]!=-100 ){
+					vertex a = createVertex(x,y,hList[y*width+x]);		//same
+					vertex b = createVertex(x-1,y,hList[y*width+x-1]);
+					vertex c = createVertex(x-1,y+1,hList[(y+1)*width+x-1]);
+					addTriangle(createTriangle(a,c,b));
+				}else{
+					triangleCount--;
+				}
 			}
 		}
 		for(int x = 1; x < width; x++){
-			vertex a = createVertex(x,height-1,hList[(height-1)*width+x]);		//same
-			vertex b = createVertex(x,height-2,hList[(height-2)*width+x]);
-			vertex c = createVertex(x-1,height-1,hList[(height-1)*width+x-1]);
-			addTriangle(createTriangle(a,c,b));
-			tc++;
+			if((int)hList[(height-1)*width+x]!=-100 & (int)hList[(height-2)*width+x]!=-100 & (int)hList[(height-1)*width+x-1]!=-100 ){
+				vertex a = createVertex(x,height-1,hList[(height-1)*width+x]);		//same
+				vertex b = createVertex(x,height-2,hList[(height-2)*width+x]);
+				vertex c = createVertex(x-1,height-1,hList[(height-1)*width+x-1]);
+				addTriangle(createTriangle(a,c,b));
+			}else{
+				triangleCount--;
+			}
 		}
+		out.seekp(80);
+		out.write((char *)&triangleCount,4);
 	}
-	cout << tc << "\n";
+	cout << triangleCount << "\n";
 }
 
 int main(int argc, char **argv)			//lat, long, res
@@ -185,7 +197,7 @@ int main(int argc, char **argv)			//lat, long, res
 	if(file.length()==6)file.insert(4,"0");
 	
 	file.append(".hgt");
-	file.insert(0,"../../hgt_files/");
+	file.insert(0,"./hgt_files/");
 	puts(file.c_str());
 	
 	//-------Find starting file index---------------
@@ -223,7 +235,7 @@ int main(int argc, char **argv)			//lat, long, res
 				h+= number[0]*256;
 				//rotate model to correct orientation
 				if(h<-11071){
-					h=-verticalscale*res*5;
+					h=-verticalscale*res*100;
 				}
 				hList[(39-y)*40+x] = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
 			}
