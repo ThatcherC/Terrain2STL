@@ -3,6 +3,16 @@ Terrain2STL
 
 A web-based service that converts publicly available HGT files to useful STL files.
 
+###To-Do List
+- [x] Make dataset voids not just a fixed negative value.
+- [ ] Make models watertight.
+- [ ] Increase maximum box size.
+- [ ] Fill voids in dataset.
+- [ ] Make the 3 arcsecond resolution available in all sizes.
+- [ ] Add ability to cross tiles.
+
+
+
 ###Descriptions of Files
 * /hgt_files
 
