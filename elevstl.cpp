@@ -240,7 +240,8 @@ int main(int argc, char **argv)			//lat, long, res
 					h=-verticalscale*res*100;
 				}
 				//rotate model to correct orientation
-				hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
+				//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
+				hList.at((height-1-y)*width+x) = h;
 			}
 		}
 	}
