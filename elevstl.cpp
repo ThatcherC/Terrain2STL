@@ -236,12 +236,12 @@ int main(int argc, char **argv)			//lat, long, res
 				}
 				h+= number[0]*256;
 				//If a void exists, marks it as -100
-				if(h<-1171){
+				if(h<-100){
 					h=-verticalscale*res*100;
 				}
 				//rotate model to correct orientation
 				//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
-				hList.at((height-1-y)*width+x) = h;
+				hList.at((height-1-y)*width+x) = h/(verticalscale);
 			}
 		}
 	}
