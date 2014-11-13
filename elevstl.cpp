@@ -107,7 +107,7 @@ void writeSTLfromArray(){
 		//write a placeholder number
 		out.write((char *)&triangleCount,4);
 		for(int c = 1; c < width; c++){
-			if((int)hList.at(c)!=-100 & (int)hList.at(c-1)!=-100 & (int)hList.at(c+width-1)!=-100 ){
+			if((int)hList.at(c)!=-99 & (int)hList.at(c-1)!=-99 & (int)hList.at(c+width-1)!=-99 ){
 				vertex a = createVertex(c, 0,hList.at(c));
 				vertex b = createVertex(c-1, 0,hList.at(c-1));
 				vertex d = createVertex(c-1, 1,hList.at(c+width-1));
@@ -124,7 +124,7 @@ void writeSTLfromArray(){
 		}
 		for(int y = 1; y < height-1; y++){
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)!=-100 & (int)hList.at((y-1)*width+x)!=-100 & (int)hList.at(y*width+x-1)!=-100 ){
+				if((int)hList.at(y*width+x)!=-99 & (int)hList.at((y-1)*width+x)!=-99 & (int)hList.at(y*width+x-1)!=-99 ){
 					vertex a = createVertex(x,y,hList.at(y*width+x));
 					vertex b = createVertex(x,y-1,hList.at((y-1)*width+x));
 					vertex c = createVertex(x-1,y,hList.at(y*width+x-1));
@@ -134,7 +134,7 @@ void writeSTLfromArray(){
 				}
 			}
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)!=-100 & (int)hList.at(y*width+x-1)!=-100 & (int)hList.at((y+1)*width+x-1)!=-100 ){
+				if((int)hList.at(y*width+x)!=-99 & (int)hList.at(y*width+x-1)!=-99 & (int)hList.at((y+1)*width+x-1)!=-99 ){
 					vertex a = createVertex(x,y,hList.at(y*width+x));		//same
 					vertex b = createVertex(x-1,y,hList.at(y*width+x-1));
 					vertex c = createVertex(x-1,y+1,hList.at((y+1)*width+x-1));
@@ -145,7 +145,7 @@ void writeSTLfromArray(){
 			}
 		}
 		for(int x = 1; x < width; x++){
-			if((int)hList.at((height-1)*width+x)!=-100 & (int)hList.at((height-2)*width+x)!=-100 & (int)hList.at((height-1)*width+x-1)!=-100 ){
+			if((int)hList.at((height-1)*width+x)!=-9 & (int)hList.at((height-2)*width+x)!=-99 & (int)hList.at((height-1)*width+x-1)!=99 ){
 				vertex a = createVertex(x,height-1,hList.at((height-1)*width+x));		//same
 				vertex b = createVertex(x,height-2,hList.at((height-2)*width+x));
 				vertex c = createVertex(x-1,height-1,hList.at((height-1)*width+x-1));
