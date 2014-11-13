@@ -94,7 +94,10 @@ string savefile = "stls/";
 void writeSTLfromArray(){
 	out.open(savefile.c_str(),ios_base::binary);
 
-	uint32_t triangleCount = (width-1)*(height-1)*2;	//number of facets in a void-free model
+	uint32_t triangleCount = (width-1)*(height-1)*2;	//number of facets in a void-free surface
+	triangleCount += 4*(width-1);	//triangle counts for the walls of the model
+	triangleCount += 4*(height-1);
+	triangleCount += 2; 			//base triangles
 	float planarScale = 40/width;
 
 	if(out.good()){
@@ -108,9 +111,15 @@ void writeSTLfromArray(){
 				vertex a = createVertex(c, 0,hList.at(c));
 				vertex b = createVertex(c-1, 0,hList.at(c-1));
 				vertex d = createVertex(c-1, 1,hList.at(c+width-1));
+				
+				vertex w = createVertex(c,0,0);				//used in model walls
+				vertex z = createVertex(c-1,0,0);
+				
 				addTriangle(createTriangle(a,d,b));
+				addTriangle(createTriangle(b,z,a));			//model walls
+				addTriangle(createTriangle(w,a,z));
 			}else{
-				triangleCount--;
+				triangleCount-=3;
 			}
 		}
 		for(int y = 1; y < height-1; y++){
@@ -140,11 +149,44 @@ void writeSTLfromArray(){
 				vertex a = createVertex(x,height-1,hList.at((height-1)*width+x));		//same
 				vertex b = createVertex(x,height-2,hList.at((height-2)*width+x));
 				vertex c = createVertex(x-1,height-1,hList.at((height-1)*width+x-1));
+				
+				vertex w = createVertex(x,height-1,0);		//used in model walls
+				vertex z = createVertex(x-1,height-1,0);
+				
 				addTriangle(createTriangle(a,c,b));
+				addTriangle(createTriangle(c,a,z));			//model walls
+				addTriangle(createTriangle(w,z,a));
 			}else{
-				triangleCount--;
+				triangleCount-=3;
 			}
 		}
+		
+		for(int y = 1; y < width; y++){						//adds walls in the y direction for
+			vertex st = createVertex(0,y,hList.at(y*width));		//for x=0 first
+			vertex sb = createVertex(0,y-1,hList.at((y-1)*width));
+			vertex bt = createVertex(0,y,0);
+			vertex bb = createVertex(0,y-1,0);
+			
+			addTriangle(createTriangle(bb,sb,st));
+			addTriangle(createTriangle(st,bt,bb));
+			
+			st = createVertex(width-1,y,hList.at(y*width+width-1));		//for x=width next
+			sb = createVertex(width-1,y-1,hList.at(y*width-1));
+			bt = createVertex(width-1,y,0);
+			bb = createVertex(width-1,y-1,0);
+			
+			addTriangle(createTriangle(sb,bb,st));
+			addTriangle(createTriangle(bt,st,bb));
+		}
+		
+		vertex origin = createVertex(0,0,0);
+		vertex bottomright = createVertex(width-1,0,0);
+		vertex topleft = createVertex(0,height-1,0);
+		vertex topright = createVertex(width-1,height-1,0);
+		addTriangle(createTriangle(origin,topright,bottomright));
+		addTriangle(createTriangle(origin,topleft,topright));
+		
+		
 		out.seekp(80);
 		out.write((char *)&triangleCount,4);
 	}
@@ -241,7 +283,7 @@ int main(int argc, char **argv)			//lat, long, res
 				}
 				//rotate model to correct orientation
 				//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
-				hList.at((height-1-y)*width+x) = h/(verticalscale);
+				hList.at((height-1-y)*width+x) = h/(verticalscale)+1; 	//+1 so that the bottom of the model does not bleed through to the top
 			}
 		}
 	}
