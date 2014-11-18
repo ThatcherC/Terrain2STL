@@ -6,15 +6,19 @@
 			body { height: 100%; margin: 0; padding: 0 }
 			#gmap { height: 100%; width: 70%; float:left}
 			#controlbox {width:25%; float: left; padding-top: 10;padding-left:10}
-			#downloadframe {height: 5%; width:25%; float: left;padding-left:10}
-			#errorbox {height: 10%; width:25%; float: left; padding-left:10}
+			#downloadframe {height: 1%; width:25%; float: left;padding-left:10}
+			#errorbox {height: 5%; width:25%; float: left; padding-left:10}
 			#inst {width:25%; float: left; padding-left:10}
+			#donations {width:25%; float: left; padding-left:10}
 		</style>
 		<script type="text/javascript"
 			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy89lQ2fSex7Te1CeMbr3Yf0iPycf3H9w">
 		</script>
 		<script type="text/javascript" src="/gmaps-gridlines.js"></script>
 		<script type = "text/javascript" src="/socket.io/socket.io.js"></script>
+		<script src="//printtopeer.io/api/print_button"></script>
+		<script src="http://coinwidget.com/widget/coin.js"></script>
+
 		<script type="text/javascript">
 			var map;
 			var gridlines;
@@ -121,34 +125,51 @@
 			google.maps.event.addDomListener(window, 'load', initializeMap);
 		</script>
 	</head>
-<body>
-<div id="gmap" width=600 height=450>Map didn't load</div>
-<div id="controlbox">
-<a style="width:25%;float:left" href="http://github.com/ThatcherC/Terrain2STL">Check this out on Github!</a>
-<h1>STL Generator</h1>
+	<body>
+		<div id="gmap" width=600 height=450>Map didn't load</div>
+		<div id="controlbox">
+		<a style="width:25%;float:left" href="http://github.com/ThatcherC/Terrain2STL">Check this out on Github!</a>
+		<h1>STL Generator</h1>
 
-<table>
-	<tr><td colspan=2>Northwest Corner Coordinates</td></tr>
-	<tr><td>Latitude:</td><td><input id="c-lat"></td></tr>
-	<tr><td>Longitude:</td><td><input id="c-lng"></td></tr>
-	<tr><td>Arc Seconds/</br>Division</td><td><input id="scaler" type="range" min="3" max="27" step="3" value="3" onchange="changeScale()"><div id="scaleLabel">3</div></td></tr>
-	<tr>
-		<td></td><td><button id="center-latlng" onclick="centerToView()">Center to View</button></td></tr>
-	<tr>
-		<td></td><td><button id="create" onclick="sendParameters()">Create STL File</button></td></tr>
-</table>
-</div>
-<p id="errorbox"></p>
-<div id="inst">
-	<h2 align='center'>Instructions</h2>
-	<ul>
-		<li>Select the area you want an STL of using the red box</li>
-		<li>'Center to View' will move the box. It's also draggable</li>
-		<li>The red box can't cross a major latitude or longitude line</li>
-		<li>Use the slider to change the box size</li>
-		<li>Voids in the dataset are shown as voids the STL</li>
-	</ul>
-</div>
-<iframe id='downloadframe' style="visibility:hidden"></iframe>
-</body>
+		<table>
+			<tr><td colspan=2>Northwest Corner Coordinates</td></tr>
+			<tr><td>Latitude:</td><td><input id="c-lat"></td></tr>
+			<tr><td>Longitude:</td><td><input id="c-lng"></td></tr>
+			<tr><td>Arc Seconds/</br>Division</td><td><input id="scaler" type="range" min="3" max="27" step="3" value="3" onchange="changeScale()"><div id="scaleLabel">3</div></td></tr>
+			<tr>
+				<td></td><td><button id="center-latlng" onclick="centerToView()">Center to View</button></td></tr>
+			<tr>
+				<td></td><td><button id="create" onclick="sendParameters()">Create STL File</button></td></tr>
+		</table>
+		</div>
+		</div>
+		<div id="errorbox"></div>
+		<div id="inst">
+			<h2 align='center'>Instructions</h2>
+			<ul>
+				<li>Select the area you want an STL of using the red box</li>
+				<li>'Center to View' will move the box. It's also draggable</li>
+				<li>The red box can't cross a major latitude or longitude line</li>
+				<li>Use the slider to change the box size</li>
+				<li>Voids in the dataset are shown as voids the STL</li>
+			</ul>
+		</div>
+		<div id="donations">
+			<h5 align="center">This website is free to use. Help support server costs, or just say thanks!</h5>
+			<script align="center">
+				CoinWidgetCom.go({
+					wallet_address: "1KXaAWojYq57SpHdVGMRMYiQ9F9m5AWKZv"
+					, currency: "bitcoin"
+					, counter: "count"
+					, alignment: "br"
+					, qrcode: false
+					, auto_show: false
+					, lbl_button: "Support Terrain2STL"
+					, lbl_address: "Bitcoin Address:"
+					, lbl_count: "donations"
+					, lbl_amount: "BTC"
+				});
+			</script>
+		<iframe id='downloadframe' style="visibility:hidden"></iframe>
+	</body>
 </html>
