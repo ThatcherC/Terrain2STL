@@ -22,7 +22,7 @@ function handler(req, res){
 		filename = "/stls"+req.url;
 		//next two lines come from: http://stackoverflow.com/a/7288883/2019017
 		res.setHeader('Content-disposition', 'attachment; filename=' + req.url.slice(1));
-		res.setHeader('Content-type', "application/octet-stream");
+		res.setHeader('Content-type', "application/sla");
 	}else if(req.url="favicon.ico"){
 		res.end();
 	}else{
