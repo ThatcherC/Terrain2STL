@@ -16,7 +16,6 @@
 		</script>
 		<script type="text/javascript" src="/gmaps-gridlines.js"></script>
 		<script type = "text/javascript" src="/socket.io/socket.io.js"></script>
-		<script src="//printtopeer.io/api/print_button"></script>
 		<script src="http://coinwidget.com/widget/coin.js"></script>
 
 		<script type="text/javascript">
@@ -32,13 +31,22 @@
 			var scaleLabel;
 			var savename;
 			
-			var socket = io("http://146.148.78.19");	//146.148.78.19
+			var socket = io("146.148.78.19");	//146.148.78.19
 			socket.on('download',function(data){
 				console.log(data.status);
+				var button = document.getElementById('my-print-button');
+				
 				if(data.status=='ready'){
 					document.getElementById('downloadframe').setAttribute('src',"/"+savename);
+					
+					button.setAttribute('data-print', "http://146.148.78.19/"+savename);
+					button.setAttribute('data-print-name', "TerrainModel");
+					button.style.visibility = 'visible';
 				}else{
 					document.getElementById('errorbox').innerText="Something went wrong... Are you spanning a grid line?";
+					button.setAttribute('data-print', "");
+					button.setAttribute('data-print-name', "");
+					button.style.visibility = 'hidden';
 				}
 			});
 			
@@ -143,10 +151,11 @@
 		</table>
 		</div>
 		</div>
+		<div id="my-print-button" class="printtopeer-print-button" style="visibility:hidden;"></div>
 		<div id="errorbox"></div>
 		<div id="inst">
 			<h2 align='center'>Instructions</h2>
-			<ul>
+			<ul style="margin-top:-20">
 				<li>Select the area you want an STL of using the red box</li>
 				<li>'Center to View' will move the box. It's also draggable</li>
 				<li>The red box can't cross a major latitude or longitude line</li>
@@ -155,7 +164,7 @@
 			</ul>
 		</div>
 		<div id="donations">
-			<h5 align="center">This website is free to use. Help support server costs, or just say thanks!</h5>
+			<h5 align="center"  style="margin-bottom:10; margin-top:0">This website is free to use. Help support server costs, or just say thanks!</h5>
 			<script align="center">
 				CoinWidgetCom.go({
 					wallet_address: "1KXaAWojYq57SpHdVGMRMYiQ9F9m5AWKZv"
@@ -172,4 +181,5 @@
 			</script>
 		<iframe id='downloadframe' style="visibility:hidden"></iframe>
 	</body>
+	<script src="//printtopeer.io/api/print_button"></script>
 </html>
