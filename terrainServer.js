@@ -1,5 +1,5 @@
 //Node server for hgt-to-stl program
-//Listens on port 8081
+//Listens on port 8080
 var app = require('http').createServer(handler)
 var io = require('socket.io')();
 var fs = require('fs');
