@@ -58,7 +58,7 @@
 					pButton.setAttribute('data-print-name', "TerrainModel");
 					pButton.style.visibility = 'visible';
 				}else{
-					document.getElementById('errorbox').innerText="Something went wrong... Are you spanning a grid line?";
+					alert("Something went wrong. You may be spanning a grid line.");
 					pButton.setAttribute('data-print', "");
 					pButton.setAttribute('data-print-name', "");
 					pButton.style.visibility = 'hidden';
@@ -137,7 +137,6 @@
 			}
 			
 			function sendParameters(){
-				document.getElementById('errorbox').innerText="";
 				savename = latBox.value+"_"+lngBox.value+"_"+scaleSlider.value+".stl";
 				var lat_param = parseFloat(latBox.value);
 				var lng_param = parseFloat(lngBox.value);
@@ -173,7 +172,6 @@
 		<div id="my-print-button" class="printtopeer-print-button" style="visibility:hidden;">
 			<a onclick="downloadSTL()" id="download-button">Download</a>
 		</div>
-		<div id="errorbox"></div>
 		<div id="inst">
 			<h2 align='center'>Instructions</h2>
 			<ul style="margin-top:-20">
