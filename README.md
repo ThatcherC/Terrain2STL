@@ -3,6 +3,18 @@ Terrain2STL
 
 A web-based service that converts publicly available HGT files to useful STL files.
 
+###Try it Out!
+This project is running on a Google Compute Engine server at [146.148.78.19](http://146.148.78.19/). It's updated soon after any commit to this repository. 
+
+You can also download everything here and start the server with: 
+
+```node terrainServer.js```
+
+It will run at localhost:8080.
+
+A few .HGT files are included, but not the whole set. You can get the rest from [the USGS](http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/), or I could send you few.
+
+
 ###To-Do List
 - [x] Make dataset voids not just a fixed negative value.
 - [x] Make models watertight.
