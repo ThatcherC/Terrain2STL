@@ -10,6 +10,23 @@
 			#errorbox {height: 5%; width:25%; float: left; padding-left:10}
 			#inst {width:25%; float: left; padding-left:10}
 			#donations {width:25%; float: right; padding-right:20}
+			#download-button { 
+				float:right;
+				display:inline-block; 
+				background-color: #1C86B6  ; 
+				color: white; 
+				text-decoration: none; 
+				border-radius: 9999px;
+				text-align: center;
+				padding: 14px 37px 14px 40px;
+				margin: 8px;
+				font-family: sans-serif;
+				font-size: 12pt;
+			}
+			#download-button:hover{
+				background-color: #065C82; 
+				color: white;
+			}
 		</style>
 		<script type="text/javascript"
 			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy89lQ2fSex7Te1CeMbr3Yf0iPycf3H9w">
@@ -34,19 +51,17 @@
 			var socket = io("146.148.78.19");	//146.148.78.19
 			socket.on('download',function(data){
 				console.log(data.status);
-				var button = document.getElementById('my-print-button');
+				var pButton = document.getElementById('my-print-button');
 				
 				if(data.status=='ready'){
-					document.getElementById('downloadframe').setAttribute('src',"/"+savename);
-					
-					button.setAttribute('data-print', "http://146.148.78.19/"+savename);
-					button.setAttribute('data-print-name', "TerrainModel");
-					button.style.visibility = 'visible';
+					pButton.setAttribute('data-print', "http://146.148.78.19/"+savename);
+					pButton.setAttribute('data-print-name', "TerrainModel");
+					pButton.style.visibility = 'visible';
 				}else{
 					document.getElementById('errorbox').innerText="Something went wrong... Are you spanning a grid line?";
-					button.setAttribute('data-print', "");
-					button.setAttribute('data-print-name', "");
-					button.style.visibility = 'hidden';
+					pButton.setAttribute('data-print', "");
+					pButton.setAttribute('data-print-name', "");
+					pButton.style.visibility = 'hidden';
 				}
 			});
 			
@@ -130,6 +145,10 @@
 							'scale':scaleSlider.value,'name':savename});
 			}
 			
+			function downloadSTL(){
+				document.getElementById('downloadframe').setAttribute('src',"/"+savename);
+			}
+			
 			google.maps.event.addDomListener(window, 'load', initializeMap);
 		</script>
 	</head>
@@ -151,7 +170,9 @@
 		</table>
 		</div>
 		</div>
-		<div id="my-print-button" class="printtopeer-print-button" style="visibility:hidden;"></div>
+		<div id="my-print-button" class="printtopeer-print-button" style="visibility:hidden;">
+			<a onclick="downloadSTL()" id="download-button">Download</a>
+		</div>
 		<div id="errorbox"></div>
 		<div id="inst">
 			<h2 align='center'>Instructions</h2>

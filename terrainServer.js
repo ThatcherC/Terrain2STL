@@ -4,6 +4,7 @@ var app = require('http').createServer(handler)
 var io = require('socket.io')();
 var fs = require('fs');
 var exec = require('child_process').exec;
+var config = require('./config');
 
 var router = {};
 router['/'] = '/terrain2stl.html';
@@ -17,6 +18,7 @@ function handler(req, res){
 	//add an about page?
 	var filename;
 	if(router[req.url]!=null){
+		if(config.logRequests & req.url=='/'){fs.appendFile(config.requestLogPath,req.connection.remoteAddress+"\t"+new Date().toString()+"\n");}
 		filename = router[req.url];
 	}else if(req.url.slice(-4)=='.stl'){
 		filename = "/stls"+req.url;
@@ -49,6 +51,7 @@ io.on('connection',function(socket){
 			if(stderr==""){
 				console.log("No errors");
 				socket.emit('download',{'status':'ready'});
+				if(config.logParams){fs.appendFile(config.paramLogPath,params.lat+"\t"+params.lng+"\t"+params.scale+"\n");}
 			}else{
 				socket.emit('download',{'status':'failed'});
 			};
