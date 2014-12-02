@@ -23,7 +23,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [ ] Fill voids in dataset.
 - [x] Make the 3 arcsecond resolution available in all sizes.
 - [ ] Add ability to cross tiles.
-- [ ] Make Print and Download buttons disappear or defocus when the selection box is moved
+- [x] Make Print and Download buttons disappear or defocus when the selection box is moved
 - [ ] Make the selection box reflect changes in the Lat/Long boxes 
 
 

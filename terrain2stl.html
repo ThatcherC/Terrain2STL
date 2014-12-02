@@ -120,6 +120,8 @@
 				//for some reason, .getNorthEast() returns the coordinates of the NW corner
 				latBox.value = rectangle.getBounds().getSouthWest().lat().toFixed(4);
 				lngBox.value = rectangle.getBounds().getSouthWest().lng().toFixed(4);
+				var pButton = document.getElementById('my-print-button');			//hide download and print buttons
+				pButton.style.visibility = 'hidden';
 			}
 			
 			function postZoom(){
