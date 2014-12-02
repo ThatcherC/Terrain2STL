@@ -107,7 +107,7 @@ void writeSTLfromArray(){
 		//write a placeholder number
 		out.write((char *)&triangleCount,4);
 		for(int c = 1; c < width; c++){
-			if((int)hList.at(c)!=-99 & (int)hList.at(c-1)!=-99 & (int)hList.at(c+width-1)!=-99 ){
+			if((int)hList.at(c)>-50 & (int)hList.at(c-1)>-50 & (int)hList.at(c+width-1)>-50 ){
 				vertex a = createVertex(c, 0,hList.at(c));
 				vertex b = createVertex(c-1, 0,hList.at(c-1));
 				vertex d = createVertex(c-1, 1,hList.at(c+width-1));
@@ -124,7 +124,7 @@ void writeSTLfromArray(){
 		}
 		for(int y = 1; y < height-1; y++){
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)!=-99 & (int)hList.at((y-1)*width+x)!=-99 & (int)hList.at(y*width+x-1)!=-99 ){
+				if((int)hList.at(y*width+x)>-50 & (int)hList.at((y-1)*width+x)>-50 & (int)hList.at(y*width+x-1)>-50 ){
 					vertex a = createVertex(x,y,hList.at(y*width+x));
 					vertex b = createVertex(x,y-1,hList.at((y-1)*width+x));
 					vertex c = createVertex(x-1,y,hList.at(y*width+x-1));
@@ -134,7 +134,7 @@ void writeSTLfromArray(){
 				}
 			}
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)!=-99 & (int)hList.at(y*width+x-1)!=-99 & (int)hList.at((y+1)*width+x-1)!=-99 ){
+				if((int)hList.at(y*width+x)>-50 & (int)hList.at(y*width+x-1)>-50 & (int)hList.at((y+1)*width+x-1)>-50 ){
 					vertex a = createVertex(x,y,hList.at(y*width+x));		//same
 					vertex b = createVertex(x-1,y,hList.at(y*width+x-1));
 					vertex c = createVertex(x-1,y+1,hList.at((y+1)*width+x-1));
@@ -145,7 +145,7 @@ void writeSTLfromArray(){
 			}
 		}
 		for(int x = 1; x < width; x++){
-			if((int)hList.at((height-1)*width+x)!=-9 & (int)hList.at((height-2)*width+x)!=-99 & (int)hList.at((height-1)*width+x-1)!=99 ){
+			if((int)hList.at((height-1)*width+x)>-50 & (int)hList.at((height-2)*width+x)>-50 & (int)hList.at((height-1)*width+x-1)>-50){
 				vertex a = createVertex(x,height-1,hList.at((height-1)*width+x));		//same
 				vertex b = createVertex(x,height-2,hList.at((height-2)*width+x));
 				vertex c = createVertex(x-1,height-1,hList.at((height-1)*width+x-1));
@@ -161,31 +161,42 @@ void writeSTLfromArray(){
 			}
 		}
 		
+		vertex st;
+		vertex sb;
+		vertex bt;
+		vertex bb;
 		for(int y = 1; y < width; y++){						//adds walls in the y direction for
-			vertex st = createVertex(0,y,hList.at(y*width));		//for x=0 first
-			vertex sb = createVertex(0,y-1,hList.at((y-1)*width));
-			vertex bt = createVertex(0,y,0);
-			vertex bb = createVertex(0,y-1,0);
-			
-			addTriangle(createTriangle(bb,sb,st));
-			addTriangle(createTriangle(st,bt,bb));
-			
-			st = createVertex(width-1,y,hList.at(y*width+width-1));		//for x=width next
-			sb = createVertex(width-1,y-1,hList.at(y*width-1));
-			bt = createVertex(width-1,y,0);
-			bb = createVertex(width-1,y-1,0);
-			
-			addTriangle(createTriangle(sb,bb,st));
-			addTriangle(createTriangle(bt,st,bb));
+			if((int)hList.at(y*width)>-50 & (int)hList.at((y-1)*width)>-50){
+				st = createVertex(0,y,hList.at(y*width));			//for x=0 first
+				sb = createVertex(0,y-1,hList.at((y-1)*width));
+				bt = createVertex(0,y,0);
+				bb = createVertex(0,y-1,0);
+				
+				addTriangle(createTriangle(bb,sb,st));
+				addTriangle(createTriangle(st,bt,bb));
+			}else{
+				triangleCount-=2;
+			}
+			if((int)hList.at(y*width+width-1)>-50 & (int)hList.at(y*width-1)>-50){
+				st = createVertex(width-1,y,hList.at(y*width+width-1));		//for x=width next
+				sb = createVertex(width-1,y-1,hList.at(y*width-1));
+				bt = createVertex(width-1,y,0);
+				bb = createVertex(width-1,y-1,0);
+				
+				addTriangle(createTriangle(sb,bb,st));
+				addTriangle(createTriangle(bt,st,bb));
+			}else{
+				triangleCount-=2;
+			}
 		}
 		
-		vertex origin = createVertex(0,0,0);
+		vertex origin = createVertex(0,0,0);					//create bottom surface
 		vertex bottomright = createVertex(width-1,0,0);
 		vertex topleft = createVertex(0,height-1,0);
 		vertex topright = createVertex(width-1,height-1,0);
 		addTriangle(createTriangle(origin,topright,bottomright));
 		addTriangle(createTriangle(origin,topleft,topright));
-		
+		//triangleCount-=2;
 		
 		out.seekp(80);
 		out.write((char *)&triangleCount,4);

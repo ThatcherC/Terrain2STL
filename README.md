@@ -18,7 +18,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 ###To-Do List
 - [x] Make dataset voids not just a fixed negative value.
 - [x] Make models watertight.
-  - [ ] Fix voids in edges of models
+  - [x] Fix voids in edges of models
 - [ ] Increase maximum box size.
 - [ ] Fill voids in dataset.
 - [x] Make the 3 arcsecond resolution available in all sizes.
