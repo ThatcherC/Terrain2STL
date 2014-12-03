@@ -18,14 +18,15 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 ###To-Do List
 - [x] Make dataset voids not just a fixed negative value.
 - [x] Make models watertight.
-  - [ ] Fix voids in edges of models
-- [ ] Increase maximum box size.
+  - [x] Fix voids in edges of models
+- [x] Increase maximum box size.
 - [ ] Fill voids in dataset.
 - [x] Make the 3 arcsecond resolution available in all sizes.
 - [ ] Add ability to cross tiles.
-- [ ] Make Print and Download buttons disappear or defocus when the selection box is moved
+- [x] Make Print and Download buttons disappear or defocus when the selection box is moved
 - [ ] Make the selection box reflect changes in the Lat/Long boxes 
-
+- [ ] Decide on a maximum file size and/or compression
+  - [ ] Add a resolution slider
 
 ###Descriptions of Files
 * /hgt_files
