@@ -11,11 +11,12 @@ router['/'] = '/terrain2stl.html';
 router['/index.html'] = '/terrain2stl.html';
 router['/gmaps-gridlines.js'] = '/gmaps-gridlines.js';
 
-app.listen(8080);
+app.listen(8081);
 io.listen(app);
 
 function handler(req, res){
 	//add an about page?
+	console.log(req.url);
 	var filename;
 	if(router[req.url]!=null){
 		if(config.logRequests & req.url=='/'){fs.appendFile(config.requestLogPath,req.connection.remoteAddress+"\t"+new Date().toString()+"\n");}
