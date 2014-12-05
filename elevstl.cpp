@@ -204,7 +204,7 @@ void writeSTLfromArray(){
 	cout << triangleCount << "\n";
 }
 
-int main(int argc, char **argv)			//lat, long, res
+int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHeight
 {
 	string file;
 	int point;
@@ -213,6 +213,8 @@ int main(int argc, char **argv)			//lat, long, res
 	int res;
 	int tile_n;
 	int tile_w;
+	int waterDrop = -2;			//millimeters
+	int baseHeight = 2;			//millimeters
 	//float true_verticalscale = 92.7;	//meters/arcsecond at equator
 	float verticalscale = 23.2;			//true_verticalscale gives models that are too flat to be interesting
 	
@@ -233,6 +235,9 @@ int main(int argc, char **argv)			//lat, long, res
 	
 	savefile.append(std::string(argv[4]));
 	printf("Saving to '%s'\n",savefile.c_str());
+	
+	waterDrop = atoi(argv[5]);
+	baseHeight = atoi(argv[6]);
 	
 	//-------get correct tile-------------------
 	if(lat>=0){								//Positive is north
@@ -288,13 +293,18 @@ int main(int argc, char **argv)			//lat, long, res
 					h = h+255;
 				}
 				h+= number[0]*256;
+				
+				if(h==0){
+					h=-waterDrop*verticalscale;
+				}
+				
 				//If a void exists, marks it as -100
 				if(h<-100){
 					h=-verticalscale*100;
 				}
 				//rotate model to correct orientation
 				//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
-				hList.at((height-1-y)*width+x) = h/(verticalscale)+1; 	//+1 so that the bottom of the model does not bleed through to the top
+				hList.at((height-1-y)*width+x) = h/(verticalscale)+baseHeight; 	//+baseHeight so that the bottom of the model does not bleed through to the top
 			}
 		}
 	}
