@@ -16,7 +16,6 @@ io.listen(app);
 
 function handler(req, res){
 	//add an about page?
-	console.log(req.url);
 	var filename;
 	if(router[req.url]!=null){
 		if(config.logRequests & req.url=='/'){fs.appendFile(config.requestLogPath,req.connection.remoteAddress+"\t"+new Date().toString()+"\n");}
@@ -47,7 +46,8 @@ function handler(req, res){
 
 io.on('connection',function(socket){
 	socket.on('parameters',function(params){
-		exec("./elevstl "+params.lat+" "+params.lng+" "+params.scale+" "+params.name,function(error,stdout,stderr){
+		exec("./elevstl "+params.lat+" "+params.lng+" "+params.scale+" "+params.name+
+				" "+params.waterDrop+" "+params.baseHeight ,function(error,stdout,stderr){
 			console.log(stderr||"STL created");
 			if(stderr==""){
 				console.log("No errors");
