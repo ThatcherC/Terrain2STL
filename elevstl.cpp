@@ -257,7 +257,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	if(file.length()==6)file.insert(4,"0");
 	
 	file.append(".hgt");
-	file.insert(0,"./hgt_files/");
+	file.insert(0,"../Terrain2STL/hgt_files/");
 	puts(file.c_str());
 	
 	//-------Find starting file index---------------
