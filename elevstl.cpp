@@ -103,7 +103,7 @@ void addTriangle(triangle t){
 
 int width = 40;		//default width and length of model
 int height = 40;
-float thickness = 2;
+float thickness = 0;
 vector<float> hList;
 
 string savefile = "stls/";
@@ -112,8 +112,10 @@ float baseheight(float below)
 {
 	if (crust)
 		return below - thickness;
-	else
+	else if (thickness)
 		return minheight - thickness;
+	else
+		return 0;
 }
 
 vertex createVertexBelow(vertex v)
@@ -232,10 +234,10 @@ void writeSTLfromArray(){
 		}
 
 		if(!crust){
-			vertex origin = createVertex(0,0,0);
-			vertex bottomright = createVertex(width-1,0,0);
-			vertex topleft = createVertex(0,height-1,0);
-			vertex topright = createVertex(width-1,height-1,0);
+			vertex origin = createVertex(0,0,minheight);
+			vertex bottomright = createVertex(width-1,0,minheight);
+			vertex topleft = createVertex(0,height-1,minheight);
+			vertex topright = createVertex(width-1,height-1,minheight);
 			addTriangle(createTriangle(origin,topright,bottomright));
 			addTriangle(createTriangle(origin,topleft,topright));
 		}
@@ -308,6 +310,8 @@ int main(int argc, const char **argv)			//lat, long, res, outfile
 			exit(0);
 		}
 	}
+	if (crust && !thickness)
+		thickness = 2;
 	res = res/3;							//SRTM data already has a resolution of 3 arcseconds
 	printf("Using resolution %i\n",res);	//Arc
 
@@ -386,15 +390,24 @@ int main(int argc, const char **argv)			//lat, long, res, outfile
 			for(int x = 0; x < width; x++){
                                 int index = (height-1-y)*width+x;
                                 h = hList.at(index);
-                                if (h == -99 && x && y)
+                                if (h == -99)
                                 {
 					// Ideally you would take average of surrounding 4 (or 8) non-void points
 					// This actually only looks at previous x/y (which are already corrected).
-					// Will go a bit wrong if you are unlucky enough to have a void when x or y is zero.
-					h = (hList.at(index-1) + hList.at(index+width))/2;
+					// Will go a bit wrong if you are unlucky enough to have a void when x and y is zero.
+					if (x && y)
+						h = (hList.at(index-1) + hList.at(index+width))/2;
+					else if (x)
+						h = hList.at(index-1);
+					else if (y)
+						h = hList.at(index+width);
+					else{
+						printf("Missing data at NW corner - aborting\n");
+						exit(0);
+					}
 					hList.at(index) = h;
 				}
-				if (h != -99 && h < minheight)
+				if (h < minheight)
 					minheight = h;
 			}
 		}
