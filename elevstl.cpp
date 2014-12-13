@@ -105,6 +105,11 @@ int width = 40;		//default width and length of model
 int height = 40;
 float thickness = 0;
 vector<float> hList;
+ifstream tiles[4];
+int ytiles;
+int xtiles;
+float lat;
+float lng;
 
 string savefile = "stls/";
 
@@ -266,15 +271,44 @@ const char ** checkOption(const char *arg, const char **argv)
 	return argv; 
 }
 
+void checkOpen(int tilex, int tiley)
+{
+	int tidx = tilex + tiley*ytiles;
+	if (tiles[tidx].is_open())
+		return;
+	string file;
+        //-------get correct tile-------------------
+        float tlat = lat - tiley;
+	float tlng = lng + tilex;
+        if(tlat>=0){                                                             //Positive is north
+                file = "N";
+        }else{
+                file = "S";
+        }
+        file.append( to_string( abs( (int)floor(tlat) ) ) );
+        if(file.length()==2) file.insert(1,"0");
+        if(tlng>=0){                                                             //Positive is east
+                file.append("E");
+        }else{
+                file.append("W");
+        }
+        file.append( to_string( abs( (int)floor(tlng) ) ) );
+        if(file.length()==5)file.insert(4,"00");
+        if(file.length()==6)file.insert(4,"0");
+
+        file.append(".hgt");
+        file.insert(0,"./hgt_files/");
+	printf("Opening %s\n",file.c_str());
+        tiles[tidx].open(file.c_str(),ios::in|ios::binary);
+        if (!tiles[tidx].is_open()){
+                printf ("Error opening file %s", file.c_str());
+		exit(0);
+	}
+}
+
 int main(int argc, const char **argv)			//lat, long, res, outfile
 {
-	string file;
-	int point;
-	float lat;
-	float lng;
 	int res;
-	int tile_n;
-	int tile_w;
 	if(argc < 5){
 		printf("Not enough arguents\n");
 		exit(0);
@@ -323,27 +357,6 @@ int main(int argc, const char **argv)			//lat, long, res, outfile
 	width = 40*res / longscale;
 	hList.resize(width*height,0);
 	
-	//-------get correct tile-------------------
-	if(lat>=0){								//Positive is north
-		file = "N";
-	}else{
-		file = "S";
-	}
-	file.append( to_string( abs( (int)floor(lat) ) ) );
-	if(file.length()==2) file.insert(1,"0");
-	if(lng>=0){								//Positive is east
-		file.append("E");
-	}else{
-		file.append("W");
-	}
-	file.append( to_string( abs( (int)floor(lng) ) ) );
-	if(file.length()==5)file.insert(4,"00");
-	if(file.length()==6)file.insert(4,"0");
-	
-	file.append(".hgt");
-	file.insert(0,"./hgt_files/");
-	puts(file.c_str());
-	
 	//-------Find starting file index---------------
 	float n = (lat-floor(lat))*3600;
 	float e = (lng-floor(lng))*3600;
@@ -351,68 +364,63 @@ int main(int argc, const char **argv)			//lat, long, res, outfile
 	int i = 1201-(int)(n/(3));
 	int j = (int)(e/(3));
 	
-	if(i+height>1201){
-		perror("Error in y");
-	}
-	if(j+width>1201){
-		perror("Error in x");
-	}
-	
-	point = j+i*1201;						//the file index of the NW corner
-
 	//------------Open file and read data into array----------------------------
-	ifstream tile;
-	tile.open(file.c_str(),ios::in|ios::binary);
 	int h;
-	if (!tile.is_open()){
-		perror ("Error opening file");
-	}else{
-		char number [2];
-		for(int y = 0; y < height; y++){
-			for(int x = 0; x < width; x++){
-				tile.seekg((point+x+y*1201)*2,ios::beg);
-				tile.read(number,2);
-				h = number[1];
-				if(h<0){
-					h = h+255;
-				}
-				h+= number[0]*256;
-				//If a void exists, marks it as -100
-				if(h<-100){
-					h=-verticalscale*100;
-				}
-				//rotate model to correct orientation
-				//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
-				hList.at((height-1-y)*width+x) = h/(verticalscale)+1;   //+1 so that the bottom of the model does not bleed through to the top
+	ytiles = (i+height) / 1200;
+	xtiles = (j+width) / 1200;
+	//tiles.resize(ytiles*xtiles);
+	char number [2];
+	for(int y = i; y < i+height; y++){
+		int tiley = y / 1200;
+		int coly = y % 1200;
+		int hy = y - i;
+		for(int x = j; x < j+width; x++) {
+			int tilex = x / 1200;
+			int colx = x % 1200;
+			int hx = x - j;
+			checkOpen(tilex, tiley);
+			tiles[tiley*ytiles+tilex].seekg((colx+coly*1201)*2,ios::beg);
+			tiles[tiley*ytiles+tilex].read(number,2);
+			h = number[1];
+			if(h<0){
+				h = h+255;
 			}
-		}
-		for(int y = 0; y < height; y++){
-			for(int x = 0; x < width; x++){
-                                int index = (height-1-y)*width+x;
-                                h = hList.at(index);
-                                if (h == -99)
-                                {
-					// Ideally you would take average of surrounding 4 (or 8) non-void points
-					// This actually only looks at previous x/y (which are already corrected).
-					// Will go a bit wrong if you are unlucky enough to have a void when x and y is zero.
-					if (x && y)
-						h = (hList.at(index-1) + hList.at(index+width))/2;
-					else if (x)
-						h = hList.at(index-1);
-					else if (y)
-						h = hList.at(index+width);
-					else{
-						printf("Missing data at NW corner - aborting\n");
-						exit(0);
-					}
-					hList.at(index) = h;
-				}
-				if (h < minheight)
-					minheight = h;
+			h+= number[0]*256;
+			//If a void exists, marks it as -100
+			if(h<-100){
+				h=-verticalscale*100;
 			}
+			//rotate model to correct orientation
+			//hList.at((height-1-hy)*width+hx) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
+			hList.at((height-1-hy)*width+hx) = h/(verticalscale)+1;   //+1 so that the bottom of the model does not bleed through to the top
 		}
 	}
-	tile.close();
+	for(int y = 0; y < height; y++){
+		for(int x = 0; x < width; x++){
+			int index = (height-1-y)*width+x;
+			h = hList.at(index);
+			if (h == -99)
+			{
+				// Ideally you would take average of surrounding 4 (or 8) non-void points
+				// This actually only looks at previous x/y (which are already corrected).
+				// Will go a bit wrong if you are unlucky enough to have a void when x and y is zero.
+				if (x && y)
+					h = (hList.at(index-1) + hList.at(index+width))/2;
+				else if (x)
+					h = hList.at(index-1);
+				else if (y)
+					h = hList.at(index+width);
+				else{
+					printf("Missing data at NW corner - aborting\n");
+					exit(0);
+				}
+				hList.at(index) = h;
+			}
+			if (h < minheight)
+				minheight = h;
+		}
+	}
+	// tile.close();
 	writeSTLfromArray();
 	return 0;
 }
