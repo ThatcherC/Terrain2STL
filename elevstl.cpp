@@ -27,6 +27,8 @@ struct triangle{
 
 char endTag[2] = {0,0};
 ofstream out;
+float longscale = 1.0;
+bool vertical;
 
 //Determines the normal vector of a triangle from three vertices
 vertex normalOf(vertex p1, vertex p2, vertex p3){
@@ -46,14 +48,27 @@ vertex normalOf(vertex p1, vertex p2, vertex p3){
 //Creates a vertex from x, y, and z coordinates
 vertex createVertex(float x, float y, float z){
 	vertex v;
-	v.x =x;
+	v.x = x * longscale;
 	v.y = y;
 	v.z = z;
 	return v;
 }
 
+vertex rotateVertex(vertex v){
+	if (!vertical)
+		return v;
+	vertex r;
+	r.x = -v.z;
+	r.y = v.y;
+	r.z = v.x;
+	return r;
+}
+
 //Creates a triangle and its normal vector from three vertices
-triangle createTriangle(vertex j, vertex k, vertex l){
+triangle createTriangle(vertex _j, vertex _k, vertex _l){
+	vertex j = rotateVertex(_j);
+	vertex k = rotateVertex(_k);
+	vertex l = rotateVertex(_l);
 	triangle t;
 	t.a = j;
 	t.b = k;
@@ -86,9 +101,27 @@ void addTriangle(triangle t){
 
 int width = 40;		//default width and length of model
 int height = 40;
+float thickness = 2;
 vector<float> hList;
 
 string savefile = "stls/";
+
+float baseheight(float below)
+{
+	if (vertical)
+		return below - thickness;
+	else
+		return 0;
+}
+
+vertex createVertexBelow(vertex v)
+{
+	vertex r;
+	r.x = v.x;
+	r.y = v.y;
+	r.z = baseheight(v.z);
+	return r;
+}
 
 //Takes a height array height array of variable length and turns it into an STL file
 void writeSTLfromArray(){
@@ -97,7 +130,10 @@ void writeSTLfromArray(){
 	uint32_t triangleCount = (width-1)*(height-1)*2;	//number of facets in a void-free surface
 	triangleCount += 4*(width-1);	//triangle counts for the walls of the model
 	triangleCount += 4*(height-1);
-	triangleCount += 2; 			//base triangles
+	if (vertical)
+		triangleCount += (width-1)*(height-1)*2;	//For bottom surface
+	else
+		triangleCount += 2; 			//base triangles
 	float planarScale = 40/width;
 
 	if(out.good()){
@@ -112,8 +148,8 @@ void writeSTLfromArray(){
 				vertex b = createVertex(c-1, 0,hList.at(c-1));
 				vertex d = createVertex(c-1, 1,hList.at(c+width-1));
 				
-				vertex w = createVertex(c,0,0);				//used in model walls
-				vertex z = createVertex(c-1,0,0);
+				vertex w = createVertexBelow(a);			//used in model walls
+				vertex z = createVertexBelow(b);
 				
 				addTriangle(createTriangle(a,d,b));
 				addTriangle(createTriangle(b,z,a));			//model walls
@@ -129,8 +165,15 @@ void writeSTLfromArray(){
 					vertex b = createVertex(x,y-1,hList.at((y-1)*width+x));
 					vertex c = createVertex(x-1,y,hList.at(y*width+x-1));
 					addTriangle(createTriangle(a,c,b));
+
+					if(vertical){
+						vertex a1 = createVertexBelow(a);
+						vertex b1 = createVertexBelow(b);
+						vertex c1 = createVertexBelow(c);
+						addTriangle(createTriangle(a1,b1,c1));
+					}
 				}else{
-					triangleCount--;
+					triangleCount-=vertical?2:1;
 				}
 			}
 			for(int x = 1; x < width; x++){
@@ -139,19 +182,26 @@ void writeSTLfromArray(){
 					vertex b = createVertex(x-1,y,hList.at(y*width+x-1));
 					vertex c = createVertex(x-1,y+1,hList.at((y+1)*width+x-1));
 					addTriangle(createTriangle(a,c,b));
+
+					if(vertical){
+						vertex a1 = createVertexBelow(a);
+						vertex b1 = createVertexBelow(b);
+						vertex c1 = createVertexBelow(c);
+						addTriangle(createTriangle(a1,b1,c1));
+					}
 				}else{
-					triangleCount--;
+					triangleCount-=vertical?2:1;
 				}
 			}
 		}
 		for(int x = 1; x < width; x++){
-			if((int)hList.at((height-1)*width+x)!=-9 & (int)hList.at((height-2)*width+x)!=-99 & (int)hList.at((height-1)*width+x-1)!=99 ){
+			if((int)hList.at((height-1)*width+x)!=-99 & (int)hList.at((height-2)*width+x)!=-99 & (int)hList.at((height-1)*width+x-1)!=99 ){
 				vertex a = createVertex(x,height-1,hList.at((height-1)*width+x));		//same
 				vertex b = createVertex(x,height-2,hList.at((height-2)*width+x));
 				vertex c = createVertex(x-1,height-1,hList.at((height-1)*width+x-1));
 				
-				vertex w = createVertex(x,height-1,0);		//used in model walls
-				vertex z = createVertex(x-1,height-1,0);
+				vertex w = createVertexBelow(a);		//used in model walls
+				vertex z = createVertexBelow(c);
 				
 				addTriangle(createTriangle(a,c,b));
 				addTriangle(createTriangle(c,a,z));			//model walls
@@ -161,32 +211,32 @@ void writeSTLfromArray(){
 			}
 		}
 		
-		for(int y = 1; y < width; y++){						//adds walls in the y direction for
+		for(int y = 1; y < height; y++){						//adds walls in the y direction for
 			vertex st = createVertex(0,y,hList.at(y*width));		//for x=0 first
 			vertex sb = createVertex(0,y-1,hList.at((y-1)*width));
-			vertex bt = createVertex(0,y,0);
-			vertex bb = createVertex(0,y-1,0);
+			vertex bt = createVertexBelow(st);
+			vertex bb = createVertexBelow(sb);
 			
 			addTriangle(createTriangle(bb,sb,st));
 			addTriangle(createTriangle(st,bt,bb));
 			
 			st = createVertex(width-1,y,hList.at(y*width+width-1));		//for x=width next
 			sb = createVertex(width-1,y-1,hList.at(y*width-1));
-			bt = createVertex(width-1,y,0);
-			bb = createVertex(width-1,y-1,0);
+			bt = createVertexBelow(st);
+			bb = createVertexBelow(sb);
 			
 			addTriangle(createTriangle(sb,bb,st));
 			addTriangle(createTriangle(bt,st,bb));
 		}
-		
-		vertex origin = createVertex(0,0,0);
-		vertex bottomright = createVertex(width-1,0,0);
-		vertex topleft = createVertex(0,height-1,0);
-		vertex topright = createVertex(width-1,height-1,0);
-		addTriangle(createTriangle(origin,topright,bottomright));
-		addTriangle(createTriangle(origin,topleft,topright));
-		
-		
+
+		if(!vertical){
+			vertex origin = createVertex(0,0,0);
+			vertex bottomright = createVertex(width-1,0,0);
+			vertex topleft = createVertex(0,height-1,0);
+			vertex topright = createVertex(width-1,height-1,0);
+			addTriangle(createTriangle(origin,topright,bottomright));
+			addTriangle(createTriangle(origin,topleft,topright));
+		}
 		out.seekp(80);
 		out.write((char *)&triangleCount,4);
 	}
@@ -214,12 +264,17 @@ int main(int argc, char **argv)			//lat, long, res
 		printf("Bad resolution\n");
 		return 0;
 	}
+	vertical = true;
 	res = res/3;							//SRTM data already has a resolution of 3 arcseconds
 	printf("Using resolution %i\n",res);	//Arc
-	height = 40*res;
-	width = 40*res;
+
+        // Mathematical expression: Length of a degree of longitude = cos(latitude) * 111.325 kilometers
+        longscale = cos(lat*0.0174532925199433);   // ratio of long to lat
+        printf ("Longitude scaling factor (at NW corner): %f\n", longscale);
+
+	height = 40*res; 
+	width = 40*res / longscale;
 	hList.resize(width*height,0);
-	
 	savefile.append(std::string(argv[4]));
 	printf("Saving to '%s'\n",savefile.c_str());
 	
@@ -284,6 +339,20 @@ int main(int argc, char **argv)			//lat, long, res
 				//rotate model to correct orientation
 				//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
 				hList.at((height-1-y)*width+x) = h/(verticalscale)+1; 	//+1 so that the bottom of the model does not bleed through to the top
+			}
+		}
+		for(int y = 0; y < height; y++){
+			for(int x = 0; x < width; x++){
+                                int index = (height-1-y)*width+x;
+                                h = hList.at(index);
+                                if (h == -99 && x && y)
+                                {
+					// Ideally you would take average of surrounding 4 (or 8) non-void points
+					// This actually only looks at previous x/y (which are already corrected).
+					// Will go a bit wrong if you are unlucky enough to have a void when x or y is zero.
+					h = (hList.at(index-1) + hList.at(index+width))/2;
+					hList.at(index) = h;
+				}
 			}
 		}
 	}
