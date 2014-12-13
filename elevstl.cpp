@@ -29,7 +29,9 @@ char endTag[2] = {0,0};
 ofstream out;
 float longscale = 1.0;
 bool vertical;
-
+bool crust;
+float minheight = 1e30;
+;
 //Determines the normal vector of a triangle from three vertices
 vertex normalOf(vertex p1, vertex p2, vertex p3){
 	vertex u,v,r;
@@ -108,10 +110,10 @@ string savefile = "stls/";
 
 float baseheight(float below)
 {
-	if (vertical)
+	if (crust)
 		return below - thickness;
 	else
-		return 0;
+		return minheight - thickness;
 }
 
 vertex createVertexBelow(vertex v)
@@ -130,7 +132,7 @@ void writeSTLfromArray(){
 	uint32_t triangleCount = (width-1)*(height-1)*2;	//number of facets in a void-free surface
 	triangleCount += 4*(width-1);	//triangle counts for the walls of the model
 	triangleCount += 4*(height-1);
-	if (vertical)
+	if (crust)
 		triangleCount += (width-1)*(height-1)*2;	//For bottom surface
 	else
 		triangleCount += 2; 			//base triangles
@@ -166,14 +168,14 @@ void writeSTLfromArray(){
 					vertex c = createVertex(x-1,y,hList.at(y*width+x-1));
 					addTriangle(createTriangle(a,c,b));
 
-					if(vertical){
+					if(crust){
 						vertex a1 = createVertexBelow(a);
 						vertex b1 = createVertexBelow(b);
 						vertex c1 = createVertexBelow(c);
 						addTriangle(createTriangle(a1,b1,c1));
 					}
 				}else{
-					triangleCount-=vertical?2:1;
+					triangleCount-=crust?2:1;
 				}
 			}
 			for(int x = 1; x < width; x++){
@@ -183,14 +185,14 @@ void writeSTLfromArray(){
 					vertex c = createVertex(x-1,y+1,hList.at((y+1)*width+x-1));
 					addTriangle(createTriangle(a,c,b));
 
-					if(vertical){
+					if(crust){
 						vertex a1 = createVertexBelow(a);
 						vertex b1 = createVertexBelow(b);
 						vertex c1 = createVertexBelow(c);
 						addTriangle(createTriangle(a1,b1,c1));
 					}
 				}else{
-					triangleCount-=vertical?2:1;
+					triangleCount-=crust?2:1;
 				}
 			}
 		}
@@ -229,7 +231,7 @@ void writeSTLfromArray(){
 			addTriangle(createTriangle(bt,st,bb));
 		}
 
-		if(!vertical){
+		if(!crust){
 			vertex origin = createVertex(0,0,0);
 			vertex bottomright = createVertex(width-1,0,0);
 			vertex topleft = createVertex(0,height-1,0);
@@ -243,7 +245,26 @@ void writeSTLfromArray(){
 	cout << triangleCount << "\n";
 }
 
-int main(int argc, char **argv)			//lat, long, res
+float verticalscale = 23.2;			// true verticalscale 92.7 meters/arcsecond (at equator) gives models that are too flat to be interesting
+
+const char ** checkOption(const char *arg, const char **argv)
+{
+	if (strcmp(arg, "--vertical")==0)
+		vertical = true;
+	else if (strcmp(arg, "--crust")==0)
+		crust = true;
+	else if (strcmp(arg, "--thickness")==0)
+		thickness = atoi(*argv++);
+	else if (strcmp(arg, "--scale")==0)
+		verticalscale = atof(*argv++);
+	else{
+		printf("Unrecognised argument %s\n", arg);
+		exit(0);
+	}
+	return argv; 
+}
+
+int main(int argc, const char **argv)			//lat, long, res, outfile
 {
 	string file;
 	int point;
@@ -252,19 +273,41 @@ int main(int argc, char **argv)			//lat, long, res
 	int res;
 	int tile_n;
 	int tile_w;
-	//float true_verticalscale = 92.7;	//meters/arcsecond at equator
-	float verticalscale = 23.2;			//true_verticalscale gives models that are too flat to be interesting
-	
-	lat = atof(argv[1]);					//Latitude of NW corner
-	printf("Using latitude: %f\n",lat);
-	lng = atof(argv[2]);					//Longitude of NW corner
-	printf("Using longitude: %f\n",lng);
-	res = atoi(argv[3]);					//arcseconds/tick in model
-	if(res%3!=0){							//must be a multiple of 3
-		printf("Bad resolution\n");
-		return 0;
+	if(argc < 5){
+		printf("Not enough arguents\n");
+		exit(0);
 	}
-	vertical = true;
+	int argno = 1;
+	argv++; // not interested in argv[0]
+	while(*argv){
+		const char *arg = *argv++;
+		if(arg[0]=='-' && arg[1]=='-')
+			argv = checkOption(arg, argv);
+		else switch(argno++){
+		case 1:
+			lat = atof(arg);					//Latitude of NW corner
+			printf("Using latitude: %f\n",lat);
+			break;
+		case 2:
+			lng = atof(arg);					//Longitude of NW corner
+			printf("Using longitude: %f\n",lng);
+			break;
+		case 3:
+			res = atoi(arg);					//arcseconds/tick in model
+			if(res%3!=0){							//must be a multiple of 3
+				printf("Bad resolution\n");
+				return 0;
+			}
+			break;
+		case 4:
+			savefile.append(std::string(arg));
+			printf("Saving to '%s'\n",savefile.c_str());
+			break;
+		default:
+			printf("Too many arguments\n");
+			exit(0);
+		}
+	}
 	res = res/3;							//SRTM data already has a resolution of 3 arcseconds
 	printf("Using resolution %i\n",res);	//Arc
 
@@ -275,8 +318,6 @@ int main(int argc, char **argv)			//lat, long, res
 	height = 40*res; 
 	width = 40*res / longscale;
 	hList.resize(width*height,0);
-	savefile.append(std::string(argv[4]));
-	printf("Saving to '%s'\n",savefile.c_str());
 	
 	//-------get correct tile-------------------
 	if(lat>=0){								//Positive is north
@@ -338,7 +379,7 @@ int main(int argc, char **argv)			//lat, long, res
 				}
 				//rotate model to correct orientation
 				//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
-				hList.at((height-1-y)*width+x) = h/(verticalscale)+1; 	//+1 so that the bottom of the model does not bleed through to the top
+				hList.at((height-1-y)*width+x) = h/(verticalscale)+1;   //+1 so that the bottom of the model does not bleed through to the top
 			}
 		}
 		for(int y = 0; y < height; y++){
@@ -353,6 +394,8 @@ int main(int argc, char **argv)			//lat, long, res
 					h = (hList.at(index-1) + hList.at(index+width))/2;
 					hList.at(index) = h;
 				}
+				if (h != -99 && h < minheight)
+					minheight = h;
 			}
 		}
 	}
