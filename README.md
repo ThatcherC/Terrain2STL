@@ -27,6 +27,8 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [ ] Make the selection box reflect changes in the Lat/Long boxes 
 - [ ] Decide on a maximum file size and/or compression
   - [ ] Add a resolution slider
+- [ ] Add longitude compensation to correct for the distortion caused by the Mercator Projection
+- [ ] Draw the northern and southern boundaries of the data set
 
 ###Descriptions of Files
 * /hgt_files
