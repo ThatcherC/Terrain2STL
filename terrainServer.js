@@ -1,7 +1,7 @@
 //Node server for hgt-to-stl program
 //Listens on port 8081
 var app = require('http').createServer(handler)
-var io = require('socket.io')();
+var io = require('socket.io')({resource:"/bravo/socket.io"});
 var fs = require('fs');
 var exec = require('child_process').exec;
 var config = require('./config');
@@ -11,7 +11,7 @@ router['/'] = '/terrain2stl.html';
 router['/index.html'] = '/terrain2stl.html';
 router['/gmaps-gridlines.js'] = '/gmaps-gridlines.js';
 
-app.listen(8080);
+app.listen(8081);
 io.listen(app);
 
 function handler(req, res){

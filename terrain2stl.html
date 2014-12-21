@@ -32,7 +32,7 @@
 			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy89lQ2fSex7Te1CeMbr3Yf0iPycf3H9w">
 		</script>
 		<script type="text/javascript" src="/gmaps-gridlines.js"></script>
-		<script type = "text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type = "text/javascript" src="/bravo/socket.io/socket.io.js"></script>
 		<script src="http://coinwidget.com/widget/coin.js"></script>
 
 		<script type="text/javascript">
@@ -48,13 +48,13 @@
 			var scaleLabel;
 			var savename;
 			
-			var socket = io.connect("jthatch.com");	//146.148.78.19
+			var socket = io.connect("jthatch.com",{path:"/bravo/socket.io"});	//146.148.78.19
 			socket.on('download',function(data){
 				console.log(data.status);
 				var pButton = document.getElementById('my-print-button');
 				
 				if(data.status=='ready'){
-					pButton.setAttribute('data-print', "http://146.148.78.19/"+savename);
+					pButton.setAttribute('data-print', "http://jthatch.co/bravo/"+savename);
 					pButton.setAttribute('data-print-name', "TerrainModel");
 					pButton.style.visibility = 'visible';
 				}else{
@@ -150,7 +150,7 @@
 			}
 			
 			function downloadSTL(){
-				document.getElementById('downloadframe').setAttribute('src',"/"+savename);
+				document.getElementById('downloadframe').setAttribute('src',"/bravo/"+savename);
 			}
 			
 			google.maps.event.addDomListener(window, 'load', initializeMap);
