@@ -4,7 +4,7 @@ Terrain2STL
 A web-based service that converts publicly available HGT files to useful STL files.
 
 ###Try it Out!
-This project is running on a Google Compute Engine server at [146.148.78.19](http://146.148.78.19/). It's updated soon after any commit to this repository. 
+This project is running on a Google Compute Engine server at [jthatch.com](http://jthatch.com/). It's updated soon after any commit to this repository. 
 
 You can also download everything here and start the server with: 
 
