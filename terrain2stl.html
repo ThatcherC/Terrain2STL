@@ -153,6 +153,19 @@
 				document.getElementById('downloadframe').setAttribute('src',"/bravo/"+savename);
 			}
 			
+			function updateLatLng(){
+				var lat = Math.min(Math.max(parseFloat(document.getElementById('c-lat').value),-56),60);
+				var lng = Math.min(Math.max(parseFloat(document.getElementById('c-lng').value),-179),180);
+				document.getElementById('c-lat').value = lat;
+				document.getElementById('c-lng').value = lng;
+				if(lat && lng){
+					updateRectangle(new google.maps.LatLngBounds(
+         	                                       new google.maps.LatLng(lat,lng),        //nw corner*/
+                	                                new google.maps.LatLng(lat-boxWidth,lng+boxWidth)
+                        	                ));
+				}
+			}
+
 			google.maps.event.addDomListener(window, 'load', initializeMap);
 		</script>
 	</head>
@@ -165,8 +178,8 @@
 		<h4 align="center" style="margin-top:-20;">Now with New Features!</h4>
 		<table>
 			<tr><td colspan=2>Northwest Corner Coordinates</td></tr>
-			<tr><td>Latitude:</td><td><input id="c-lat"></td></tr>
-			<tr><td>Longitude:</td><td><input id="c-lng"></td></tr>
+			<tr><td>Latitude:</td><td><input id="c-lat" onchange="updateLatLng()"></td></tr>
+			<tr><td>Longitude:</td><td><input id="c-lng" onchange="updateLatLng()"></td></tr>
 			<tr><td>Arc Seconds/</br>Division</td><td><input id="scaler" style="width:169px" type="range" min="3" max="27" step="3" value="3" onchange="changeScale()"><div id="scaleLabel">3</div></td></tr>
 			<tr><td>Water Drop:</td><td><input id="wDrop" value="0" type="number" min="0" max="10" onkeyup="this.value=this.value.replace(/[^\d]/,'')"> Base Height: <input id="bHeight" value="1" type="number" min="1" max="10" onkeyup="this.value=this.value.replace(/[^\d]/,'')"></td>
 			</tr>

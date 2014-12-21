@@ -24,7 +24,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [x] Make the 3 arcsecond resolution available in all sizes.
 - [x] Add ability to cross tiles. !!!
 - [x] Make Print and Download buttons disappear or defocus when the selection box is moved
-- [ ] Make the selection box reflect changes in the Lat/Long boxes 
+- [x] Make the selection box reflect changes in the Lat/Long boxes 
 - [ ] Decide on a maximum file size and/or compression
   - [ ] Add a resolution slider
 - [ ] Add longitude compensation to correct for the distortion caused by the Mercator Projection
