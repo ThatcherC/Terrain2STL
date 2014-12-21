@@ -204,9 +204,34 @@ void writeSTLfromArray(){
 	cout << triangleCount << "\n";
 }
 
+string tiles[4];
+
+void getTile(float lat, float lng, int index){
+	string file;
+	//-------get correct tile-------------------
+	if(lat>=0){								//Positive is north
+		file = "N";
+	}else{
+		file = "S";
+	}
+	file.append( to_string( abs( (int)floor(lat) ) ) );
+	if(file.length()==2) file.insert(1,"0");
+	if(lng>=0){								//Positive is east
+		file.append("E");
+	}else{
+		file.append("W");
+	}
+	file.append( to_string( abs( (int)floor(lng) ) ) );
+	if(file.length()==5)file.insert(4,"00");
+	if(file.length()==6)file.insert(4,"0");
+	
+	file.append(".hgt");
+	file.insert(0,"../Terrain2STL/hgt_files/");
+	tiles[index] = file;
+}
+
 int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHeight
 {
-	string file;
 	int point;
 	float lat;
 	float lng;
@@ -239,26 +264,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	waterDrop = atoi(argv[5]);
 	baseHeight = atoi(argv[6]);
 	
-	//-------get correct tile-------------------
-	if(lat>=0){								//Positive is north
-		file = "N";
-	}else{
-		file = "S";
-	}
-	file.append( to_string( abs( (int)floor(lat) ) ) );
-	if(file.length()==2) file.insert(1,"0");
-	if(lng>=0){								//Positive is east
-		file.append("E");
-	}else{
-		file.append("W");
-	}
-	file.append( to_string( abs( (int)floor(lng) ) ) );
-	if(file.length()==5)file.insert(4,"00");
-	if(file.length()==6)file.insert(4,"0");
-	
-	file.append(".hgt");
-	file.insert(0,"../Terrain2STL/hgt_files/");
-	puts(file.c_str());
+	getTile(lat,lng,0);
 	
 	//-------Find starting file index---------------
 	float n = (lat-floor(lat))*3600;
@@ -267,48 +273,91 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	int i = 1201-(int)(n/(3));
 	int j = (int)(e/(3));
 	
-	if(i+height>1201){
-		perror("Error in y");
+	int tilesOffsetX = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
+	int tilesOffsetY = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
+	if(i+height>1200){
+		printf("Extra tile in y");
+		tilesOffsetY = 1200-i;
+		getTile(lat-1.0,lng,2);
 	}
-	if(j+width>1201){
-		perror("Error in x");
+	if(j+width>1200){
+		printf("Extra tile in x");
+		tilesOffsetX = 1200-j;
+		getTile(lat,lng+1.0,1);
+		if(tilesOffsetY!=10000){
+			getTile(lat-1.0,lng+1.0,3);
+		}
 	}
 	
 	point = j+i*1201;						//the file index of the NW corner
 
 	//------------Open file and read data into array----------------------------
-	ifstream tile;
-	tile.open(file.c_str(),ios::in|ios::binary);
+
+	
 	int h;
-	if (!tile.is_open()){
-		perror ("Error opening file");
-	}else{
-		char number [2];
-		for(int y = 0; y < height; y++){
-			for(int x = 0; x < width; x++){
-				tile.seekg((point+x+y*1201)*2,ios::beg);
-				tile.read(number,2);
-				h = number[1];
-				if(h<0){
-					h = h+255;
-				}
-				h+= number[0]*256;
-				
-				if(h==0){
-					h=-waterDrop*verticalscale;
-				}
-				
-				//If a void exists, marks it as -100
-				if(h<-100){
-					h=-verticalscale*100;
-				}
-				//rotate model to correct orientation
-				//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
-				hList.at((height-1-y)*width+x) = h/(verticalscale)+baseHeight; 	//+baseHeight so that the bottom of the model does not bleed through to the top
+	char number [2];
+	
+	int whichTile;
+	int tileX;
+	int tileY;
+	ifstream file;
+	int openTile = -1;;
+	
+	for(int y = 0; y < height; y++){						
+		for(int x = 0; x < width; x++){
+			tileX = x;
+			tileY = y;
+			if(x<=tilesOffsetX && y<=tilesOffsetY){			//simplify this with bitwise logic?
+				whichTile = 0;
+				point = j+i*1201;
 			}
+			if(x>tilesOffsetX && y<=tilesOffsetY){
+				whichTile = 1;
+				tileX = x-tilesOffsetX+2;
+				point = i*1201;
+			}
+			if(x<=tilesOffsetX && y>tilesOffsetY){
+				whichTile = 2;
+				tileY = y-tilesOffsetY;
+				point = j;
+			}
+			if(x>tilesOffsetX && y>tilesOffsetY){
+				whichTile = 3;
+				tileX = x-tilesOffsetX;
+				tileY = y-tilesOffsetY;
+				point = 0;
+			}
+			
+			if(openTile!=whichTile){
+				//printf("%s",tiles[whichTile].c_str());
+				openTile = whichTile;
+				file.close();
+				file.open(tiles[whichTile].c_str(),ios::in|ios::binary);
+			}
+			
+			
+			file.seekg((point+tileX+tileY*1201)*2,ios::beg);
+			file.read(number,2);
+			h = number[1];
+			if(h<0){
+				h = h+255;
+			}
+			h+= number[0]*256;
+			
+			if(h==0){
+				h=-waterDrop*verticalscale;
+			}
+			
+			//If a void exists, marks it as -100
+			if(h<-100){
+				h=-verticalscale*100;
+			}
+			//rotate model to correct orientation
+			//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
+			hList.at((height-1-y)*width+x) = h/(verticalscale)+baseHeight; 	//+baseHeight so that the bottom of the model does not bleed through to the top
 		}
 	}
-	tile.close();
+	
 	writeSTLfromArray();
 	return 0;
 }
