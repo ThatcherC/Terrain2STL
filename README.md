@@ -22,7 +22,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [x] Increase maximum box size.
 - [ ] Fill voids in dataset.
 - [x] Make the 3 arcsecond resolution available in all sizes.
-- [ ] Add ability to cross tiles.
+- [x] Add ability to cross tiles. !!!
 - [x] Make Print and Download buttons disappear or defocus when the selection box is moved
 - [ ] Make the selection box reflect changes in the Lat/Long boxes 
 - [ ] Decide on a maximum file size and/or compression
