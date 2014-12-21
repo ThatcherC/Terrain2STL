@@ -1,5 +1,5 @@
 //Node server for hgt-to-stl program
-//Listens on port 8080
+//Listens on port 8081
 var app = require('http').createServer(handler)
 var io = require('socket.io')();
 var fs = require('fs');
@@ -16,6 +16,9 @@ io.listen(app);
 
 function handler(req, res){
 	//add an about page?
+
+	console.log("req");
+
 	var filename;
 	if(router[req.url]!=null){
 		if(config.logRequests & req.url=='/'){fs.appendFile(config.requestLogPath,req.connection.remoteAddress+"\t"+new Date().toString()+"\n");}
@@ -44,9 +47,13 @@ function handler(req, res){
 	}
 }
 
+
+
 io.on('connection',function(socket){
+	console.log("connection");
 	socket.on('parameters',function(params){
-		exec("./elevstl "+params.lat+" "+params.lng+" "+params.scale+" "+params.name,function(error,stdout,stderr){
+		exec("./elevstl "+params.lat+" "+params.lng+" "+params.scale+" "+params.name+
+				" "+params.waterDrop+" "+params.baseHeight ,function(error,stdout,stderr){
 			console.log(stderr||"STL created");
 			if(stderr==""){
 				console.log("No errors");
