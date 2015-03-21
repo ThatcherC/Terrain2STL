@@ -313,7 +313,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 			}
 			if(x>tilesOffsetX && y<=tilesOffsetY){
 				whichTile = 1;
-				tileX = x-tilesOffsetX+2;
+				tileX = x-tilesOffsetX;
 				point = i*1201;
 			}
 			if(x<=tilesOffsetX && y>tilesOffsetY){
