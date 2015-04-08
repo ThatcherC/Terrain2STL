@@ -4,7 +4,7 @@ Terrain2STL
 A web-based service that converts publicly available HGT files to useful STL files.
 
 ###Try it Out!
-This project is running on a Google Compute Engine server at [jthatch.com](http://jthatch.com/). It's updated soon after any commit to this repository. 
+This project is running on a Google Compute Engine server at [jthatch.com](http://jthatch.com/terrain2stl). It's updated soon after any commit to this repository. 
 
 You can also download everything here and start the server with: 
 
@@ -29,6 +29,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
   - [ ] Add a resolution slider
 - [ ] Add longitude compensation to correct for the distortion caused by the Mercator Projection
 - [ ] Draw the northern and southern boundaries of the data set
+- [ ] Normalize model height to remove vertical offset
 
 ###Descriptions of Files
 * /hgt_files
