@@ -307,8 +307,8 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	ifstream file;
 	int openTile = -1;;
 	
-	for(int y = 0; y < height; y+=stepSize){						
-		for(int x = 0; x < width; x+=stepSize){
+	for(int y = 0; y < height*stepSize; y+=stepSize){						
+		for(int x = 0; x < width*stepSize; x+=stepSize){
 			tileX = x;
 			tileY = y;
 			if(x<=tilesOffsetX && y<=tilesOffsetY){			//simplify this with bitwise logic?
