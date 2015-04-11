@@ -236,6 +236,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	float lat;
 	float lng;
 	int res;
+	int stepSize = 1;
 	int tile_n;
 	int tile_w;
 	int waterDrop = -2;			//millimeters
@@ -253,9 +254,12 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 		return 0;
 	}
 	res = res/3;							//SRTM data already has a resolution of 3 arcseconds
+	if(res>9){
+		stepSize = 2;
+	}
 	printf("Using resolution %i\n",res);	//Arc
-	height = 40*res;
-	width = 40*res;
+	height = 40*res/stepSize;
+	width = 40*res/stepSize;
 	hList.resize(width*height,0);
 	
 	savefile.append(std::string(argv[4]));
@@ -303,8 +307,8 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	ifstream file;
 	int openTile = -1;;
 	
-	for(int y = 0; y < height; y++){						
-		for(int x = 0; x < width; x++){
+	for(int y = 0; y < height; y+=stepSize){						
+		for(int x = 0; x < width; x+=stepSize){
 			tileX = x;
 			tileY = y;
 			if(x<=tilesOffsetX && y<=tilesOffsetY){			//simplify this with bitwise logic?
