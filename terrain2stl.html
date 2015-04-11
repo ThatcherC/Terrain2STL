@@ -133,7 +133,7 @@
 			}
 			
 			function changeScale(){
-				boxWidth=minBoxWidth*scaleSlider.value/3;
+				boxWidth=minBoxWidth*scaleSlider.value/120;
 				scaleLabel.innerHTML = scaleSlider.value;
 				centerToView();
 			}
@@ -145,7 +145,7 @@
 				var waterDrop = parseInt(document.getElementById("wDrop").value);
 				var baseHeight = parseInt(document.getElementById("bHeight").value);
 				socket.emit('parameters',{'lat':lat_param,'lng':lng_param,
-							'scale':scaleSlider.value,'name':savename,
+							'scale':scaleSlider.value/40,'name':savename,
 							'waterDrop':waterDrop,'baseHeight':baseHeight});
 			}
 			
@@ -190,7 +190,7 @@
 			<tr><td colspan=2>Northwest Corner Coordinates</td></tr>
 			<tr><td>Latitude:</td><td><input id="c-lat" onchange="updateLatLng()"></td></tr>
 			<tr><td>Longitude:</td><td><input id="c-lng" onchange="updateLatLng()"></td></tr>
-			<tr><td>Arc Seconds/</br>Division</td><td><input id="scaler" style="width:169px" type="range" min="3" max="27" step="3" value="3" onchange="changeScale()"><div id="scaleLabel">3</div></td></tr>
+			<tr><td>Box Size</br>(Arc Seconds)</td><td><input id="scaler" style="width:169px" type="range" min="120" max="1080" step="120" value="120" onchange="changeScale()"><div id="scaleLabel">3</div></td></tr>
 			<tr><td>Water Drop:</td><td><input id="wDrop" value="0" type="number" min="0" max="10" onkeyup="this.value=this.value.replace(/[^\d]/,'')"> Base Height: <input id="bHeight" value="1" type="number" min="1" max="10" onkeyup="this.value=this.value.replace(/[^\d]/,'')"></td>
 			</tr>
 			<tr>
