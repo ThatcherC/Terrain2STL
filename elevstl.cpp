@@ -254,20 +254,26 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 		return 0;
 	}
 	res = res/3;							//SRTM data already has a resolution of 3 arcseconds
-	if(res>9){
+	if(res>15){
+		stepSize = 8;
+	}else if(res>12){
+		stepSize = 4;
+	}else if(res>9){
 		stepSize = 2;
 	}
+	printf("Stepsize: %i\n",stepSize);
 	printf("Using resolution %i\n",res);	//Arc
 	height = 40*res/stepSize;
 	width = 40*res/stepSize;
+
 	hList.resize(width*height,0);
-	
+
 	savefile.append(std::string(argv[4]));
 	printf("Saving to '%s'\n",savefile.c_str());
-	
+
 	waterDrop = atoi(argv[5]);
 	baseHeight = atoi(argv[6]);
-	
+	printf("getting tile");
 	getTile(lat,lng,0);
 	
 	//-------Find starting file index---------------
@@ -307,6 +313,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	ifstream file;
 	int openTile = -1;;
 	
+	printf("Beginning file reading");
 	for(int y = 0; y < height*stepSize; y+=stepSize){						
 		for(int x = 0; x < width*stepSize; x+=stepSize){
 			tileX = x;
