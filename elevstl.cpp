@@ -286,12 +286,12 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	int tilesOffsetY = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
 	if(i+height*stepSize>1200){
 		printf("Extra tile in y");
-		tilesOffsetY = (int)((1200-i)/stepSize);
+		tilesOffsetY = (1200-i);
 		getTile(lat-1.0,lng,2);
 	}
 	if(j+width*stepSize>1200){
 		printf("Extra tile in x");
-		tilesOffsetX = (int)((1200-j)/stepSize);
+		tilesOffsetX = (1200-j);
 		getTile(lat,lng+1.0,1);
 		if(tilesOffsetY!=10000){
 			getTile(lat-1.0,lng+1.0,3);
