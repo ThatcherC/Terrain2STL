@@ -359,11 +359,11 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 			
 			//If a void exists, marks it as -100
 			if(h<-100){
-				h=-verticalscale*100;
+				h=-verticalscale*100*stepSize;
 			}
 			//rotate model to correct orientation
 			//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
-			hList.at((height-1-y/stepSize)*width+x/stepSize) = h/(verticalscale)+baseHeight; 	//+baseHeight so that the bottom of the model does not bleed through to the top
+			hList.at((height-1-y/stepSize)*width+x/stepSize) = h/(verticalscale*stepSize)+baseHeight; 	//+baseHeight so that the bottom of the model does not bleed through to the top
 		}
 	}
 	
