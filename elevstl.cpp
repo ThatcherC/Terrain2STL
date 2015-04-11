@@ -273,7 +273,6 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 
 	waterDrop = atoi(argv[5]);
 	baseHeight = atoi(argv[6]);
-	printf("getting tile");
 	getTile(lat,lng,0);
 	
 	//-------Find starting file index---------------
@@ -313,7 +312,6 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	ifstream file;
 	int openTile = -1;;
 	
-	printf("Beginning file reading");
 	for(int y = 0; y < height*stepSize; y+=stepSize){						
 		for(int x = 0; x < width*stepSize; x+=stepSize){
 			tileX = x;
@@ -365,7 +363,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 			}
 			//rotate model to correct orientation
 			//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
-			hList.at((height-1-y/2)*width+x/2) = h/(verticalscale)+baseHeight; 	//+baseHeight so that the bottom of the model does not bleed through to the top
+			hList.at((height-1-y/stepSize)*width+x/stepSize) = h/(verticalscale)+baseHeight; 	//+baseHeight so that the bottom of the model does not bleed through to the top
 		}
 	}
 	
