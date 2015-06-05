@@ -25,9 +25,9 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [x] Add ability to cross tiles. !!!
 - [x] Make Print and Download buttons disappear or defocus when the selection box is moved
 - [x] Make the selection box reflect changes in the Lat/Long boxes 
-- [ ] Decide on a maximum file size and/or compression
+- [x] Decide on a maximum file size and/or compression
   - [ ] Add a resolution slider
-- [ ] Add longitude compensation to correct for the distortion caused by the Mercator Projection
+- [x] Add longitude compensation to correct for the distortion caused by the Mercator Projection
 - [ ] Draw the northern and southern boundaries of the data set
 - [ ] Normalize model height to remove vertical offset
 

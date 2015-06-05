@@ -111,11 +111,11 @@ void writeSTLfromArray(){
 		for(int c = 1; c < width; c++){
 			if((int)hList.at(c)>-50 & (int)hList.at(c-1)>-50 & (int)hList.at(c+width-1)>-50 ){
 				vertex a = createVertex(c*xScale, 0,hList.at(c));
-				vertex b = createVertex((c-1*xScale), 0,hList.at(c-1));
-				vertex d = createVertex((c-1*xScale), 1,hList.at(c+width-1));
+				vertex b = createVertex((c-1)*xScale, 0,hList.at(c-1));
+				vertex d = createVertex((c-1)*xScale, 1,hList.at(c+width-1));
 				
 				vertex w = createVertex(c*xScale,0,0);				//used in model walls
-				vertex z = createVertex((c-1*xScale),0,0);
+				vertex z = createVertex((c-1)*xScale,0,0);
 				
 				addTriangle(createTriangle(a,d,b));
 				addTriangle(createTriangle(b,z,a));			//model walls
