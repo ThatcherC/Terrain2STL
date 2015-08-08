@@ -10,12 +10,12 @@
 			#errorbox {height: 5%; width:25%; float: left; padding-left:10}
 			#inst {width:25%; float: left; padding-left:10}
 			#donations {width:25%; float: right; padding-right:20}
-			#download-button { 
+			#download-button {
 				float:right;
-				display:inline-block; 
-				background-color: #1C86B6  ; 
-				color: white; 
-				text-decoration: none; 
+				display:inline-block;
+				background-color: #1C86B6  ;
+				color: white;
+				text-decoration: none;
 				border-radius: 9999px;
 				text-align: center;
 				padding: 14px 37px 14px 40px;
@@ -24,7 +24,7 @@
 				font-size: 12pt;
 			}
 			#download-button:hover{
-				background-color: #065C82; 
+				background-color: #065C82;
 				color: white;
 			}
 		</style>
@@ -47,12 +47,12 @@
 			var scaleSlider;
 			var scaleLabel;
 			var savename;
-			
+
 			var socket = io.connect("jthatch.com",{path:"/terrain2stl/socket.io"});	//146.148.78.19
 			socket.on('download',function(data){
 				console.log(data.status);
 				var pButton = document.getElementById('my-print-button');
-				
+
 				if(data.status=='ready'){
 					pButton.setAttribute('data-print', "http://jthatch.com/terrain2stl/"+savename);
 					pButton.setAttribute('data-print-name', "TerrainModel");
@@ -64,7 +64,7 @@
 					pButton.style.visibility = 'hidden';
 				}
 			});
-			
+
 			function initializeMap(){
 				var mapOptions = {
 					center: mapCenter,
@@ -73,14 +73,14 @@
 					maxZoom: 13,
 					mapTypeId:google.maps.MapTypeId.TERRAIN
 				};
-				
+
 				latBox = document.getElementById("c-lat");
 				lngBox = document.getElementById("c-lng");
-				
+
 				map = new google.maps.Map(document.getElementById("gmap"),
 					mapOptions);
 				gridlines = new Graticule(map);
-					
+
 				rectangle = new google.maps.Rectangle({
 					strokeColor: '#FF0000',
 					strokeOpacity: 0.8,
@@ -94,15 +94,15 @@
 				)});
 				rectangle.setDraggable(true);
 				rectangle.geodesic = true;
-				
+
 				scaleSlider = document.getElementById("scaler");
 				scaleLabel = document.getElementById("scaleLabel");
-				
+
 				google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
 				google.maps.event.addListener(map,'zoom_changed', postZoom);	//call function when zoom level changes
 			}
-			
-			
+
+
 			function centerToView(){
 				mapCenter = map.getCenter();
 				updateRectangle(new google.maps.LatLngBounds(
@@ -111,11 +111,11 @@
 					));
 				postDrag();
 			}
-			
+
 			function updateRectangle(rectBounds){
 				rectangle.setBounds(rectBounds);
 			}
-			
+
 			function postDrag(){		//called after rectangle is dragged
 				//for some reason, .getNorthEast() returns the coordinates of the NW corner
 				latBox.value = rectangle.getBounds().getSouthWest().lat().toFixed(4);
@@ -123,7 +123,7 @@
 				var pButton = document.getElementById('my-print-button');			//hide download and print buttons
 				pButton.style.visibility = 'hidden';
 			}
-			
+
 			function postZoom(){
 				if(map.getZoom()>5){
 					gridlines.show();
@@ -131,13 +131,13 @@
 					gridlines.hide();
 				}
 			}
-			
+
 			function changeScale(){
 				boxWidth=minBoxWidth*scaleSlider.value/120;
 				scaleLabel.innerHTML = scaleSlider.value;
 				centerToView();
 			}
-			
+
 			function sendParameters(){
 				savename = latBox.value+"_"+lngBox.value+"_"+scaleSlider.value+".stl";
 				var lat_param = parseFloat(latBox.value);
@@ -148,11 +148,12 @@
 							'scale':scaleSlider.value/40,'name':savename,
 							'waterDrop':waterDrop,'baseHeight':baseHeight});
 			}
-			
+
 			function downloadSTL(){
 				document.getElementById('downloadframe').setAttribute('src',"/terrain2stl/"+savename);
+				ga('send', 'event', 'Terrain2STL', 'Download');
 			}
-			
+
 			function updateLatLng(){
 				var lat = Math.min(Math.max(parseFloat(document.getElementById('c-lat').value),-56),60);
 				var lng = Math.min(Math.max(parseFloat(document.getElementById('c-lng').value),-179),180);
