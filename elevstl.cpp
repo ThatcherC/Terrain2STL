@@ -61,14 +61,14 @@ triangle createTriangle(vertex j, vertex k, vertex l){
 	t.normal = normalOf(j,k,l);
 	return t;
 }
-	
+
 //Writes a triangle into the STL file
 void addTriangle(triangle t){
 	//normal vector1
 	out.write((char *)&t.normal.x,sizeof(float));
 	out.write((char *)&t.normal.y,sizeof(float));
 	out.write((char *)&t.normal.z,sizeof(float));
-	
+
 	//vertices
 	out.write((char *)&t.a.x,sizeof(float));
     out.write((char *)&t.a.y,sizeof(float));
@@ -101,6 +101,7 @@ void writeSTLfromArray(){
 	triangleCount += 2; 			//base triangles
 	float planarScale = 40/width;
 	float xScale = (float)cos(globalLat);
+	const int voidCutoff = -500;
 
 	if(out.good()){
 		for(int i = 0; i < 80; i++){
@@ -109,14 +110,14 @@ void writeSTLfromArray(){
 		//write a placeholder number
 		out.write((char *)&triangleCount,4);
 		for(int c = 1; c < width; c++){
-			if((int)hList.at(c)>-50 & (int)hList.at(c-1)>-50 & (int)hList.at(c+width-1)>-50 ){
+			if((int)hList.at(c)>voidCutoff & (int)hList.at(c-1)>voidCutoff & (int)hList.at(c+width-1)>voidCutoff ){
 				vertex a = createVertex(c*xScale, 0,hList.at(c));
 				vertex b = createVertex((c-1)*xScale, 0,hList.at(c-1));
 				vertex d = createVertex((c-1)*xScale, 1,hList.at(c+width-1));
-				
+
 				vertex w = createVertex(c*xScale,0,0);				//used in model walls
 				vertex z = createVertex((c-1)*xScale,0,0);
-				
+
 				addTriangle(createTriangle(a,d,b));
 				addTriangle(createTriangle(b,z,a));			//model walls
 				addTriangle(createTriangle(w,a,z));
@@ -126,7 +127,7 @@ void writeSTLfromArray(){
 		}
 		for(int y = 1; y < height-1; y++){
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)>-50 & (int)hList.at((y-1)*width+x)>-50 & (int)hList.at(y*width+x-1)>-50 ){
+				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at((y-1)*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff ){
 					vertex a = createVertex(x*xScale,y,hList.at(y*width+x));
 					vertex b = createVertex(x*xScale,y-1,hList.at((y-1)*width+x));
 					vertex c = createVertex((x-1)*xScale,y,hList.at(y*width+x-1));
@@ -136,7 +137,7 @@ void writeSTLfromArray(){
 				}
 			}
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)>-50 & (int)hList.at(y*width+x-1)>-50 & (int)hList.at((y+1)*width+x-1)>-50 ){
+				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff & (int)hList.at((y+1)*width+x-1)>voidCutoff ){
 					vertex a = createVertex(x*xScale,y,hList.at(y*width+x));		//same
 					vertex b = createVertex((x-1)*xScale,y,hList.at(y*width+x-1));
 					vertex c = createVertex((x-1)*xScale,y+1,hList.at((y+1)*width+x-1));
@@ -147,14 +148,14 @@ void writeSTLfromArray(){
 			}
 		}
 		for(int x = 1; x < width; x++){
-			if((int)hList.at((height-1)*width+x)>-50 & (int)hList.at((height-2)*width+x)>-50 & (int)hList.at((height-1)*width+x-1)>-50){
+			if((int)hList.at((height-1)*width+x)>voidCutoff & (int)hList.at((height-2)*width+x)>voidCutoff & (int)hList.at((height-1)*width+x-1)>voidCutoff){
 				vertex a = createVertex(x*xScale,height-1,hList.at((height-1)*width+x));		//same
 				vertex b = createVertex(x*xScale,height-2,hList.at((height-2)*width+x));
 				vertex c = createVertex((x-1)*xScale,height-1,hList.at((height-1)*width+x-1));
-				
+
 				vertex w = createVertex(x*xScale,height-1,0);		//used in model walls
 				vertex z = createVertex((x-1)*xScale,height-1,0);
-				
+
 				addTriangle(createTriangle(a,c,b));
 				addTriangle(createTriangle(c,a,z));			//model walls
 				addTriangle(createTriangle(w,z,a));
@@ -162,36 +163,36 @@ void writeSTLfromArray(){
 				triangleCount-=3;
 			}
 		}
-		
+
 		vertex st;
 		vertex sb;
 		vertex bt;
 		vertex bb;
 		for(int y = 1; y < width; y++){						//adds walls in the y direction for
-			if((int)hList.at(y*width)>-50 & (int)hList.at((y-1)*width)>-50){
+			if((int)hList.at(y*width)>voidCutoff & (int)hList.at((y-1)*width)>voidCutoff){
 				st = createVertex(0,y,hList.at(y*width));			//for x=0 first
 				sb = createVertex(0,y-1,hList.at((y-1)*width));
 				bt = createVertex(0,y,0);
 				bb = createVertex(0,y-1,0);
-				
+
 				addTriangle(createTriangle(bb,sb,st));
 				addTriangle(createTriangle(st,bt,bb));
 			}else{
 				triangleCount-=2;
 			}
-			if((int)hList.at(y*width+width-1)>-50 & (int)hList.at(y*width-1)>-50){
+			if((int)hList.at(y*width+width-1)>voidCutoff & (int)hList.at(y*width-1)>voidCutoff){
 				st = createVertex((width-1)*xScale,y,hList.at(y*width+width-1));		//for x=width next
 				sb = createVertex((width-1)*xScale,y-1,hList.at(y*width-1));
 				bt = createVertex((width-1)*xScale,y,0);
 				bb = createVertex((width-1)*xScale,y-1,0);
-				
+
 				addTriangle(createTriangle(sb,bb,st));
 				addTriangle(createTriangle(bt,st,bb));
 			}else{
 				triangleCount-=2;
 			}
 		}
-		
+
 		vertex origin = createVertex(0,0,0);					//create bottom surface
 		vertex bottomright = createVertex((width-1)*xScale,0,0);
 		vertex topleft = createVertex(0,height-1,0);
@@ -199,7 +200,7 @@ void writeSTLfromArray(){
 		addTriangle(createTriangle(origin,topright,bottomright));
 		addTriangle(createTriangle(origin,topleft,topright));
 		//triangleCount-=2;
-		
+
 		out.seekp(80);
 		out.write((char *)&triangleCount,4);
 	}
@@ -226,7 +227,7 @@ void getTile(float lat, float lng, int index){
 	file.append( to_string( abs( (int)floor(lng) ) ) );
 	if(file.length()==5)file.insert(4,"00");
 	if(file.length()==6)file.insert(4,"0");
-	
+
 	file.append(".hgt");
 	file.insert(0,"../Terrain2STL/hgt_files/");
 	tiles[index] = file;
@@ -245,7 +246,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	int baseHeight = 2;			//millimeters
 	//float true_verticalscale = 92.7;	//meters/arcsecond at equator
 	float verticalscale = 23.2;			//true_verticalscale gives models that are too flat to be interesting
-	
+
 	lat = atof(argv[1]);					//Latitude of NW corner
 	printf("Using latitude: %f\n",lat);
 	globalLat = 3.1415926*lat/180;
@@ -277,14 +278,14 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	waterDrop = atoi(argv[5]);
 	baseHeight = atoi(argv[6]);
 	getTile(lat,lng,0);
-	
+
 	//-------Find starting file index---------------
 	float n = (lat-floor(lat))*3600;
 	float e = (lng-floor(lng))*3600;
-	
+
 	int i = 1201-(int)(n/(3));
 	int j = (int)(e/(3));
-	
+
 	int tilesOffsetX = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
 	int tilesOffsetY = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
 	if(i+height*stepSize>1200){
@@ -300,22 +301,22 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 			getTile(lat-1.0,lng+1.0,3);
 		}
 	}
-	
+
 	point = j+i*1201;						//the file index of the NW corner
 
 	//------------Open file and read data into array----------------------------
 
-	
+
 	int h;
 	char number [2];
-	
+
 	int whichTile;
 	int tileX;
 	int tileY;
 	ifstream file;
 	int openTile = -1;;
-	
-	for(int y = 0; y < height*stepSize; y+=stepSize){						
+
+	for(int y = 0; y < height*stepSize; y+=stepSize){
 		for(int x = 0; x < width*stepSize; x+=stepSize){
 			tileX = x;
 			tileY = y;
@@ -339,15 +340,15 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 				tileY = y-tilesOffsetY;
 				point = 0;
 			}
-			
+
 			if(openTile!=whichTile){
 				//printf("%s",tiles[whichTile].c_str());
 				openTile = whichTile;
 				file.close();
 				file.open(tiles[whichTile].c_str(),ios::in|ios::binary);
 			}
-			
-			
+
+
 			file.seekg((point+tileX+tileY*1201)*2,ios::beg);
 			file.read(number,2);
 			h = number[1];
@@ -355,13 +356,13 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 				h = h+255;
 			}
 			h+= number[0]*256;
-			
+
 			if(h==0){
 				h=-waterDrop*verticalscale;
 			}
-			
-			//If a void exists, marks it as -100
-			if(h<-100){
+
+			//If a void exists, marks it as -1000
+			if(h<-1000){
 				h=-verticalscale*100*stepSize;
 			}
 			//rotate model to correct orientation
@@ -369,9 +370,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 			hList.at((height-1-y/stepSize)*width+x/stepSize) = h/(verticalscale*stepSize)+baseHeight; 	//+baseHeight so that the bottom of the model does not bleed through to the top
 		}
 	}
-	
+
 	writeSTLfromArray();
 	return 0;
 }
-
-
