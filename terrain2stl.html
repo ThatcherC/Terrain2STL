@@ -28,10 +28,7 @@
 				color: white;
 			}
 		</style>
-		<script type="text/javascript"
-			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy89lQ2fSex7Te1CeMbr3Yf0iPycf3H9w">
-		</script>
-		<script type="text/javascript" src="gmaps-gridlines.js"></script>
+	<!--	<script type="text/javascript" src="gmaps-gridlines.js"></script> -->
 		<script type = "text/javascript" src="/terrain2stl/socket.io/socket.io.js"></script>
 		<script src="http://coinwidget.com/widget/coin.js"></script>
 
@@ -41,7 +38,7 @@
 			var rectangle;
 			var latBox;
 			var lngBox;
-			var mapCenter = new google.maps.LatLng(44.1579, -69.0864);
+			var mapCenter;
 			var minBoxWidth = 0.03333; //width of box in degrees = 40 arc seconds
 			var boxWidth = 0.03333;
 			var scaleSlider;
@@ -66,6 +63,7 @@
 			});
 
 			function initializeMap(){
+				mapCenter = new google.maps.LatLng(44.1579, -69.0864)
 				var mapOptions = {
 					center: mapCenter,
 					zoom: 8,
@@ -79,7 +77,7 @@
 
 				map = new google.maps.Map(document.getElementById("gmap"),
 					mapOptions);
-				gridlines = new Graticule(map);
+			<!--	gridlines = new Graticule(map);  -->
 
 				rectangle = new google.maps.Rectangle({
 					strokeColor: '#FF0000',
@@ -126,9 +124,9 @@
 
 			function postZoom(){
 				if(map.getZoom()>5){
-					gridlines.show();
+					//gridlines.show();
 				}else{
-					gridlines.hide();
+					//gridlines.hide();
 				}
 			}
 
@@ -166,8 +164,6 @@
                         	                ));
 				}
 			}
-
-			google.maps.event.addDomListener(window, 'load', initializeMap);
 		</script>
 		<!-- Google Analytics -->
 		<script>
@@ -237,6 +233,9 @@
 				});
 			</script>
 		<iframe id='downloadframe' style="visibility:hidden"></iframe>
+		<script async defer
+    		  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC2I9wZ-oU3PfWc_3ErfOpO0SJIYco8yWo&callback=initializeMap">
+    		</script>
 	</body>
 	<script src="//printtopeer.io/api/print_button"></script>
 </html>
