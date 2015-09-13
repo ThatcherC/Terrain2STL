@@ -90,6 +90,7 @@ vector<float> hList;
 
 string savefile = "stls/";
 float globalLat = 0;		//Latitude in radians, used for cosine adjustment
+int voidCutoff = 0;
 
 //Takes a height array height array of variable length and turns it into an STL file
 void writeSTLfromArray(){
@@ -101,7 +102,6 @@ void writeSTLfromArray(){
 	triangleCount += 2; 			//base triangles
 	float planarScale = 40/width;
 	float xScale = (float)cos(globalLat);
-	const int voidCutoff = -500;
 
 	if(out.good()){
 		for(int i = 0; i < 80; i++){
@@ -362,8 +362,9 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 			}
 
 			//If a void exists, marks it as -1000
+			voidCutoff = -verticalscale*900*stepSize;
 			if(h<-1000){
-				h=-verticalscale*100*stepSize;
+				h=-verticalscale*1000*stepSize;
 			}
 			//rotate model to correct orientation
 			//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
