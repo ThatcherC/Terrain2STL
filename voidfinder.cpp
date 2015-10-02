@@ -20,17 +20,22 @@ int main(int argc, char **argv){
   file.open(argv[1]);
 
 
-  //scan through every point and find zeros
-    //what's a zero exactly?
-
-  file.read(number,2);
-  h = number[1];
-  if(h<0){
-    h = h+255;
+  //scan through every point and find voids
+  //voids occur at -32768
+  int count = 0;
+  for(int i = 0; i < 2884802; i+=2){  //size of HGT file
+    file.read(number,2);
+    h = number[1];
+    if(h<0){
+      h = h+255;
+    }
+    h+= number[0]*256;
+    if(h == -32768){
+      count++;
+    }
   }
-  h+= number[0]*256;
-  cout << h << "\n";
 
   //count them and print
+  cout << count << "\n";
   return 0;
 }
