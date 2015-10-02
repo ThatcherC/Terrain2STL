@@ -362,9 +362,9 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 			}
 
 			//If a void exists, marks it as -1000
-			voidCutoff = -verticalscale*900*stepSize;
+			voidCutoff = -1900;
 			if(h<-1000){
-				h=-verticalscale*1000*stepSize;
+				h=-verticalscale*2000*stepSize;
 			}
 			//rotate model to correct orientation
 			//hList.at((height-1-y)*width+x) = h/(verticalscale*res); //cast verticalscale to int for COOl effect!
