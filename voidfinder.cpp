@@ -14,9 +14,8 @@ int main(int argc, char **argv){
   int h;
   char number [2];
 	ifstream file;
+
   //open file
-  cout << argv[0] << "\n";
-  cout << argv[1] << "\n";
   file.open(argv[1]);
 
 
@@ -30,12 +29,13 @@ int main(int argc, char **argv){
       h = h+255;
     }
     h+= number[0]*256;
+
+    //if there's even one void, print the filename and break
     if(h == -32768){
-      count++;
+      cout << argv[1] << "\n";
+      break;
     }
   }
 
-  //count them and print
-  cout << count << "\n";
   return 0;
 }
