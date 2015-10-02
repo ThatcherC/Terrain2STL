@@ -1,0 +1,5 @@
+Command adapted from http://stackoverflow.com/a/10523492
+
+========
+
+find hgt_files -maxdepth 1 -type f -exec ./voidfinder {} \; > results.out
