@@ -6,7 +6,7 @@
 #include "stdlib.h"
 #include <string>
 
-// g++ elevstl.cpp -o elevstl -std=c++0x
+// g++ voidfinder.cpp -o voidfinder -std=c++0x
 
 using namespace std;
 
