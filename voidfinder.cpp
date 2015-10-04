@@ -17,8 +17,10 @@ int main(int argc, char **argv){
   int count = 1;
 
   //open file
-  file.open(argv[sizeof(argv)-1]);
-  if(argv[1]=='-c'){
+
+  file.open(argv[argc-1]);
+
+  if(argv[1] == string("-c")){
     count = atoi(argv[2]);
   }
 
@@ -36,7 +38,7 @@ int main(int argc, char **argv){
     if(h == -32768){
       count--;
       if(count==0){
-        cout << argv[1] << "\n";
+        cout << argv[argc-1] << "\n";
         break;
       }
     }
