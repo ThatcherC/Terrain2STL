@@ -14,14 +14,16 @@ int main(int argc, char **argv){
   int h;
   char number [2];
 	ifstream file;
+  int count = 1;
 
   //open file
-  file.open(argv[1]);
-
+  file.open(argv[sizeof(argv)-1]);
+  if(argv[1]=='-c'){
+    count = atoi(argv[2]);
+  }
 
   //scan through every point and find voids
   //voids occur at -32768
-  int count = 0;
   for(int i = 0; i < 2884802; i+=2){  //size of HGT file
     file.read(number,2);
     h = number[1];
@@ -32,8 +34,11 @@ int main(int argc, char **argv){
 
     //if there's even one void, print the filename and break
     if(h == -32768){
-      cout << argv[1] << "\n";
-      break;
+      count--;
+      if(count==0){
+        cout << argv[1] << "\n";
+        break;
+      }
     }
   }
 
