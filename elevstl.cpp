@@ -245,7 +245,8 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	int waterDrop = -2;			//millimeters
 	int baseHeight = 2;			//millimeters
 	//float true_verticalscale = 92.7;	//meters/arcsecond at equator
-	float verticalscale = 23.2;			//true_verticalscale gives models that are too flat to be interesting
+	//old vertical scale was 23.2
+	float verticalscale = 92.7;			//true_verticalscale gives models that are too flat to be interesting
 
 	lat = atof(argv[1]);					//Latitude of NW corner
 	printf("Using latitude: %f\n",lat);
