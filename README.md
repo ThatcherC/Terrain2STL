@@ -20,7 +20,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [x] Make models watertight.
   - [x] Fix voids in edges of models
 - [x] Increase maximum box size.
-- [ ] Fill voids in dataset.
+- [x] Fill voids in dataset.
 - [x] Make the 3 arcsecond resolution available in all sizes.
 - [x] Add ability to cross tiles. !!!
 - [x] Make Print and Download buttons disappear or defocus when the selection box is moved
@@ -30,6 +30,8 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [x] Add longitude compensation to correct for the distortion caused by the Mercator Projection
 - [ ] Draw the northern and southern boundaries of the data set
 - [ ] Normalize model height to remove vertical offset
+- [ ] Change view to fit lat/long
+- [ ] Vertical scale slider
 
 ###Descriptions of Files
 * /hgt_files
