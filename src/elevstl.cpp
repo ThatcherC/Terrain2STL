@@ -62,13 +62,13 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	float verticalscale = 92.7;			//true_verticalscale gives models that are too flat to be interesting
 
 	lat = atof(argv[1]);					//Latitude of NW corner
-	printf("Using latitude: %f\n",lat);
+	clog << "Using latitude: " <<lat;
 	globalLat = 3.1415926*lat/180;
 	lng = atof(argv[2]);					//Longitude of NW corner
-	printf("Using longitude: %f\n",lng);
+	clog << "Using longitude: " << lng;
 	res = atoi(argv[3]);					//arcseconds/tick in model
 	if(res%3!=0){							//must be a multiple of 3
-		printf("Bad resolution\n");
+		clog << "Bad resolution\n";
 		return 0;
 	}
 	res = res/3;							//SRTM data already has a resolution of 3 arcseconds
@@ -79,8 +79,8 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	}else if(res>9){
 		stepSize = 2;
 	}
-	printf("Stepsize: %i\n",stepSize);
-	printf("Using resolution %i\n",res);	//Arc
+	clog << "Stepsize: " << stepSize;
+	clog << "Using resolution " << res;	//Arc
 	height = 40*res/stepSize;
 	width = 40*res/stepSize;
 
@@ -102,12 +102,12 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	int tilesOffsetX = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
 	int tilesOffsetY = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
 	if(i+height*stepSize>1200){
-		printf("Extra tile in y");
+		clog << "Extra tile in y";
 		tilesOffsetY = (1200-i);
 		getTile(lat-1.0,lng,2);
 	}
 	if(j+width*stepSize>1200){
-		printf("Extra tile in x");
+		clog << "Extra tile in x";
 		tilesOffsetX = (1200-j);
 		getTile(lat,lng+1.0,1);
 		if(tilesOffsetY!=10000){
@@ -155,7 +155,6 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 			}
 
 			if(openTile!=whichTile){
-				//printf("%s",tiles[whichTile].c_str());
 				openTile = whichTile;
 				file.close();
 				file.open(tiles[whichTile].c_str(),ios::in|ios::binary);
@@ -183,7 +182,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 		}
 	}
 
-	//passing global lat as an xscale - only needed for 
+	//passing global lat as an xscale - only needed for
 	writeSTLfromArray(hList,width,height,globalLat);
 	return 0;
 }
