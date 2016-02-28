@@ -21,7 +21,6 @@ struct triangle{
 };
 
 
-float globalLat = 0;		//Latitude in radians, used for cosine adjustment
 int voidCutoff = -1900;
 char endTag[2] = {0,0};
 
@@ -75,13 +74,16 @@ void addTriangle(triangle t){
 }
 
 //Takes a height array of variable length and turns it into an STL file
-void writeSTLfromArray(const vector<float> &hList, int width, int height){
+void writeSTLfromArray(const vector<float> &hList, int width, int height, float xScale){
 	uint32_t triangleCount = (width-1)*(height-1)*2;	//number of facets in a void-free surface
 	triangleCount += 4*(width-1);	//triangle counts for the walls of the model
 	triangleCount += 4*(height-1);
 	triangleCount += 2; 			//base triangles
 	float planarScale = 40/width;
-	float xScale = (float)cos(globalLat);
+
+  //Depending on implementation and whether or not geodesic selection boxes
+  //are used, this might be important:
+  //float xScale = (float)cos(globalLat);
 
 	if(cout.good()){
 		for(int i = 0; i < 80; i++){

@@ -86,8 +86,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 
 	hList.resize(width*height,0);
 
-	savefile.append(std::string(argv[4]));
-	printf("Saving to '%s'\n",savefile.c_str());
+	//savefile = std::string(argv[4]))
 
 	waterDrop = atoi(argv[5]);
 	baseHeight = atoi(argv[6]);
@@ -184,6 +183,7 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 		}
 	}
 
-	writeSTLfromArray(hList,width,height);
+	//passing global lat as an xscale - only needed for 
+	writeSTLfromArray(hList,width,height,globalLat);
 	return 0;
 }

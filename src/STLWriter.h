@@ -9,6 +9,6 @@ Vector normalOf(const Vector&, const Vector&, const Vector&);
 triangle createTriangle(const Vector&, const Vector&, const Vector&);
 void addTriangle(triangle t);
 
-void writeSTLfromArray(const std::vector<float>&, int, int);
+void writeSTLfromArray(const std::vector<float>&, int, int, float);
 
 #endif
