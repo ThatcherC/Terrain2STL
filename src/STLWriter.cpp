@@ -86,6 +86,7 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
   //float xScale = (float)cos(globalLat);
 
 	if(cout.good()){
+
 		for(int i = 0; i < 80; i++){
 			cout.write("t",1);
 		}
