@@ -62,10 +62,10 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	float verticalscale = 92.7;			//true_verticalscale gives models that are too flat to be interesting
 
 	lat = atof(argv[1]);					//Latitude of NW corner
-	clog << "Using latitude: " <<lat;
+	clog << "Using latitude: " <<lat << "\n";
 	globalLat = 3.1415926*lat/180;
 	lng = atof(argv[2]);					//Longitude of NW corner
-	clog << "Using longitude: " << lng;
+	clog << "Using longitude: " << lng << "\n";
 	res = atoi(argv[3]);					//arcseconds/tick in model
 	if(res%3!=0){							//must be a multiple of 3
 		clog << "Bad resolution\n";
@@ -79,8 +79,8 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	}else if(res>9){
 		stepSize = 2;
 	}
-	clog << "Stepsize: " << stepSize;
-	clog << "Using resolution " << res;	//Arc
+	clog << "Stepsize: " << stepSize << "\n";
+	clog << "Using resolution " << res << "\n";	//Arc
 	height = 40*res/stepSize;
 	width = 40*res/stepSize;
 
@@ -102,12 +102,12 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 	int tilesOffsetX = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
 	int tilesOffsetY = 10000;	//how much the secondary x tiles should be offset in x, 10000 means only one tile is used
 	if(i+height*stepSize>1200){
-		clog << "Extra tile in y";
+		clog << "Extra tile in y\n";
 		tilesOffsetY = (1200-i);
 		getTile(lat-1.0,lng,2);
 	}
 	if(j+width*stepSize>1200){
-		clog << "Extra tile in x";
+		clog << "Extra tile in x\n";
 		tilesOffsetX = (1200-j);
 		getTile(lat,lng+1.0,1);
 		if(tilesOffsetY!=10000){
