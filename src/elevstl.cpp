@@ -86,10 +86,8 @@ int main(int argc, char **argv)			//lat, long, res, filename, waterDrop, baseHei
 
 	hList.resize(width*height,0);
 
-	//savefile = std::string(argv[4]))
-
-	waterDrop = atoi(argv[5]);
-	baseHeight = atoi(argv[6]);
+	waterDrop = atoi(argv[4]);
+	baseHeight = atoi(argv[5]);
 	getTile(lat,lng,0);
 
 	//-------Find starting file index---------------
