@@ -52,8 +52,8 @@ function handler(req, res){
 io.on('connection',function(socket){
 	console.log("connection");
 	socket.on('parameters',function(params){
-		exec("./elevstl "+params.lat+" "+params.lng+" "+params.scale+" "+params.name+
-				" "+params.waterDrop+" "+params.baseHeight ,function(error,stdout,stderr){
+		exec("./elevstl "+params.lat+" "+params.lng+" "+params.scale+" "+
+				" "+params.waterDrop+" "+params.baseHeight+" > stls/"+params.name ,function(error,stdout,stderr){
 			console.log(stderr||"STL created");
 			if(stderr==""){
 				console.log("No errors");
