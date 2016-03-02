@@ -75,6 +75,7 @@ void addTriangle(triangle t){
 
 //Takes a height array of variable length and turns it into an STL file
 void writeSTLfromArray(const vector<float> &hList, int width, int height, float xScale){
+  xScale = cos(xScale);
 	uint32_t triangleCount = (width-1)*(height-1)*2;	//number of facets in a void-free surface
 	triangleCount += 4*(width-1);	//triangle counts for the walls of the model
 	triangleCount += 4*(height-1);
