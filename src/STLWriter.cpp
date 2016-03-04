@@ -17,7 +17,6 @@ struct triangle{
 };
 
 
-float globalLat = 0;		//Latitude in radians, used for cosine adjustment
 int voidCutoff = -1000;
 char endTag[2] = {0,0};
 
