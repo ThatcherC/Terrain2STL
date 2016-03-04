@@ -76,7 +76,7 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 	triangleCount += 4*(height-1);
 	triangleCount += 2; 			//base triangles
 	float planarScale = 40/width;
-	float xScale = cos(xScale);
+	xScale = cos(xScale);
 
 	if(cout.good()){
 		for(int i = 0; i < 80; i++){
