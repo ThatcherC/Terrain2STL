@@ -2,11 +2,7 @@
 //makes an stl file from a big array
 #include <iostream>
 #include <vector>
-//#include <stdint.h>
-//#include <fstream>
 #include <cmath>
-//#include "stdio.h"
-//#include "stdlib.h"
 #include <string>
 #include "Vector.h"
 #include "STLWriter.h"
@@ -21,7 +17,8 @@ struct triangle{
 };
 
 
-int voidCutoff = -1900;
+float globalLat = 0;		//Latitude in radians, used for cosine adjustment
+int voidCutoff = -1000;
 char endTag[2] = {0,0};
 
 //Determines the normal vector of a triangle from three vertices
@@ -74,73 +71,68 @@ void addTriangle(triangle t){
 }
 
 //Takes a height array of variable length and turns it into an STL file
-void writeSTLfromArray(const vector<float> &hList, int width, int height, float xScale){
-  xScale = cos(xScale);
+void writeSTLfromArray(const vector<float> &hList, int width, int height){
 	uint32_t triangleCount = (width-1)*(height-1)*2;	//number of facets in a void-free surface
 	triangleCount += 4*(width-1);	//triangle counts for the walls of the model
 	triangleCount += 4*(height-1);
 	triangleCount += 2; 			//base triangles
 	float planarScale = 40/width;
-
-  //Depending on implementation and whether or not geodesic selection boxes
-  //are used, this might be important:
-  //float xScale = (float)cos(globalLat);
+	float xScale = (float)cos(globalLat);
 
 	if(cout.good()){
-
 		for(int i = 0; i < 80; i++){
 			cout.write("t",1);
 		}
 		//write a placeholder number
 		cout.write((char *)&triangleCount,4);
+
 		for(int c = 1; c < width; c++){
 			if((int)hList.at(c)>voidCutoff & (int)hList.at(c-1)>voidCutoff & (int)hList.at(c+width-1)>voidCutoff ){
 				Vector a(c*xScale, 0,hList.at(c));
 				Vector b((c-1)*xScale, 0,hList.at(c-1));
-				Vector d((c-1)*xScale, 1,hList.at(c+width-1));
 
 				Vector w(c*xScale,0,0);				//used in model walls
 				Vector z((c-1)*xScale,0,0);
 
-				addTriangle(createTriangle(a,d,b));
 				addTriangle(createTriangle(b,z,a));			//model walls
 				addTriangle(createTriangle(w,a,z));
 			}else{
 				triangleCount-=3;
 			}
 		}
-		for(int y = 1; y < height-1; y++){
+		for(int y = 1; y < height; y++){
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at((y-1)*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff ){
-					Vector a(x*xScale,y,hList.at(y*width+x));
-					Vector b(x*xScale,y-1,hList.at((y-1)*width+x));
-					Vector c((x-1)*xScale,y,hList.at(y*width+x-1));
-					addTriangle(createTriangle(a,c,b));
+				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff & (int)hList.at((y-1)*width+x)>voidCutoff ){
+          float ha = hList.at(y*width+x);
+          float hb = hList.at((y-1)*width+x);         // d---a
+          float hc = hList.at((y-1)*width+x-1);       // |   |
+          float hd = hList.at(y*width+x-1);           // c---b
+
+					Vector a = Vector(x*xScale,y,ha);
+					Vector b = Vector(x*xScale,y-1,hb);
+					Vector c = Vector((x-1)*xScale,y-1,hc);
+          Vector d = Vector((x-1)*xScale,y,hd);
+
+          if(abs(hd-hb)>abs(ha-hc)){
+  					addTriangle(createTriangle(a,d,b));
+            addTriangle(createTriangle(c,b,d));
+          }else{
+            addTriangle(createTriangle(a,d,c));
+            addTriangle(createTriangle(a,c,b));
+          }
 				}else{
-					triangleCount--;
-				}
-			}
-			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff & (int)hList.at((y+1)*width+x-1)>voidCutoff ){
-					Vector a = Vector(x*xScale,y,hList.at(y*width+x));		//same
-					Vector b = Vector((x-1)*xScale,y,hList.at(y*width+x-1));
-					Vector c = Vector((x-1)*xScale,y+1,hList.at((y+1)*width+x-1));
-					addTriangle(createTriangle(a,c,b));
-				}else{
-					triangleCount--;
+					triangleCount-=2;
 				}
 			}
 		}
 		for(int x = 1; x < width; x++){
 			if((int)hList.at((height-1)*width+x)>voidCutoff & (int)hList.at((height-2)*width+x)>voidCutoff & (int)hList.at((height-1)*width+x-1)>voidCutoff){
 				Vector a = Vector(x*xScale,height-1,hList.at((height-1)*width+x));		//same
-				Vector b = Vector(x*xScale,height-2,hList.at((height-2)*width+x));
 				Vector c = Vector((x-1)*xScale,height-1,hList.at((height-1)*width+x-1));
 
 				Vector w = Vector(x*xScale,height-1,0);		//used in model walls
 				Vector z = Vector((x-1)*xScale,height-1,0);
 
-				addTriangle(createTriangle(a,c,b));
 				addTriangle(createTriangle(c,a,z));			//model walls
 				addTriangle(createTriangle(w,z,a));
 			}else{
