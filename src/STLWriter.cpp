@@ -112,7 +112,7 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 					Vector c = Vector((x-1)*xScale,y-1,hc);
           Vector d = Vector((x-1)*xScale,y,hd);
 
-          if(abs(hd-hb)>abs(ha-hc)){
+          if(abs(hd-hb)<abs(ha-hc)){
   					addTriangle(createTriangle(a,d,b));
             addTriangle(createTriangle(c,b,d));
           }else{
