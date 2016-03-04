@@ -2,11 +2,7 @@
 //makes an stl file from a big array
 #include <iostream>
 #include <vector>
-//#include <stdint.h>
-//#include <fstream>
 #include <cmath>
-//#include "stdio.h"
-//#include "stdlib.h"
 #include <string>
 #include "Vector.h"
 #include "STLWriter.h"
@@ -21,7 +17,8 @@ struct triangle{
 };
 
 
-int voidCutoff = -1900;
+float globalLat = 0;		//Latitude in radians, used for cosine adjustment
+int voidCutoff = -1000;
 char endTag[2] = {0,0};
 
 //Determines the normal vector of a triangle from three vertices
@@ -74,20 +71,15 @@ void addTriangle(triangle t){
 }
 
 //Takes a height array of variable length and turns it into an STL file
-void writeSTLfromArray(const vector<float> &hList, int width, int height, float xScale){
-  xScale = cos(xScale);
+void writeSTLfromArray(const vector<float> &hList, int width, int height){
 	uint32_t triangleCount = (width-1)*(height-1)*2;	//number of facets in a void-free surface
 	triangleCount += 4*(width-1);	//triangle counts for the walls of the model
 	triangleCount += 4*(height-1);
 	triangleCount += 2; 			//base triangles
 	float planarScale = 40/width;
-
-  //Depending on implementation and whether or not geodesic selection boxes
-  //are used, this might be important:
-  //float xScale = (float)cos(globalLat);
+	float xScale = (float)cos(globalLat);
 
 	if(cout.good()){
-
 		for(int i = 0; i < 80; i++){
 			cout.write("t",1);
 		}
