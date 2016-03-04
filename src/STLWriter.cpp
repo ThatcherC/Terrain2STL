@@ -93,54 +93,54 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 		}
 		//write a placeholder number
 		cout.write((char *)&triangleCount,4);
-		for(int c = 1; c < width; c++){
+
+    for(int c = 1; c < width; c++){
 			if((int)hList.at(c)>voidCutoff & (int)hList.at(c-1)>voidCutoff & (int)hList.at(c+width-1)>voidCutoff ){
 				Vector a(c*xScale, 0,hList.at(c));
 				Vector b((c-1)*xScale, 0,hList.at(c-1));
-				Vector d((c-1)*xScale, 1,hList.at(c+width-1));
 
 				Vector w(c*xScale,0,0);				//used in model walls
 				Vector z((c-1)*xScale,0,0);
 
-				addTriangle(createTriangle(a,d,b));
 				addTriangle(createTriangle(b,z,a));			//model walls
 				addTriangle(createTriangle(w,a,z));
 			}else{
 				triangleCount-=3;
 			}
 		}
-		for(int y = 1; y < height-1; y++){
+		for(int y = 1; y < height; y++){
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at((y-1)*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff ){
-					Vector a(x*xScale,y,hList.at(y*width+x));
-					Vector b(x*xScale,y-1,hList.at((y-1)*width+x));
-					Vector c((x-1)*xScale,y,hList.at(y*width+x-1));
-					addTriangle(createTriangle(a,c,b));
+				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff & (int)hList.at((y-1)*width+x)>voidCutoff ){
+          float ha = hList.at(y*width+x);
+          float hb = hList.at((y-1)*width+x);         // d---a
+          float hc = hList.at((y-1)*width+x-1);       // |   |
+          float hd = hList.at(y*width+x-1);           // c---b
+
+					Vector a = Vector(x*xScale,y,ha);
+					Vector b = Vector(x*xScale,y-1,hb);
+					Vector c = Vector((x-1)*xScale,y-1,hc);
+          Vector d = Vector((x-1)*xScale,y,hd);
+
+          if(abs(hd-hb)>abs(ha-hc)){
+  					addTriangle(createTriangle(a,d,b));
+            addTriangle(createTriangle(c,b,d));
+          }else{
+            addTriangle(createTriangle(a,d,c));
+            addTriangle(createTriangle(a,c,b));
+          }
 				}else{
-					triangleCount--;
-				}
-			}
-			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff & (int)hList.at((y+1)*width+x-1)>voidCutoff ){
-					Vector a = Vector(x*xScale,y,hList.at(y*width+x));		//same
-					Vector b = Vector((x-1)*xScale,y,hList.at(y*width+x-1));
-					Vector c = Vector((x-1)*xScale,y+1,hList.at((y+1)*width+x-1));
-					addTriangle(createTriangle(a,c,b));
-				}else{
-					triangleCount--;
+					triangleCount-=2;
 				}
 			}
 		}
 		for(int x = 1; x < width; x++){
 			if((int)hList.at((height-1)*width+x)>voidCutoff & (int)hList.at((height-2)*width+x)>voidCutoff & (int)hList.at((height-1)*width+x-1)>voidCutoff){
 				Vector a = Vector(x*xScale,height-1,hList.at((height-1)*width+x));		//same
-				Vector b = Vector(x*xScale,height-2,hList.at((height-2)*width+x));
 				Vector c = Vector((x-1)*xScale,height-1,hList.at((height-1)*width+x-1));
 
 				Vector w = Vector(x*xScale,height-1,0);		//used in model walls
 				Vector z = Vector((x-1)*xScale,height-1,0);
 
-				addTriangle(createTriangle(a,c,b));
 				addTriangle(createTriangle(c,a,z));			//model walls
 				addTriangle(createTriangle(w,z,a));
 			}else{
