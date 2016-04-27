@@ -28,7 +28,7 @@ string getTile(float lat, float lng){
 	if(file.length()==6)file.insert(4,"0");
 
 	file.append(".hgt");
-	file.insert(0,"../Terrain2STL-master/hgt_files/");
+	file.insert(0,"./hgt_files/");
 
 	return file;
 }
