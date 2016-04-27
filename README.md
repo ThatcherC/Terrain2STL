@@ -29,9 +29,9 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
   - [ ] Add a resolution slider
 - [x] Add longitude compensation to correct for the distortion caused by the Mercator Projection
 - [ ] Draw the northern and southern boundaries of the data set
-- [ ] Normalize model height to remove vertical offset
+- [x] Normalize model height to remove vertical offset
 - [ ] Change view to fit lat/long
-- [ ] Vertical scale slider
+- [x] Vertical scale slider
 
 ###Descriptions of Files
 * /hgt_files
