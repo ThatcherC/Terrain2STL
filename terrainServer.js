@@ -22,7 +22,7 @@ app.post("/stl",function(req,res){
 	var b = req.body;
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
-	var filename = "./terrain-"+counter+".stl"
+	var filename = "./stls/terrain-"+counter+".stl"
 
 	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
 			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" 1 2 > "+filename;
@@ -34,7 +34,7 @@ app.post("/stl",function(req,res){
 
 				 res.download(filename);
 			 });
-
+	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
 });
 
