@@ -38,7 +38,7 @@ function initializeMap(){
   google.maps.visualRefresh = true;
   map = new google.maps.Map(document.getElementById("gmap"),
     mapOptions);
-  addMoonMaps(map);
+  //addMoonMaps(map);
 
   google.maps.event.addListener(map, 'maptypeid_changed', function() {
     console.log(map.getMapTypeId());
