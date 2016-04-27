@@ -31,7 +31,7 @@ app.post("/stl",function(req,res){
 	exec(command, function(error,stdout,stderr){
 				 console.log(stderr||"STL created");
 				 //
-
+				 res.type("application/sla");
 				 res.download(filename);
 			 });
 	counter++;
