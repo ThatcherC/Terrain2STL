@@ -25,9 +25,9 @@ app.post("/stl",function(req,res){
 	var filename = "./stls/terrain-"+counter+".stl"
 
 	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
-			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" 1 2 > "+filename;
+			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" > "+filename;
 
-  console.log(command);
+  //console.log(command);
 	exec(command, function(error,stdout,stderr){
 				 console.log(stderr||"STL created");
 				 //

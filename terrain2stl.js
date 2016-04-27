@@ -13,6 +13,10 @@ var rotationSlider;
 var rotationLabel;
 var vScaleSlider;
 var vScaleLabel;
+var waterDropSlider;
+var waterDropLabel;
+var baseHeightSlider;
+var baseHeightLabel;
 
 
 function initializeMap(){
@@ -70,6 +74,10 @@ function initializeMap(){
   rotationLabel = document.getElementById("rotationLabel");
   vScaleSlider = document.getElementsByName("vScale")[0];
   vScaleLabel = document.getElementById("vScaleLabel");
+  waterDropSlider = document.getElementsByName("waterDrop")[0];
+  waterDropLabel = document.getElementById("waterDropLabel");
+  baseHeightSlider = document.getElementsByName("baseHeight")[0];
+  baseHeightLabel = document.getElementById("baseHeightLabel");
 
   google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
 }
@@ -125,6 +133,14 @@ function changeRotation(){
 
 function changeVScale(){
   vScaleLabel.innerHTML = vScaleSlider.value;
+}
+
+function changeWaterDrop(){
+  waterDropLabel.innerHTML = waterDropSlider.value;
+}
+
+function changeBaseHeight(){
+  baseHeightLabel.innerHTML = baseHeightSlider.value;
 }
 
 function updateLatLng(){
