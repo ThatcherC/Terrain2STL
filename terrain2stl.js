@@ -24,8 +24,8 @@ function initializeMap(){
 
   var mapOptions = {
     center: mapCenter,
-    zoom: 3,
-    minZoom: 6,
+    zoom: 6,
+    minZoom: 3,
     maxZoom: 13,
     streetViewControl: false,
     mapTypeControlOptions: {
