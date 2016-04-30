@@ -20,12 +20,12 @@ var baseHeightLabel;
 
 
 function initializeMap(){
-  mapCenter = new google.maps.LatLng(37.954, -122.375);
+  mapCenter = new google.maps.LatLng(44.191442, -69.074608);
 
   var mapOptions = {
     center: mapCenter,
-    zoom: 8,
-    minZoom: 3,
+    zoom: 3,
+    minZoom: 6,
     maxZoom: 13,
     streetViewControl: false,
     mapTypeControlOptions: {

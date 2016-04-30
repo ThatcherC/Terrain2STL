@@ -10,15 +10,11 @@ var app = express();
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-var router = {};
-router['/'] = '/terrain2stl.html';
-router['/index.html'] = '/terrain2stl.html';
-
 app.listen(8080);
 
 var counter = 0;
 
-app.post("/stl",function(req,res){
+app.post("/",function(req,res){
 	var b = req.body;
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
