@@ -25,13 +25,17 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [x] Add ability to cross tiles. !!!
 - [x] Make Print and Download buttons disappear or defocus when the selection box is moved
 - [x] Make the selection box reflect changes in the Lat/Long boxes 
-- [x] Decide on a maximum file size and/or compression
+- [x] Decide on a maximum file size
   - [ ] Add a resolution slider
 - [x] Add longitude compensation to correct for the distortion caused by the Mercator Projection
 - [ ] Draw the northern and southern boundaries of the data set
-- [ ] Normalize model height to remove vertical offset
+- [x] Normalize model height to remove vertical offset
 - [ ] Change view to fit lat/long
-- [ ] Vertical scale slider
+- [x] Vertical scale slider
+  - [ ] Increase scale range (maybe to 4x)
+- [ ] Add a negative version for molds
+- [ ] Make a manifold surface option (bigger file, but better performance)
+- [ ] Compress STL files
 
 ###Descriptions of Files
 * /hgt_files
