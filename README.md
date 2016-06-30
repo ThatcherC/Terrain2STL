@@ -36,6 +36,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [ ] Add a negative version for molds
 - [ ] Make a manifold surface option (bigger file, but better performance)
 - [ ] Compress STL files
+- [ ] Re-add latitude compensation
 
 ###Descriptions of Files
 * /hgt_files
