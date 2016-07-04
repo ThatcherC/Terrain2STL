@@ -22,10 +22,13 @@ app.post("/stl",function(req,res){
 	var b = req.body;
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
-	var filename = "./stls/terrain-"+counter+".stl"
+	var zipname  = "./stls/terrain-"+counter;
+	var filename = "./stls/rawmodel-"+counter+".stl";
 
 	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
 			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" > "+filename;
+	command += "; zip -q "+zipname+" "+filename+"; rm "+filename;
+	console.log(command);
 
   //console.log(command);
 	exec(command, function(error,stdout,stderr){
