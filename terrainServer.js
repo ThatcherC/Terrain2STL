@@ -30,8 +30,8 @@ app.post("/",function(req,res){
 	exec(command, function(error,stdout,stderr){
 				 console.log(stderr||"STL created");
 				 //
-				 res.type("application/sla");
-				 res.download(filename);
+				 res.type("application/zip");
+				 res.download(zipname+".zip");
 			 });
 	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
