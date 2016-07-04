@@ -1,67 +1,48 @@
 //Node server for hgt-to-stl program
 //Listens on port 8081
-var app = require('http').createServer(handler)
-var io = require('socket.io')({resource:"/terrain2stl/socket.io"});
+var express = require('express');
+var bodyParser = require('body-parser');
 var fs = require('fs');
 var exec = require('child_process').exec;
 var config = require('./config');
 
-var router = {};
-router['/'] = '/terrain2stl.html';
-router['/index.html'] = '/terrain2stl.html';
-router['/gmaps-gridlines.js'] = '/gmaps-gridlines.js';
+var app = express();
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.listen(8080);
-io.listen(app);
 
-function handler(req, res){
-	//add an about page?
+var counter = 0;
 
-	console.log(req.url);
+app.post("/",function(req,res){
+	var b = req.body;
+	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
-	var filename;
-	if(router[req.url]!=null){
-		//if(config.logRequests & req.url=='/'){fs.appendFile(config.requestLogPath,req.connection.remoteAddress+"\t"+new Date().toString()+"\n");}
-		filename = router[req.url];
-	}else if(req.url.slice(-4)=='.stl'){
-		filename = "/stls"+req.url;
-		//next two lines come from: http://stackoverflow.com/a/7288883/2019017
-		res.setHeader('Content-disposition', 'attachment; filename=' + req.url.slice(1));
-		res.setHeader('Content-type', "application/sla");
-	}else if(req.url="favicon.ico"){
-		res.end();
-	}else{
-		filename = "404.html";
-	}
-	if(filename!=undefined){
-		fs.readFile(__dirname + filename,
-			function (err, data) {
-				if (err) {
-				  console.log(err);
-				  res.writeHead(500);
-				  return res.end('Error loading page');
-				}
-				res.writeHead(200);
-				res.end(data);
-		 	 });
-	}
-}
+	var zipname  = "./stls/terrain-"+counter;
+	var filename = "./stls/rawmodel-"+counter+".stl";
 
+	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
+			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" > "+filename;
+	command += "; zip -q "+zipname+" "+filename+"; rm "+filename;
+	console.log(command);
 
+  //console.log(command);
+	exec(command, function(error,stdout,stderr){
+				 console.log(stderr||"STL created");
+				 //
+				 res.type("application/sla");
+				 res.download(filename);
+			 });
+	counter++;
+	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
+});
 
-io.on('connection',function(socket){
-	console.log("connection");
-	socket.on('parameters',function(params){
-		exec("./elevstl "+params.lat+" "+params.lng+" "+params.scale+" "+
-				" "+params.waterDrop+" "+params.baseHeight+" > stls/"+params.name ,function(error,stdout,stderr){
-			console.log(stderr||"STL created");
-			if(stderr==""){
-				console.log("No errors");
-				socket.emit('download',{'status':'ready'});
-				if(config.logParams){fs.appendFile(config.paramLogPath,params.lat+"\t"+params.lng+"\t"+params.scale+"\n");}
-			}else{
-				socket.emit('download',{'status':'failed'});
-			};
-		});
-	});
+app.get("/test.stl",function(req,res){
+	fs.readFile("test.stl",function(err,data){
+		console.log(err);
+		res.setHeader('Content-disposition', 'attachment; filename=' + "test.stl");
+	  res.setHeader('Content-type', "application/sla");
+	  res.writeHead(200);
+		res.end(data);
+	})
 });
