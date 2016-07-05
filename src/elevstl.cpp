@@ -58,6 +58,6 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	//passing global lat as an xscale - only needed for
 	//writeSTLfromArray(hList,width,height,globalLat);
 	//passing zero as latittude to bypass lat compensation
-	writeSTLfromArray(hList,width,height,0);
+	writeSTLfromArray(hList,width,height,globalLat);
 	return 0;
 }
