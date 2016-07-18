@@ -32,7 +32,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [x] Normalize model height to remove vertical offset
 - [ ] Change view to fit lat/long
 - [x] Vertical scale slider
-  - [ ] Increase scale range (maybe to 4x)
+  - [x] Increase scale range (maybe to 4x)
 - [ ] Add a negative version for molds
 - [ ] Make a manifold surface option (bigger file, but better performance)
 - [x] Compress STL files
