@@ -154,5 +154,6 @@ function updateLatLng(){
       {lat: _lat, lng:_lng+boxWidth},
       {lat: _lat, lng: _lng},
     ]);
+    map.setCenter({lat: _lat, lng: _lng});
   }
 }
