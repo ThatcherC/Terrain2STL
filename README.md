@@ -30,7 +30,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 - [x] Add longitude compensation to correct for the distortion caused by the Mercator Projection
 - [ ] Draw the northern and southern boundaries of the data set
 - [x] Normalize model height to remove vertical offset
-- [ ] Change view to fit lat/long
+- [x] Change view to fit lat/long
 - [x] Vertical scale slider
   - [x] Increase scale range (maybe to 4x)
 - [ ] Add a negative version for molds
