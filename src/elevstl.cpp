@@ -32,7 +32,6 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	int stepSize = 1;
 	int waterDrop = -2;			//millimeters
 	int baseHeight = 2;			//millimeters
-	int stepSize = 1;
 
 	//float true_verticalscale = 92.7;	//meters/arcsecond at equator
 	//old vertical scale was 23.2
