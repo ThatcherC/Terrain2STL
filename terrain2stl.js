@@ -72,10 +72,8 @@ function initializeMap(){
 
   sizeSlider = document.getElementsByName("boxSize")[0];
   sizeLabel = document.getElementById("boxSizeLabel");
-
   scaleSlider = document.getElementsByName("boxScale")[0];
   scaleLabel = document.getElementById("boxScaleLabel");
-
   rotationSlider = document.getElementsByName("rotation")[0];
   rotationLabel = document.getElementById("rotationLabel");
   vScaleSlider = document.getElementsByName("vScale")[0];
