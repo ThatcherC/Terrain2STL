@@ -41,7 +41,7 @@ int getTileIndex(float lat, float lng){
 
 
 //width and heigth are in 'pixels'
-vector<float> getElevations(float _lat,float _lng,int width,int height,float vscale,float rot, int waterDrop, int baseHeight){
+vector<float> getElevations(float _lat,float _lng,int width,int height,float vscale,float rot, int waterDrop, int baseHeight, int stepSize){
 	int tileNumber = 0;
 	string tileName = "";
 	ifstream file;
@@ -59,6 +59,9 @@ vector<float> getElevations(float _lat,float _lng,int width,int height,float vsc
 		for(int y = 0; y<height; y++){
 			float u = (float)y/1200 - (float)height/1200;
 			float v = (float)x/1200;
+
+			u *= stepSize;
+			v *= stepSize;
 
 			//get the lat and lng for each point
 			float lat = _lat + u*cos(rot) + v*sin(rot);

@@ -19,8 +19,7 @@ float globalLat = 0;
 vector<float> hList;
 const float  PI=3.14159265358979f;
 
-int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
-//no need for res anymore - always use best res
+int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight, stepSize
 //width and height are in units of steps or maybe degrees??
 //rot is in degrees
 {
@@ -33,6 +32,7 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	int stepSize = 1;
 	int waterDrop = -2;			//millimeters
 	int baseHeight = 2;			//millimeters
+	int stepSize = 1;
 
 	//float true_verticalscale = 92.7;	//meters/arcsecond at equator
 	//old vertical scale was 23.2
@@ -53,7 +53,12 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	waterDrop = atoi(argv[7]);
 	baseHeight = atoi(argv[8]);
 
-	hList = getElevations(lat,lng,width,height,userscale/verticalscale,rot,waterDrop,baseHeight);
+	stepSize = atoi(argv[9]);
+	clog << "Step size: " << stepSize << " units\n";
+
+	float scaleFactor = (userscale/verticalscale) / ((float) stepSize);
+
+	hList = getElevations(lat,lng,width,height,scaleFactor,rot,waterDrop,baseHeight,stepSize);
 
 	//passing global lat as an xscale - only needed for
 	//writeSTLfromArray(hList,width,height,globalLat);
