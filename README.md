@@ -18,6 +18,9 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
 ###To-Do List
 
 - [ ] Add a resolution slider
+  ~~Box size is in multiples of 120, so allowable downscales are 2,3,4,5,6,8,..~~
+  Actually DEM resolution is 1/3, allowable downscales  are 2,4,5,8
+  Probably 1/8 resolution is minimum desirable
 - [ ] Draw the northern and southern boundaries of the data set
 - [ ] Add a negative version for molds
 - [ ] Make a manifold surface option (bigger file, but better performance)
