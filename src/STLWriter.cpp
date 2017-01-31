@@ -17,7 +17,7 @@ struct triangle{
 };
 
 
-int voidCutoff = -1000;
+int voidCutoff = 0;
 char endTag[2] = {0,0};
 
 //Determines the normal vector of a triangle from three vertices
@@ -101,7 +101,7 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 		}
 		for(int y = 1; y < height; y++){
 			for(int x = 1; x < width; x++){
-				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff & (int)hList.at((y-1)*width+x)>voidCutoff ){
+				if((int)hList.at(y*width+x)>voidCutoff & (int)hList.at(y*width+x-1)>voidCutoff & (int)hList.at((y-1)*width+x)>voidCutoff & (int)hList.at((y-1)*width+x-1)>voidCutoff){
           float ha = hList.at(y*width+x);
           float hb = hList.at((y-1)*width+x);         // d---a
           float hc = hList.at((y-1)*width+x-1);       // |   |
