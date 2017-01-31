@@ -22,7 +22,7 @@ app.post("/",function(req,res){
 	var filename = "./stls/rawmodel-"+counter+".stl";
 
 	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
-			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" > "+filename;
+			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale+" > "+filename;
 	command += "; zip -q "+zipname+" "+filename+"; rm "+filename;
 	console.log(command);
 

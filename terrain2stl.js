@@ -9,6 +9,8 @@ var boxWidth = 0.03333;
 var boxRotation = 0;
 var sizeSlider;
 var sizeLabel;
+var scaleSlider;
+var scaleLabel;
 var rotationSlider;
 var rotationLabel;
 var vScaleSlider;
@@ -70,6 +72,10 @@ function initializeMap(){
 
   sizeSlider = document.getElementsByName("boxSize")[0];
   sizeLabel = document.getElementById("boxSizeLabel");
+
+  scaleSlider = document.getElementsByName("boxScale")[0];
+  scaleLabel = document.getElementById("boxScaleLabel");
+
   rotationSlider = document.getElementsByName("rotation")[0];
   rotationLabel = document.getElementById("rotationLabel");
   vScaleSlider = document.getElementsByName("vScale")[0];
@@ -109,8 +115,11 @@ function postDrag(){		//called after rectangle is dragged
 }
 
 function changeSize(){
-  boxWidth=minBoxWidth*sizeSlider.value/120;
-  sizeLabel.innerHTML = sizeSlider.value;
+  var boxScale = scaleSlider.value;
+  scaleLabel.innerHTML = scaleSlider.value;
+
+  boxWidth=minBoxWidth*sizeSlider.value*boxScale/120;
+  sizeLabel.innerHTML = sizeSlider.value*boxScale;
   centerToView();
 }
 
