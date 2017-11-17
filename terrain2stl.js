@@ -33,7 +33,8 @@ function initializeMap(){
     mapTypeControlOptions: {
       mapTypeIds: [google.maps.MapTypeId.TERRAIN,"moon-visible","moon-elevation","mars-visible","mars-elevation"]
     },
-    mapTypeId:google.maps.MapTypeId.TERRAIN
+    mapTypeId:google.maps.MapTypeId.TERRAIN,
+    gestureHandling: 'greedy'
   };
 
 
