@@ -152,7 +152,7 @@ function changeBaseHeight(){
 }
 
 function updateLatLng(){
-  var _lat = Math.min(Math.max(parseFloat(document.getElementById('c-lat').value),-56),60);
+  var _lat = Math.min(Math.max(parseFloat(document.getElementById('c-lat').value),-69),69);
   var _lng = Math.min(Math.max(parseFloat(document.getElementById('c-lng').value),-179),180);
   document.getElementById('c-lat').value = _lat;
   document.getElementById('c-lng').value = _lng;
