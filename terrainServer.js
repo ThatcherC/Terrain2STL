@@ -24,14 +24,23 @@ app.post("/",function(req,res){
 	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
 			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale+" > "+filename;
 	command += "; zip -q "+zipname+" "+filename+"; rm "+filename;
-	console.log(command);
+	
+	startTime = Date.now()
+	paramLog = startTime+"\t"+b.lat+"\t"+b.lng+
+		"\t"+b.boxSize+"\t"+b.boxScale+"\t"+
+		b.vScale+"\t"+b.rotation+"\t"+b.waterDrop+"\t"+b.baseHeight+"\t";
 
-  //console.log(command);
+	//console.log(command);
+
 	exec(command, function(error,stdout,stderr){
 				 console.log(stderr||"STL created");
 				 //
 				 res.type("application/zip");
 				 res.download(zipname+".zip");
+				logString = paramLog+Date.now()+"\n";
+				fs.writeFile("logs/params.log", logString,function(err){
+					if(err) throw err;
+				});
 			 });
 	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
