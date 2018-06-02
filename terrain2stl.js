@@ -37,8 +37,6 @@ function initializeMap(){
     gestureHandling: 'greedy'
   };
 
-
-
   latBox = document.getElementById("c-lat");
   lngBox = document.getElementById("c-lng");
 
@@ -70,7 +68,6 @@ function initializeMap(){
     geodesic:true
   });
 
-
   sizeSlider = document.getElementsByName("boxSize")[0];
   sizeLabel = document.getElementById("boxSizeLabel");
   scaleSlider = document.getElementsByName("boxScale")[0];
@@ -85,8 +82,43 @@ function initializeMap(){
   baseHeightLabel = document.getElementById("baseHeightLabel");
 
   google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
+
+  initializeForm()
 }
 
+//https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
+function initializeForm(){
+  var form = document.getElementById("paramForm");
+  function sendData() {
+    var XHR = new XMLHttpRequest();
+
+    // Bind the FormData object and the form element
+    var FD = new FormData(form);
+
+    // Define what happens on successful data submission
+    XHR.addEventListener("load", function(event) {
+      console.log(event.target.responseText);
+    });
+
+    // Define what happens in case of error
+    XHR.addEventListener("error", function(event) {
+      console.log('Oops! Something went wrong.');
+    });
+
+    // Set up our request
+    XHR.open("POST", "/gen");
+
+    // The data sent is what the user provided in the form
+    XHR.send(FD);
+  }
+
+  // ...and take over its submit event.
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    sendData();
+  });
+}
 
 function centerToView(){
   mapCenter = map.getCenter();

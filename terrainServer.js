@@ -18,8 +18,9 @@ app.post("/",function(req,res){
 	var b = req.body;
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
-	var zipname  = "./stls/terrain-"+counter;
-	var filename = "./stls/rawmodel-"+counter+".stl";
+	var fileNum  = counter;
+	var zipname  = "./stls/terrain-"+fileNum;
+	var filename = "./stls/rawmodel-"+fileNum+".stl";
 
 	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
 			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale+" > "+filename;
@@ -34,9 +35,9 @@ app.post("/",function(req,res){
 
 	exec(command, function(error,stdout,stderr){
 				 console.log(stderr||"STL created");
-				 //
-				 res.type("application/zip");
-				 res.download(zipname+".zip");
+				 res.end(String(fileNum));
+				 //res.type("application/zip");
+				 //res.download(zipname+".zip");
 				logString = paramLog+Date.now()+"\n";
 				fs.appendFile("logs/params.log", logString,function(err){
 					if(err) throw err;
