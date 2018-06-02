@@ -38,7 +38,7 @@ app.post("/",function(req,res){
 				 res.type("application/zip");
 				 res.download(zipname+".zip");
 				logString = paramLog+Date.now()+"\n";
-				fs.writeFile("logs/params.log", logString,function(err){
+				fs.appendFile("logs/params.log", logString,function(err){
 					if(err) throw err;
 				});
 			 });
