@@ -94,7 +94,7 @@ function initializeForm(){
 
   $( "form" ).submit(function( event ) {
     var str = $( this ).serialize();
-    console.log( str );
+    //console.log( str );
     sendData(str);
     event.preventDefault();
   });
