@@ -83,21 +83,36 @@ function initializeMap(){
 
   google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
 
-  initializeForm()
+  initializeForm();
 }
 
 //https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
 function initializeForm(){
   var form = document.getElementById("paramForm");
-  function sendData() {
-    var XHR = new XMLHttpRequest();
+  var downloadButton = document.getElementById("downloadbtn");
+  //var downloadLink   = document.getElementById("downloadlink");
 
-    // Bind the FormData object and the form element
-    var FD = new FormData(form);
+  $( "form" ).submit(function( event ) {
+    var str = $( this ).serialize();
+    console.log( str );
+    sendData(str);
+    event.preventDefault();
+  });
+
+  
+  function sendData(str) {
+    downloadButton.style = "visibility:hidden";
+    var XHR = new XMLHttpRequest();
 
     // Define what happens on successful data submission
     XHR.addEventListener("load", function(event) {
-      console.log(event.target.responseText);
+      var modelNumber = event.target.responseText;
+      var modelName   = "stls/terrain-"+modelNumber+".zip";
+      
+      //make download button visible
+      downloadButton.style = "visibility:visible";
+      //give link the right href
+      downloadButton.href = modelName;
     });
 
     // Define what happens in case of error
@@ -106,19 +121,15 @@ function initializeForm(){
     });
 
     // Set up our request
-    XHR.open("POST", "/gen");
+    XHR.open("POST", "gen",true);
+    XHR.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
 
     // The data sent is what the user provided in the form
-    XHR.send(FD);
+    XHR.send(str);
   }
-
-  // ...and take over its submit event.
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    sendData();
-  });
 }
+
 
 function centerToView(){
   mapCenter = map.getCenter();
