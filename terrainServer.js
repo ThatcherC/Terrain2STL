@@ -25,7 +25,7 @@ app.post("/",function(req,res){
 	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
 			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale+" > "+filename;
 	command += "; zip -q "+zipname+" "+filename;
-
+	
 	startTime = Date.now()
 	paramLog = startTime+"\t"+b.lat+"\t"+b.lng+
 		"\t"+b.boxSize+"\t"+b.boxScale+"\t"+
