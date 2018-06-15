@@ -101,6 +101,8 @@ function initializeForm(){
 
   
   function sendData(str) {
+    $("#genButton").addClass("disabled");
+    $("#genButton").html("<i>Generating...</i>");
     downloadButton.style = "visibility:hidden";
     var XHR = new XMLHttpRequest();
 
@@ -113,6 +115,8 @@ function initializeForm(){
       downloadButton.style = "visibility:visible";
       //give link the right href
       downloadButton.href = modelName;
+      $("#genButton").removeClass("disabled");
+      $("#genButton").html("Generate Model");
     });
 
     // Define what happens in case of error
