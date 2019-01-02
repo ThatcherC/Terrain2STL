@@ -27,6 +27,7 @@
   "homepage": "https://github.com/ThatcherC/Terrain2STL#readme",
   "dependencies": {
     "body-parser": "^1.15.0",
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "task-queue": "^1.0.2"
   }
 }
