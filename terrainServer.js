@@ -47,7 +47,7 @@ app.post("/",function(req,res){
 				fs.appendFile("logs/params.log", logString,function(err){
 					if(err) throw err;
 				});
-			}]};
+			}]});
 	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
 });
