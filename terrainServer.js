@@ -51,13 +51,3 @@ app.post("/",function(req,res){
 	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
 });
-
-app.get("/test.stl",function(req,res){
-	fs.readFile("test.stl",function(err,data){
-		console.log(err);
-		res.setHeader('Content-disposition', 'attachment; filename=' + "test.stl");
-	  res.setHeader('Content-type', "application/sla");
-	  res.writeHead(200);
-		res.end(data);
-	})
-});
