@@ -3,9 +3,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
-var execSync = require('child_process').exec;
+var exec = require('child_process').exec;
 var config = require('./config');
-var tq = require('task-queue');
+var queue = require("queue");
 
 var app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -15,8 +15,10 @@ app.listen(8080);
 var counter = 0;
 
 //initialization from https://www.npmjs.com/package/task-queue
-var queue = tq.Queue({capacity: 30, concurrency: 2});
-queue.start();
+var q = queue()
+q.concurrency = 2;
+q.timeout=20000;
+q.autostart = true;
 
 app.post("/",function(req,res){
 	var b = req.body;
@@ -37,8 +39,8 @@ app.post("/",function(req,res){
 
 	//console.log(command);
 
-	queue.enqueue(execSync,
-		{args: [command,{timeout: 30000}, function(error,stdout,stderr){
+	q.push(function(cb){
+			exec(command, function(error,stdout,stderr){
 				 console.log(stderr||"STL "+fileNum+ " created");
 				 res.end(String(fileNum));
 				 //res.type("application/zip");
@@ -47,7 +49,8 @@ app.post("/",function(req,res){
 				fs.appendFile("logs/params.log", logString,function(err){
 					if(err) console.log("> Error!: "+err);
 				});
-			}]});
+				cb();
+			})});
 	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
 });
