@@ -3,7 +3,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
-var exec = require('child_process').exec;
+var execSync = require('child_process').exec;
 var config = require('./config');
 var tq = require('task-queue');
 
@@ -15,7 +15,7 @@ app.listen(8080);
 var counter = 0;
 
 //initialization from https://www.npmjs.com/package/task-queue
-var queue = tq.Queue({capacity: 10, concurrency: 1});
+var queue = tq.Queue({capacity: 30, concurrency: 2});
 queue.start();
 
 app.post("/",function(req,res){
@@ -29,7 +29,7 @@ app.post("/",function(req,res){
 	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
 			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale+" > "+filename;
 	command += "; zip -q "+zipname+" "+filename;
-
+        console.log("> Request for "+b.lat+" "+b.lng);
 	startTime = Date.now()
 	paramLog = startTime+"\t"+b.lat+"\t"+b.lng+
 		"\t"+b.boxSize+"\t"+b.boxScale+"\t"+
@@ -37,15 +37,15 @@ app.post("/",function(req,res){
 
 	//console.log(command);
 
-	queue.enqueue(exec,
-		{args: [command, function(error,stdout,stderr){
-				 console.log(stderr||"STL created");
+	queue.enqueue(execSync,
+		{args: [command,{timeout: 30000}, function(error,stdout,stderr){
+				 console.log(stderr||"STL "+fileNum+ " created");
 				 res.end(String(fileNum));
 				 //res.type("application/zip");
 				 //res.download(zipname+".zip");
 				logString = paramLog+Date.now()+"\n";
 				fs.appendFile("logs/params.log", logString,function(err){
-					if(err) throw err;
+					if(err) console.log("> Error!: "+err);
 				});
 			}]});
 	counter++;
