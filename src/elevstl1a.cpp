@@ -7,7 +7,7 @@
 #include <vector>
 #include "Vector.h"
 #include "LatLng.h"
-#include "STLWriter.h"
+#include "STLWriter1a.h"
 #include "Elevation1a.h"
 
 
@@ -57,11 +57,11 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 
 	float scaleFactor = (userscale/verticalscale) / ((float) stepSize);
 
-	hList = getElevations(lat,lng,width,height,scaleFactor,rot,waterDrop,baseHeight,stepSize);
+	hList = getElevations(lat,lng,width*3,height*3,scaleFactor,rot,waterDrop,baseHeight,stepSize);
 
 	//passing global lat as an xscale - only needed for
 	//writeSTLfromArray(hList,width,height,globalLat);
 	//passing zero as latittude to bypass lat compensation
-	writeSTLfromArray(hList,width,height,globalLat);
+	writeSTLfromArray(hList,width*3,height*3,globalLat);
 	return 0;
 }
