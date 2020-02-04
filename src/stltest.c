@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdint.h>
 #include "STLWriter.h"
 
 // gcc stltest.c STLWriter.c -o stltest -lm
