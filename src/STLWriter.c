@@ -41,7 +41,8 @@ void addTriangle(FILE * file, triangle t){
   fwrite(&t.normal.z, sizeof(float), 1, file);
 
 	//vertices
-  #warning "Could these all be written in one line?"
+  fwrite(&t.a.x, sizeof(float), 9, file);
+  /* vvv replace by ^^^
   fwrite(&t.a.x, sizeof(float), 1, file);
   fwrite(&t.a.y, sizeof(float), 1, file);
   fwrite(&t.a.z, sizeof(float), 1, file);
@@ -53,7 +54,7 @@ void addTriangle(FILE * file, triangle t){
   fwrite(&t.c.x, sizeof(float), 1, file);
   fwrite(&t.c.y, sizeof(float), 1, file);
   fwrite(&t.c.z, sizeof(float), 1, file);
-
+  */
   fwrite(endTag, 1, 2, file);
 }
 
