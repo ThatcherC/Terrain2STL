@@ -16,12 +16,14 @@ int main(){
 
   FILE *stl = fopen("corner.stl", "w");
 
-  startSTLfile(stl, 4);
+  startSTLfile(stl, 1);
 
   addTriangle(stl, xy);
   addTriangle(stl, yz);
   addTriangle(stl, zx);
   addTriangle(stl, xyz);
+
+  setSTLtriangles(stl, 4);
 
   fclose(stl);
 }

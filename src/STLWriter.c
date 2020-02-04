@@ -68,6 +68,12 @@ void startSTLfile(FILE * file, int numTriangles){
   fwrite((uint32_t *)&numTriangles,4,1,file);
 }
 
+void setSTLtriangles(FILE * file, int numTriangles){
+  fseek(file, 80, SEEK_SET);
+  //write the number of triangles (4 bytes)
+  fwrite((uint32_t *)&numTriangles,4,1,file);
+}
+
 /*
 
 //Takes a height array of variable length and turns it into an STL file

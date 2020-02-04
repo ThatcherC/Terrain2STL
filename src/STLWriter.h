@@ -20,5 +20,6 @@ vect3 normalOf(vect3, vect3, vect3);
 triangle createTriangle(vect3, vect3, vect3);
 void addTriangle(FILE *, triangle t);
 void startSTLfile(FILE *, int);
+void setSTLtriangles(FILE *, int);
 
 //void writeSTLfromArray(const std::vector<float>&, int, int, float);
