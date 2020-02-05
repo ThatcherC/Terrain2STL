@@ -68,7 +68,7 @@ int writeXStrip(FILE * file, float * lh, float * uh, int width, float xScale, fl
 			struct _vect3 d = {(x-1)*xScale,hyval,hd};
 
 			//choose where to split the square based on local curvature
-			if( abs(hd-hb) < abs(ha-hc) ){
+			if( fabs(hd-hb) < fabs(ha-hc) ){
 				addTriangle(file, createTriangle(a,d,b));
 				addTriangle(file, createTriangle(c,b,d));
 			}else{
