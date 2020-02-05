@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+int voidCutoff;
+
 typedef struct _vect3 {
   float x;
   float y;
