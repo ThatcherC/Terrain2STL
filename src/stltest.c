@@ -16,6 +16,7 @@ int main(){
 
   FILE *stl = fopen("corner.stl", "w");
 
+  //write the STL header, saying we have just one triangle for now
   startSTLfile(stl, 1);
 
   addTriangle(stl, xy);
@@ -23,6 +24,7 @@ int main(){
   addTriangle(stl, zx);
   addTriangle(stl, xyz);
 
+  //set the number of triangles in the header to 4
   setSTLtriangles(stl, 4);
 
   fclose(stl);
