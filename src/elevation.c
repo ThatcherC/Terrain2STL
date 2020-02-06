@@ -64,26 +64,27 @@ int getElevationLine(float* heights, int width, int nthLine, float startLat,floa
 					tileNumber = getTileIndex(intlat, intlng);
 					getTile(tileName, 100, intlat, intlng);
 
-					printf("Opening %s\n", tileName);
-
 					if(elfile != NULL) fclose(elfile);
 					#warning "Handle the case where we can't open the file - return zeros for ocean elev"
 		      elfile = fopen(tileName, "rb");
 					if(elfile == NULL){
-						printf("Couldn't open %s\n", tileName);
 					}
 				}
 
 				int p = (int) (1201*(intlng-floor(intlng)));		//x or lng component
 				p += (int)(1201*(ceil(intlat)-intlat))* 1201;	//y or lat component
-				fseek(elfile, p*2, SEEK_SET);
-				fread(number, 1, 2, elfile);
-		    h = number[1];
-		    if(h<0){
-		      h = h+255;
-		    }
-		    h += number[0]<<8;
 
+				if(elfile==NULL){  //if we can't open the file, return height = 0
+					h = 0;
+				}else{             //otherwise read height from file
+					fseek(elfile, p*2, SEEK_SET);
+					fread(number, 1, 2, elfile);
+			    h = number[1];
+			    if(h<0){
+			      h = h+255;
+			    }
+			    h += number[0]<<8;
+				}
 				if(h==0){
 					h-= waterDrop/vscale;
 				}
@@ -101,7 +102,7 @@ int getElevationLine(float* heights, int width, int nthLine, float startLat,floa
 		float intHeight = westLng*(1-fracLng) + eastLng*fracLng;
 		heights[x] = intHeight*vscale+baseHeight;
 	}
-	fclose(elfile);
+	if(elfile!=NULL) fclose(elfile);
 	elfile = NULL;
 	return 1;
 }
