@@ -11,7 +11,7 @@
 float globalLat = 0;
 const float  PI=3.14159265358979f;
 
-int writeLineWall(FILE * file, float * heights, int width, float xScale, float yval){
+int writeLineWall(FILE * file, float * heights, int width, float xScale, float yval, int flipNormal){
 	int numtris = 0;
 
 	for(int i = 1; i <width; i++){
@@ -22,8 +22,13 @@ int writeLineWall(FILE * file, float * heights, int width, float xScale, float y
 			struct _vect3 w = {i*xScale,     yval, 0};
 			struct _vect3 z = {(i-1)*xScale, yval, 0};
 
-			addTriangle(file, createTriangle(b,z,a));			//model walls
-			addTriangle(file, createTriangle(w,a,z));
+			if(flipNormal){
+				addTriangle(file, createTriangle(z,b,a));			//model walls
+				addTriangle(file, createTriangle(a,w,z));
+			}else{
+				addTriangle(file, createTriangle(b,z,a));			//model walls
+				addTriangle(file, createTriangle(w,a,z));
+			}
 
 			numtris += 2;
 		}
@@ -135,8 +140,8 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	startSTLfile(stl, 4);
 
 	//get zeroth line
-	getElevationLine(nextline, width, 0, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
-	tris += writeLineWall(stl, nextline, width, cos(globalLat), 0);
+	getElevationLine(nextline, width, -height, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
+	tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
 
 	for(int y = -height+1; y<=0; y++){
 		for(int x = 0; x<width; x++){
@@ -148,7 +153,7 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	}
 
 	//write other x wall
-	tris += writeLineWall(stl, nextline, width, cos(globalLat), -height);
+	tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 1);
 
 	//set the number of triangles in the header to tris
   setSTLtriangles(stl, tris);
