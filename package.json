@@ -28,6 +28,7 @@
   "dependencies": {
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
+    "queue": "^6.0.1",
     "task-queue": "^1.0.2"
   }
 }
