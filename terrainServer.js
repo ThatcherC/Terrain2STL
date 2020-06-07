@@ -70,3 +70,7 @@ app.post("/",function(req,res){
 	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
 });
+
+var datetime = new Date();
+console.log("terrainServer.js starting at:");
+console.log(datetime);
