@@ -95,6 +95,7 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	if(argc!=11){
 		printf("Got %d arguments, expected 10:\n", argc-1);
 		printf("%s lat long width height verticalscale rot waterDrop baseHeight stepSize outputname\n", argv[1]);
+		return -1;
 	}
 	float lat;
 	float lng;
