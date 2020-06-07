@@ -6,7 +6,7 @@
 #include "elevation.h"
 
 
-// gcc elevstl.c STLWriter.c elevation.c -o elevstl -lm
+// gcc elevstl.c STLWriter.c elevation.c -o celevstl -lm
 
 float globalLat = 0;
 const float  PI=3.14159265358979f;
