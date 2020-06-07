@@ -88,10 +88,14 @@ int writeXStrip(FILE * file, float * lh, float * uh, int width, float xScale, fl
 }
 
 
-int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight, stepSize
+int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight, stepSize, outputname
 //width and height are in units of steps or maybe degrees??
 //rot is in degrees
 {
+	if(argc!=11){
+		printf("Got %d arguments, expected 10:\n", argc-1);
+		printf("%s lat long width height verticalscale rot waterDrop baseHeight stepSize outputname\n", argv[1]);
+	}
 	float lat;
 	float lng;
 	int width;
@@ -120,6 +124,9 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	baseHeight = atoi(argv[8]);
 
 	stepSize = atoi(argv[9]);
+
+	char * outputName = argv[10];
+
 	printf("Step size: %d units\n", stepSize);
 
 	float scaleFactor = (userscale/verticalscale) / ((float) stepSize);
@@ -136,7 +143,7 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	}
 
 	int tris = 0;
-	FILE* stl = fopen("out.stl", "w");
+	FILE* stl = fopen(outputName, "w");
 	startSTLfile(stl, 4);
 
 	//get zeroth line
