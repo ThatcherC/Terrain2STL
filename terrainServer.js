@@ -37,7 +37,7 @@ app.post("/",function(req,res){
 		"\t"+b.boxSize+"\t"+b.boxScale+"\t"+
 		b.vScale+"\t"+b.rotation+"\t"+b.waterDrop+"\t"+b.baseHeight+"\t";
 
-	//console.log(command);
+	console.log(command);
 
 	q.push(function(cb){
 			exec(command, function(error,stdout,stderr){
@@ -46,9 +46,9 @@ app.post("/",function(req,res){
 				 //res.type("application/zip");
 				 //res.download(zipname+".zip");
 				logString = paramLog+Date.now()+"\n";
-				fs.appendFile("logs/params.log", logString,function(err){
-					if(err) console.log("> Error!: "+err);
-				});
+				//fs.appendFile("logs/params.log", logString,function(err){
+				//	if(err) console.log("> Error!: "+err);
+				//});
 				cb();
 			})});
 	counter++;
