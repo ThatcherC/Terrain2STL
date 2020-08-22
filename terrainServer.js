@@ -62,9 +62,12 @@ app.post("/",function(req,res){
 				 //res.type("application/zip");
 				 //res.download(zipname+".zip");
 				logString = paramLog+Date.now()+"\n";
-				//fs.appendFile("logs/params.log", logString,function(err){
-				//	if(err) console.log("> Error!: "+err);
-				//});
+				fs.appendFile("logs/params.log", logString,function(err){
+					if(err) console.log("> Error!: "+err);
+				});
+				fs.appendFile("logs/commands.log", command+"\n", function(err){
+					if(err) console.log("> Error!: "+err);
+				});
 				cb();
 			})});
 	counter++;
