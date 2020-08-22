@@ -1,30 +1,16 @@
-//STL.cpp
-//makes an stl file from a big array
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <string>
-#include "Vector.h"
+#include <stdio.h>
+#include <stdint.h>
 #include "STLWriter.h"
-
-using namespace std;
-
-struct triangle{
-  Vector a;
-  Vector b;
-  Vector c;
-  Vector normal;
-};
 
 
 int voidCutoff = 0;
 char endTag[2] = {0,0};
 
 //Determines the normal vector of a triangle from three vertices
-Vector normalOf(const Vector &p1, const Vector &p2, const Vector &p3){
-	Vector u(0,0,0);
-	Vector v(0,0,0);
-	Vector r(0,0,0);
+vect3 normalOf(vect3 p1, vect3 p2, vect3 p3){
+	vect3 u = {0,0,0};
+	vect3 v = {0,0,0};
+	vect3 r = {0,0,0};
 	u.x = p2.x-p1.x;
 	u.y = p2.y-p1.y;
 	u.z = p2.z-p1.z;
@@ -38,7 +24,7 @@ Vector normalOf(const Vector &p1, const Vector &p2, const Vector &p3){
 }
 
 //Creates a triangle and its normal vector from three vertices
-triangle createTriangle(const Vector &j, const Vector &k, const Vector &l){
+triangle createTriangle(vect3 j, vect3 k, vect3 l){
 	triangle t;
 	t.a = j;
 	t.b = k;
@@ -48,26 +34,47 @@ triangle createTriangle(const Vector &j, const Vector &k, const Vector &l){
 }
 
 //Writes a triangle into the STL file
-void addTriangle(triangle t){
+void addTriangle(FILE * file, triangle t){
 	//normal vector1
-	cout.write((char *)&t.normal.x,sizeof(float));
-	cout.write((char *)&t.normal.y,sizeof(float));
-	cout.write((char *)&t.normal.z,sizeof(float));
+  fwrite(&t.normal.x, sizeof(float), 1, file);
+  fwrite(&t.normal.y, sizeof(float), 1, file);
+  fwrite(&t.normal.z, sizeof(float), 1, file);
 
 	//vertices
-	cout.write((char *)&t.a.x,sizeof(float));
-    cout.write((char *)&t.a.y,sizeof(float));
-    cout.write((char *)&t.a.z,sizeof(float));
+  fwrite(&t.a.x, sizeof(float), 9, file);
+  /* vvv replace by ^^^
+  fwrite(&t.a.x, sizeof(float), 1, file);
+  fwrite(&t.a.y, sizeof(float), 1, file);
+  fwrite(&t.a.z, sizeof(float), 1, file);
 
-	cout.write((char *)&t.b.x,sizeof(float));
-    cout.write((char *)&t.b.y,sizeof(float));
-    cout.write((char *)&t.b.z,sizeof(float));
+  fwrite(&t.b.x, sizeof(float), 1, file);
+  fwrite(&t.b.y, sizeof(float), 1, file);
+  fwrite(&t.b.z, sizeof(float), 1, file);
 
-	cout.write((char *)&t.c.x,sizeof(float));
-    cout.write((char *)&t.c.y,sizeof(float));
-    cout.write((char *)&t.c.z,sizeof(float));
-  	cout.write(endTag,2);
+  fwrite(&t.c.x, sizeof(float), 1, file);
+  fwrite(&t.c.y, sizeof(float), 1, file);
+  fwrite(&t.c.z, sizeof(float), 1, file);
+  */
+  fwrite(endTag, 1, 2, file);
 }
+
+void startSTLfile(FILE * file, int numTriangles){
+  rewind(file);
+  //write the 80 byte STL header (can be whatever)
+  for(int i = 0; i < 80; i++){
+    fwrite("t",1,1,file);
+  }
+  //write the number of triangles (4 bytes)
+  fwrite((uint32_t *)&numTriangles,4,1,file);
+}
+
+void setSTLtriangles(FILE * file, int numTriangles){
+  fseek(file, 80, SEEK_SET);
+  //write the number of triangles (4 bytes)
+  fwrite((uint32_t *)&numTriangles,4,1,file);
+}
+
+/*
 
 //Takes a height array of variable length and turns it into an STL file
 void writeSTLfromArray(const vector<float> &hList, int width, int height, float xScale){
@@ -183,3 +190,5 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 	}
 	clog << "Triangle count: " << triangleCount << "\n";
 }
+
+*/

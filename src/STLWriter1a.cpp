@@ -5,7 +5,7 @@
 #include <cmath>
 #include <string>
 #include "Vector.h"
-#include "STLWriter.h"
+#include "STLWriter1a.h"
 
 using namespace std;
 
@@ -88,11 +88,11 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
     //walls in x direction, y=0
     for(int c = 1; c < width; c++){
 			if((int)hList.at(c)>voidCutoff & (int)hList.at(c-1)>voidCutoff & (int)hList.at(c+width-1)>voidCutoff ){
-				Vector a(c*xScale, 0,hList.at(c));
-				Vector b((c-1)*xScale, 0,hList.at(c-1));
+				Vector a(c*xScale/3, 0,hList.at(c));
+				Vector b((c-1)*xScale/3, 0,hList.at(c-1));
 
-				Vector w(c*xScale,0,0);				//used in model walls
-				Vector z((c-1)*xScale,0,0);
+				Vector w(c*xScale/3,0,0);				//used in model walls
+				Vector z((c-1)*xScale/3,0,0);
 
 				addTriangle(createTriangle(b,z,a));			//model walls
 				addTriangle(createTriangle(w,a,z));
@@ -108,10 +108,10 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
           float hc = hList.at((y-1)*width+x-1);       // |   |
           float hd = hList.at(y*width+x-1);           // c---b
 
-					Vector a = Vector(x*xScale,y,ha);
-					Vector b = Vector(x*xScale,y-1,hb);
-					Vector c = Vector((x-1)*xScale,y-1,hc);
-          Vector d = Vector((x-1)*xScale,y,hd);
+					Vector a = Vector(x*xScale/3,y/3,ha);
+					Vector b = Vector(x*xScale/3,(y-1)/3,hb);
+					Vector c = Vector((x-1)*xScale/3,(y-1)/3,hc);
+          Vector d = Vector((x-1)*xScale,y/3,hd);
 
           if(abs(hd-hb)<abs(ha-hc)){
   					addTriangle(createTriangle(a,d,b));
@@ -128,11 +128,11 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
     //walls in x direction, y=top
 		for(int x = 1; x < width; x++){
 			if((int)hList.at((height-1)*width+x)>voidCutoff & (int)hList.at((height-2)*width+x)>voidCutoff & (int)hList.at((height-1)*width+x-1)>voidCutoff){
-				Vector a = Vector(x*xScale,height-1,hList.at((height-1)*width+x));		//same
-				Vector c = Vector((x-1)*xScale,height-1,hList.at((height-1)*width+x-1));
+				Vector a = Vector(x*xScale/3,(height-1)/3,hList.at((height-1)*width+x));		//same
+				Vector c = Vector((x-1)*xScale/3,(height-1)/3,hList.at((height-1)*width+x-1));
 
-				Vector w = Vector(x*xScale,height-1,0);		//used in model walls
-				Vector z = Vector((x-1)*xScale,height-1,0);
+				Vector w = Vector(x*xScale/3,(height-1)/3,0);		//used in model walls
+				Vector z = Vector((x-1)*xScale/3,(height-1)/3,0);
 
 				addTriangle(createTriangle(c,a,z));			//model walls
 				addTriangle(createTriangle(w,z,a));
@@ -147,10 +147,10 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 		Vector bb = Vector(0,0,0);
 		for(int y = 1; y < width; y++){						//adds walls in the y direction for
 			if((int)hList.at(y*width)>voidCutoff & (int)hList.at((y-1)*width)>voidCutoff){
-				st =  Vector(0,y,hList.at(y*width));			//for x=0 first
-				sb =  Vector(0,y-1,hList.at((y-1)*width));
-				bt =  Vector(0,y,0);
-				bb =  Vector(0,y-1,0);
+				st =  Vector(0,y/3,hList.at(y*width));			//for x=0 first
+				sb =  Vector(0,(y-1)/3,hList.at((y-1)*width));
+				bt =  Vector(0,y/3,0);
+				bb =  Vector(0,(y-1)/3,0);
 
 				addTriangle(createTriangle(bb,sb,st));
 				addTriangle(createTriangle(st,bt,bb));
@@ -158,10 +158,10 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 				triangleCount-=2;
 			}
 			if((int)hList.at(y*width+width-1)>voidCutoff & (int)hList.at(y*width-1)>voidCutoff){
-				st =  Vector((width-1)*xScale,y,hList.at(y*width+width-1));		//for x=width next
-				sb = Vector((width-1)*xScale,y-1,hList.at(y*width-1));
-				bt = Vector((width-1)*xScale,y,0);
-				bb = Vector((width-1)*xScale,y-1,0);
+				st =  Vector((width-1)*xScale/3,y/3,hList.at(y*width+width-1));		//for x=width next
+				sb = Vector((width-1)*xScale/3,(y-1)/3,hList.at(y*width-1));
+				bt = Vector((width-1)*xScale/3,y/3,0);
+				bb = Vector((width-1)*xScale/3,(y-1)/3,0);
 
 				addTriangle(createTriangle(sb,bb,st));
 				addTriangle(createTriangle(bt,st,bb));

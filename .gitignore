@@ -1,0 +1,10 @@
+*.hgt
+*.stl
+*.zip
+*.log
+/hgt_files/*
+/node_modules/*
+*.min.*
+elevstl
+celevstl
+/stls/*
