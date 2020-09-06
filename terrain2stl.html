@@ -1,241 +1,196 @@
 <html>
 	<head>
 		<title>Terrain2STL</title>
-		<style type="text/css">
-			html { height: 100% }
-			body { height: 100%; margin: 0; padding: 0 }
-			#gmap { height: 100%; width: 70%; float:left}
-			#controlbox {width:25%; float: left; padding-top: 10;padding-left:10}
-			#downloadframe {height: 1%; width:25%; float: left;padding-left:10}
-			#errorbox {height: 5%; width:25%; float: left; padding-left:10}
-			#inst {width:25%; float: left; padding-left:10}
-			#donations {width:25%; float: right; padding-right:20}
-			#download-button {
-				float:right;
-				display:inline-block;
-				background-color: #1C86B6  ;
-				color: white;
-				text-decoration: none;
-				border-radius: 9999px;
-				text-align: center;
-				padding: 14px 37px 14px 40px;
-				margin: 8px;
-				font-family: sans-serif;
-				font-size: 12pt;
-			}
-			#download-button:hover{
-				background-color: #065C82;
-				color: white;
-			}
-		</style>
-	<script type = "text/javascript" src="/terrain2stl/socket.io/socket.io.js"></script>
-		<script type = "text/javascript" src="/terrain2stl/socket.io/socket.io.js"></script>
-		<script src="http://coinwidget.com/widget/coin.js"></script>
-
-		<script type="text/javascript">
-			var map;
-			var gridlines;
-			var rectangle;
-			var latBox;
-			var lngBox;
-			var mapCenter;
-			var minBoxWidth = 0.03333; //width of box in degrees = 40 arc seconds
-			var boxWidth = 0.03333;
-			var scaleSlider;
-			var scaleLabel;
-			var savename;
-
-			var socket = io.connect("jthatch.com",{path:"/terrain2stl/socket.io"});	//146.148.78.19
-			socket.on('download',function(data){
-				console.log(data.status);
-				var pButton = document.getElementById('my-print-button');
-
-				if(data.status=='ready'){
-					pButton.setAttribute('data-print', "http://jthatch.com/terrain2stl/"+savename);
-					pButton.setAttribute('data-print-name', "TerrainModel");
-					pButton.style.visibility = 'visible';
-				}else{
-					alert("Something went wrong. You may be spanning a grid line.");
-					pButton.setAttribute('data-print', "");
-					pButton.setAttribute('data-print-name', "");
-					pButton.style.visibility = 'hidden';
-				}
-			});
-
-			function initializeMap(){
-				mapCenter = new google.maps.LatLng(44.1579, -69.0864)
-				var mapOptions = {
-					center: mapCenter,
-					zoom: 8,
-					minZoom: 3,
-					maxZoom: 13,
-					mapTypeId:google.maps.MapTypeId.TERRAIN
-				};
-
-				latBox = document.getElementById("c-lat");
-				lngBox = document.getElementById("c-lng");
-
-				map = new google.maps.Map(document.getElementById("gmap"),
-					mapOptions);
-			<!--	gridlines = new Graticule(map);  -->
-
-				rectangle = new google.maps.Rectangle({
-					strokeColor: '#FF0000',
-					strokeOpacity: 0.8,
-					strokeWeight: 2,
-					fillColor: '#FF0000',
-					fillOpacity: 0.35,
-					map: map,
-					bounds: new google.maps.LatLngBounds(
-						new google.maps.LatLng(mapCenter.lat(),mapCenter.lng()),	//nw corner*/
-						new google.maps.LatLng(mapCenter.lat()-boxWidth,mapCenter.lng()+boxWidth)	//se corner
-				)});
-				rectangle.setDraggable(true);
-				rectangle.geodesic = true;
-
-				scaleSlider = document.getElementById("scaler");
-				scaleLabel = document.getElementById("scaleLabel");
-
-				google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
-				google.maps.event.addListener(map,'zoom_changed', postZoom);	//call function when zoom level changes
-			}
-
-
-			function centerToView(){
-				mapCenter = map.getCenter();
-				updateRectangle(new google.maps.LatLngBounds(
-						new google.maps.LatLng(mapCenter.lat(),mapCenter.lng()),	//nw corner*/
-						new google.maps.LatLng(mapCenter.lat()-boxWidth,mapCenter.lng()+boxWidth)	//se corner
-					));
-				postDrag();
-			}
-
-			function updateRectangle(rectBounds){
-				rectangle.setBounds(rectBounds);
-			}
-
-			function postDrag(){		//called after rectangle is dragged
-				//for some reason, .getNorthEast() returns the coordinates of the NW corner
-				latBox.value = rectangle.getBounds().getSouthWest().lat().toFixed(4);
-				lngBox.value = rectangle.getBounds().getSouthWest().lng().toFixed(4);
-				var pButton = document.getElementById('my-print-button');			//hide download and print buttons
-				pButton.style.visibility = 'hidden';
-			}
-
-			function postZoom(){
-				if(map.getZoom()>5){
-					//gridlines.show();
-				}else{
-					//gridlines.hide();
-				}
-			}
-
-			function changeScale(){
-				boxWidth=minBoxWidth*scaleSlider.value/120;
-				scaleLabel.innerHTML = scaleSlider.value;
-				centerToView();
-			}
-
-			function sendParameters(){
-				savename = latBox.value+"_"+lngBox.value+"_"+scaleSlider.value+".stl";
-				var lat_param = parseFloat(latBox.value);
-				var lng_param = parseFloat(lngBox.value);
-				var waterDrop = parseInt(document.getElementById("wDrop").value);
-				var baseHeight = parseInt(document.getElementById("bHeight").value);
-				socket.emit('parameters',{'lat':lat_param,'lng':lng_param,
-							'scale':scaleSlider.value/40,'name':savename,
-							'waterDrop':waterDrop,'baseHeight':baseHeight});
-			}
-
-			function downloadSTL(){
-				document.getElementById('downloadframe').setAttribute('src',"/terrain2stl/"+savename);
-				ga('send', 'event', 'Terrain2STL', 'Download');
-			}
-
-			function updateLatLng(){
-				var lat = Math.min(Math.max(parseFloat(document.getElementById('c-lat').value),-56),60);
-				var lng = Math.min(Math.max(parseFloat(document.getElementById('c-lng').value),-179),180);
-				document.getElementById('c-lat').value = lat;
-				document.getElementById('c-lng').value = lng;
-				if(lat && lng){
-					updateRectangle(new google.maps.LatLngBounds(
-         	                                       new google.maps.LatLng(lat,lng),        //nw corner*/
-                	                                new google.maps.LatLng(lat-boxWidth,lng+boxWidth)
-                        	                ));
-				}
-			}
-		</script>
-		<!-- Google Analytics -->
-		<script>
-  			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  			ga('create', 'UA-61036065-1', 'auto');
-  			ga('send', 'pageview');
-		</script>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="//jthatch.com/bootstrap-custom.css">
+		<script type="text/javascript" src="terrain2stl.js"></script>
+		<!-- <script type="text/javascript" src="moonmaps.js"></script> -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+		<script type="text/javascript" src="bootstrap.min.js"></script>
 	</head>
 	<body>
-		<div id="gmap" width=600 height=450>Map didn't load</div>
-		<div id="controlbox">
-		<a style="width:25%;float:left" href="http://github.com/ThatcherC/Terrain2STL">Check this out on Github!</a>
-		<a style="width:25%;float:right"href="mailto:j.thatcher.c+t2s@gmail.com">Email me!</a>
-		<h1>STL Generator</h1>
-		<h4 align="center" style="margin-top:-20;">Now with Accurate Vertical Scaling!</h4>
-		<table>
-			<tr><td colspan=2>Northwest Corner Coordinates</td></tr>
-			<tr><td>Latitude:</td><td><input id="c-lat" onchange="updateLatLng()"></td></tr>
-			<tr><td>Longitude:</td><td><input id="c-lng" onchange="updateLatLng()"></td></tr>
-			<tr><td>Box Size</br>(Arc Seconds)</td><td><input id="scaler" style="width:169px" type="range" min="120" max="4320" step="240" value="120" onchange="changeScale()"><div id="scaleLabel">3</div></td></tr>
-			<tr><td>Water Drop:</td><td><input id="wDrop" value="0" type="number" min="0" max="10" onkeyup="this.value=this.value.replace(/[^\d]/,'')"> Base Height: <input id="bHeight" value="1" type="number" min="1" max="10" onkeyup="this.value=this.value.replace(/[^\d]/,'')"></td>
-			</tr>
-			<tr>
-				<td></td><td><button id="center-latlng" onclick="centerToView()">Center to View</button></td></tr>
-			<tr>
-				<td></td><td><button id="create" onclick="sendParameters()">Create STL File</button></td></tr>
-		</table>
+		<div class="container-fluid">
+			<div class="page-header">
+				<h1>Terrain2STL <small>Create STL models of the surface of Earth</small></h1>
+			</div>
+			<div class="row">
+				<div class="col-md-8"><div style="height:75%" id="gmap">Map didn't load</div></div>
+				<div class="col-md-4" id="controlbox">
+
+					<center><h1>STL Generator</h1></center>
+
+					<form id="paramForm" class="form-horizontal" action="gen" method="post" onsubmit="ga('send', 'event', 'Terrain2STL', 'Model');">
+
+					<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+						<div class="panel panel-default">
+					    <div class="panel-heading" role="tab" id="headingOne">
+					      <h4 class="panel-title">
+					        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
+					          Location
+					        </a>
+					      </h4>
+					    </div>
+					    <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero">
+					      <div class="panel-body">
+									<h4>Northwest Corner Coordinates</h4>
+
+
+										<div class="form-group">
+											<label class="col-sm-3 control-label">Latitude: </label>
+											<div class="col-sm-4">
+												<input class="form-control" value=44.2 name="lat" id="c-lat" onchange="updateLatLng()">
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-3 control-label">Longitude: </label>
+											<div class="col-sm-4">
+												<input class="form-control" value=-69.09 name="lng" id="c-lng" onchange="updateLatLng()"></br>
+											</div>
+										</div>
+
+									<input type="button" class="btn btn-small" onclick="centerToView()" value="Center to View">
+					      </div>
+					    </div>
+					  </div>
+						<div class="panel panel-default">
+					    <div class="panel-heading" role="tab" id="headingOne">
+					      <h4 class="panel-title">
+					        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					          Model Details
+					        </a>
+					      </h4>
+					    </div>
+					    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+					      <div class="panel-body">
+									<div class="form-group">
+										<label class="control-label col-sm-6">Box Size:</label>
+										<div class="col-sm-4">
+											<input name="boxSize" type="range" min="120" max="4920" step="240" value="120" onchange="changeSize()">
+										</div>
+										<div class="col-sm-2" id="boxSizeLabel">120</div>
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-sm-6">Box Scaling Factor:</label>
+										<div class="col-sm-4">
+											<input name="boxScale" type="range" min="1" max="10" step="1" value="1" onchange="changeSize()">
+										</div>
+										<div class="col-sm-2" id="boxScaleLabel">1</div>
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-sm-6">Box Rotation (degrees)</label>
+										<div class="col-sm-4">
+											<input name="rotation" type="range" min="-90" max="90" step="1" value="0" onchange="changeRotation()">
+										</div>
+										<div class="col-sm-2" id="rotationLabel">0</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-6">Vertical Scaling</label>
+										<div class="col-sm-4">
+											<input name="vScale" type="range" min=".5" max="4" step=".1" value="1" onchange="changeVScale()">
+										</div>
+										<div class="col-sm-2" id="vScaleLabel">1</div>
+									</div>
+					      </div>
+					    </div>
+					  </div>
+
+						<div class="panel panel-default">
+					    <div class="panel-heading" role="tab" id="headingFive">
+					      <h4 class="panel-title">
+					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+					          Water and Base Settings
+					        </a>
+					      </h4>
+					    </div>
+							<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+					      <div class="panel-body">
+									<div class="form-group">
+										<label class="control-label col-sm-6">Water Drop (mm):</label>
+										<div class="col-sm-4">
+											<input name="waterDrop" type="range" min="0" max="5" step="1" value="0"  onchange="changeWaterDrop()">
+										</div>
+										<div class="col-sm-2" id="waterDropLabel">0</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-6">Base Height (mm):</label>
+										<div class="col-sm-4">
+											<input name="baseHeight" type="range" min="1" max="10" step="1" value="1"  onchange="changeBaseHeight()">
+										</div>
+										<div class="col-sm-2" id="baseHeightLabel">2</div>
+									</div>
+					      </div>
+					    </div>
+					  </div>
+
+						<div class="panel panel-default">
+					    <div class="panel-heading" role="tab" id="headingThree">
+					      <h4 class="panel-title">
+					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+					          Instructions
+					        </a>
+					      </h4>
+					    </div>
+							<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+					      <div class="panel-body">
+
+									<div id="inst">
+										<h2 align='center' style="margin-top:-10">Instructions</h2></br>
+										<ul style="margin-top:-20">
+											<li>Select the area you want an STL of using the red box</li>
+											<li>'Center to View' will move the box. It's also draggable</li>
+											<li>Rotate and resize the box as needed</li>
+											<li>Z-Scale exaggerates the vertical scale of models</li>
+											<li>Water drop lowers the height of the oceans for emphasis</li>
+											<li>Don't worry about the box skewing with rotations - the model will be accurate to the real terrain</li>
+										</ul>
+									</div>
+
+					      </div>
+					    </div>
+					  </div>
+					</div>
+
+					<button type="submit" id="genButton" class="btn btn-default">Generate Model</button>
+					<a id="downloadbtn" style="visibility:hidden" role="button" class="btn btn-default" href="stls/rawmodel-0.stl">Download</a>
+				</form>
+				<center><small>Terrain2STL is a free-to-use service, but if you want to help <a href="/support.html">support</a> the site, donations are welcome.</small></center>
+				</div>
+			</div>
+			<div class="row">
+	      </br>
+	      <center>
+	        <small><i>
+	          Terrain2STL creates STL files using the <a href='http://www.cgiar-csi.org/data/srtm-90m-digital-elevation-database-v4-1'>SRTM3 dataset</a> from 2000,
+	          which has a resolution of about 90 meters on the equator.
+	        </i></small>
+	      </center>
+	    </div>
+	    <div class="row">
+	      </br>
+	      <center>
+	        <small>
+	          <a href="/">Home</a> | Terrain2STL | <a href="mailto:j.thatcher.c+t2s@gmail.com">Contact</a></br>
+	        </small>
+	      </center>
+	    </div>
+
 		</div>
-		</div>
-		<div id="my-print-button" class="printtopeer-print-button" style="visibility:hidden;">
-			<a onclick="downloadSTL()" id="download-button">Download</a>
-		</div>
-		<div id="inst">
-			<h2 align='center' style="margin-top:-10">Instructions</h2>
-			<ul style="margin-top:-20">
-				<li>Select the area you want an STL of using the red box</li>
-				<li>'Center to View' will move the box. It's also draggable</li>
-				<li>Use the slider to change the box size</li>
-				<li>Water drop lowers the height of the oceans for emphasis</li>
-			</ul>
-		</div>
-		<div id="donations">
-			<h5 align="center"  style="margin-bottom:10; margin-top:0">This website is free to use. Help support server costs, or just say thanks!</h5>
-			<form align="center" style="margin:-3" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----MIIHPwYJKoZIhvcNAQcEoIIHMDCCBywCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYC23DojKcCUvq7jPyR6W6Ny+jyLo+WvUKnO8baA/hvGnczgtuD7vvlYCqeEKHb/0ocxLbAEOn3wfLDmu0qMgDJ/2tW3dQ9tjGhIhyP80DVUN2XAmpSbrHspm5m1HXjv15coyFfQpMiLs/LokWIabN8LQ6lgUPOtfadHbApm5fo9gTELMAkGBSsOAwIaBQAwgbwGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIn+R/jN6VTViAgZhvotZktQFZJ+xIFh7l/GwL6jClYTx4kjg5OcDVvOBJR9MtGxcpntT89cCpwUJjKCH2Nr6JgAzrQi0k/yVO3jBKp7XOG7FgDplAO7FPZbz26TxSdm3hMV53zbWqw5+eDLa/fFTkuDJiTkGonEs4M5ixlVUAW8slwc/fhopaHbVKkyQJAQ3XXCIYP6LbHx1S9GzU6w8mqYhTB6CCA4cwggODMIIC7KADAgECAgEAMA0GCSqGSIb3DQEBBQUAMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbTAeFw0wNDAyMTMxMDEzMTVaFw0zNTAyMTMxMDEzMTVaMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAwUdO3fxEzEtcnI7ZKZL412XvZPugoni7i7D7prCe0AtaHTc97CYgm7NsAtJyxNLixmhLV8pyIEaiHXWAh8fPKW+R017+EmXrr9EaquPmsVvTywAAE1PMNOKqo2kl4Gxiz9zZqIajOm1fZGWcGS0f5JQ2kBqNbvbg2/Za+GJ/qwUCAwEAAaOB7jCB6zAdBgNVHQ4EFgQUlp98u8ZvF71ZP1LXChvsENZklGswgbsGA1UdIwSBszCBsIAUlp98u8ZvF71ZP1LXChvsENZklGuhgZSkgZEwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tggEAMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAgV86VpqAWuXvX6Oro4qJ1tYVIT5DgWpE692Ag422H7yRIr/9j/iKG4Thia/Oflx4TdL+IFJBAyPK9v6zZNZtBgPBynXb048hsP16l2vi0k5Q2JKiPDsEfBhGI+HnxLXEaUWAcVfCsQFvd2A1sxRr67ip5y2wwBelUecP3AjJ+YcxggGaMIIBlgIBATCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE1MDQyODE5MzQxMFowIwYJKoZIhvcNAQkEMRYEFEaxMdM82kx+fC2Rn0bUfnynTn5oMA0GCSqGSIb3DQEBAQUABIGAR5+Zqx6P+FKuNJ+zJtnmKFc3UvxwVnYaisTUIgblkcuugceT9QuKPBWG2ejH9nBUG4T7J5Vr9x+MQMFcATMI6mpRwQ8Q8NSve9x0LCc+qcwL/EHv4YGwjlc5yoLu96+/bgnit91z6t9V0sOMB/hd8MbjoTOF6IZELTA/5axvVL8=-----END PKCS7-----
-">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-			<script>
-				CoinWidgetCom.go({
-					wallet_address: "1KXaAWojYq57SpHdVGMRMYiQ9F9m5AWKZv"
-					, currency: "bitcoin"
-					, counter: "count"
-					, alignment: "br"
-					, qrcode: false
-					, auto_show: false
-					, lbl_button: "Support Terrain2STL"
-					, lbl_address: "Bitcoin Address:"
-					, lbl_count: "donations"
-					, lbl_amount: "BTC"
-				});
-			</script>
-		<iframe id='downloadframe' style="visibility:hidden"></iframe>
+
+
 		<script async defer
-    		  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC2I9wZ-oU3PfWc_3ErfOpO0SJIYco8yWo&callback=initializeMap">
-    		</script>
+    		  src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_API_KEY&callback=initializeMap">
+    </script>
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61036065-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
 	</body>
-	<script src="//printtopeer.io/api/print_button"></script>
 </html>

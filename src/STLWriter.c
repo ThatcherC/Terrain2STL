@@ -1,30 +1,16 @@
-//STL.cpp
-//makes an stl file from a big array
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <string>
-#include "Vector.h"
-#include "STLWriter1a.h"
-
-using namespace std;
-
-struct triangle{
-  Vector a;
-  Vector b;
-  Vector c;
-  Vector normal;
-};
+#include <stdio.h>
+#include <stdint.h>
+#include "STLWriter.h"
 
 
 int voidCutoff = 0;
 char endTag[2] = {0,0};
 
 //Determines the normal vector of a triangle from three vertices
-Vector normalOf(const Vector &p1, const Vector &p2, const Vector &p3){
-	Vector u(0,0,0);
-	Vector v(0,0,0);
-	Vector r(0,0,0);
+vect3 normalOf(vect3 p1, vect3 p2, vect3 p3){
+	vect3 u = {0,0,0};
+	vect3 v = {0,0,0};
+	vect3 r = {0,0,0};
 	u.x = p2.x-p1.x;
 	u.y = p2.y-p1.y;
 	u.z = p2.z-p1.z;
@@ -38,7 +24,7 @@ Vector normalOf(const Vector &p1, const Vector &p2, const Vector &p3){
 }
 
 //Creates a triangle and its normal vector from three vertices
-triangle createTriangle(const Vector &j, const Vector &k, const Vector &l){
+triangle createTriangle(vect3 j, vect3 k, vect3 l){
 	triangle t;
 	t.a = j;
 	t.b = k;
@@ -48,26 +34,47 @@ triangle createTriangle(const Vector &j, const Vector &k, const Vector &l){
 }
 
 //Writes a triangle into the STL file
-void addTriangle(triangle t){
+void addTriangle(FILE * file, triangle t){
 	//normal vector1
-	cout.write((char *)&t.normal.x,sizeof(float));
-	cout.write((char *)&t.normal.y,sizeof(float));
-	cout.write((char *)&t.normal.z,sizeof(float));
+  fwrite(&t.normal.x, sizeof(float), 1, file);
+  fwrite(&t.normal.y, sizeof(float), 1, file);
+  fwrite(&t.normal.z, sizeof(float), 1, file);
 
 	//vertices
-	cout.write((char *)&t.a.x,sizeof(float));
-    cout.write((char *)&t.a.y,sizeof(float));
-    cout.write((char *)&t.a.z,sizeof(float));
+  fwrite(&t.a.x, sizeof(float), 9, file);
+  /* vvv replace by ^^^
+  fwrite(&t.a.x, sizeof(float), 1, file);
+  fwrite(&t.a.y, sizeof(float), 1, file);
+  fwrite(&t.a.z, sizeof(float), 1, file);
 
-	cout.write((char *)&t.b.x,sizeof(float));
-    cout.write((char *)&t.b.y,sizeof(float));
-    cout.write((char *)&t.b.z,sizeof(float));
+  fwrite(&t.b.x, sizeof(float), 1, file);
+  fwrite(&t.b.y, sizeof(float), 1, file);
+  fwrite(&t.b.z, sizeof(float), 1, file);
 
-	cout.write((char *)&t.c.x,sizeof(float));
-    cout.write((char *)&t.c.y,sizeof(float));
-    cout.write((char *)&t.c.z,sizeof(float));
-  	cout.write(endTag,2);
+  fwrite(&t.c.x, sizeof(float), 1, file);
+  fwrite(&t.c.y, sizeof(float), 1, file);
+  fwrite(&t.c.z, sizeof(float), 1, file);
+  */
+  fwrite(endTag, 1, 2, file);
 }
+
+void startSTLfile(FILE * file, int numTriangles){
+  rewind(file);
+  //write the 80 byte STL header (can be whatever)
+  for(int i = 0; i < 80; i++){
+    fwrite("t",1,1,file);
+  }
+  //write the number of triangles (4 bytes)
+  fwrite((uint32_t *)&numTriangles,4,1,file);
+}
+
+void setSTLtriangles(FILE * file, int numTriangles){
+  fseek(file, 80, SEEK_SET);
+  //write the number of triangles (4 bytes)
+  fwrite((uint32_t *)&numTriangles,4,1,file);
+}
+
+/*
 
 //Takes a height array of variable length and turns it into an STL file
 void writeSTLfromArray(const vector<float> &hList, int width, int height, float xScale){
@@ -88,11 +95,11 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
     //walls in x direction, y=0
     for(int c = 1; c < width; c++){
 			if((int)hList.at(c)>voidCutoff & (int)hList.at(c-1)>voidCutoff & (int)hList.at(c+width-1)>voidCutoff ){
-				Vector a(c*xScale/3, 0,hList.at(c));
-				Vector b((c-1)*xScale/3, 0,hList.at(c-1));
+				Vector a(c*xScale, 0,hList.at(c));
+				Vector b((c-1)*xScale, 0,hList.at(c-1));
 
-				Vector w(c*xScale/3,0,0);				//used in model walls
-				Vector z((c-1)*xScale/3,0,0);
+				Vector w(c*xScale,0,0);				//used in model walls
+				Vector z((c-1)*xScale,0,0);
 
 				addTriangle(createTriangle(b,z,a));			//model walls
 				addTriangle(createTriangle(w,a,z));
@@ -108,10 +115,10 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
           float hc = hList.at((y-1)*width+x-1);       // |   |
           float hd = hList.at(y*width+x-1);           // c---b
 
-					Vector a = Vector(x*xScale/3,y/3,ha);
-					Vector b = Vector(x*xScale/3,(y-1)/3,hb);
-					Vector c = Vector((x-1)*xScale/3,(y-1)/3,hc);
-          Vector d = Vector((x-1)*xScale,y/3,hd);
+					Vector a = Vector(x*xScale,y,ha);
+					Vector b = Vector(x*xScale,y-1,hb);
+					Vector c = Vector((x-1)*xScale,y-1,hc);
+          Vector d = Vector((x-1)*xScale,y,hd);
 
           if(abs(hd-hb)<abs(ha-hc)){
   					addTriangle(createTriangle(a,d,b));
@@ -128,11 +135,11 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
     //walls in x direction, y=top
 		for(int x = 1; x < width; x++){
 			if((int)hList.at((height-1)*width+x)>voidCutoff & (int)hList.at((height-2)*width+x)>voidCutoff & (int)hList.at((height-1)*width+x-1)>voidCutoff){
-				Vector a = Vector(x*xScale/3,(height-1)/3,hList.at((height-1)*width+x));		//same
-				Vector c = Vector((x-1)*xScale/3,(height-1)/3,hList.at((height-1)*width+x-1));
+				Vector a = Vector(x*xScale,height-1,hList.at((height-1)*width+x));		//same
+				Vector c = Vector((x-1)*xScale,height-1,hList.at((height-1)*width+x-1));
 
-				Vector w = Vector(x*xScale/3,(height-1)/3,0);		//used in model walls
-				Vector z = Vector((x-1)*xScale/3,(height-1)/3,0);
+				Vector w = Vector(x*xScale,height-1,0);		//used in model walls
+				Vector z = Vector((x-1)*xScale,height-1,0);
 
 				addTriangle(createTriangle(c,a,z));			//model walls
 				addTriangle(createTriangle(w,z,a));
@@ -147,10 +154,10 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 		Vector bb = Vector(0,0,0);
 		for(int y = 1; y < width; y++){						//adds walls in the y direction for
 			if((int)hList.at(y*width)>voidCutoff & (int)hList.at((y-1)*width)>voidCutoff){
-				st =  Vector(0,y/3,hList.at(y*width));			//for x=0 first
-				sb =  Vector(0,(y-1)/3,hList.at((y-1)*width));
-				bt =  Vector(0,y/3,0);
-				bb =  Vector(0,(y-1)/3,0);
+				st =  Vector(0,y,hList.at(y*width));			//for x=0 first
+				sb =  Vector(0,y-1,hList.at((y-1)*width));
+				bt =  Vector(0,y,0);
+				bb =  Vector(0,y-1,0);
 
 				addTriangle(createTriangle(bb,sb,st));
 				addTriangle(createTriangle(st,bt,bb));
@@ -158,10 +165,10 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 				triangleCount-=2;
 			}
 			if((int)hList.at(y*width+width-1)>voidCutoff & (int)hList.at(y*width-1)>voidCutoff){
-				st =  Vector((width-1)*xScale/3,y/3,hList.at(y*width+width-1));		//for x=width next
-				sb = Vector((width-1)*xScale/3,(y-1)/3,hList.at(y*width-1));
-				bt = Vector((width-1)*xScale/3,y/3,0);
-				bb = Vector((width-1)*xScale/3,(y-1)/3,0);
+				st =  Vector((width-1)*xScale,y,hList.at(y*width+width-1));		//for x=width next
+				sb = Vector((width-1)*xScale,y-1,hList.at(y*width-1));
+				bt = Vector((width-1)*xScale,y,0);
+				bb = Vector((width-1)*xScale,y-1,0);
 
 				addTriangle(createTriangle(sb,bb,st));
 				addTriangle(createTriangle(bt,st,bb));
@@ -183,3 +190,5 @@ void writeSTLfromArray(const vector<float> &hList, int width, int height, float 
 	}
 	clog << "Triangle count: " << triangleCount << "\n";
 }
+
+*/

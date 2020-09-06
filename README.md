@@ -3,7 +3,7 @@ Terrain2STL
 
 A web-based service that converts publicly available HGT files to useful STL files.
 
-###Try it Out!
+### Try it Out!
 This project is running on a Google Compute Engine server at [jthatch.com](http://jthatch.com/terrain2stl). It's updated soon after any commit to this repository.
 
 You can also download everything here and start the server with:
@@ -15,7 +15,7 @@ It will run at localhost:8080.
 A few .HGT files are included, but not the whole set. You can get the rest from [the USGS](http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/), or I could send you few.
 
 
-###To-Do List
+### To-Do List
 
 - [ ] Add a resolution slider
   ~~Box size is in multiples of 120, so allowable downscales are 2,3,4,5,6,8,..~~
@@ -46,7 +46,7 @@ A few .HGT files are included, but not the whole set. You can get the rest from 
   * Node.js server. Takes parameters from the HTML page and passes them to elevstl to create the STL.
   * Also handles client downloading of pages and files.
 
-###Done
+### Done
 
 *(Previously on to-do list)*
 
