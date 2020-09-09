@@ -28,8 +28,8 @@ app.post("/",function(req,res){
 	var zipname  = "./stls/terrain-"+fileNum;
 	var filename = "./stls/rawmodel-"+fileNum+".stl";
 
-	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
-			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
+	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth/3+" "
+			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
 			+b.baseHeight+" "+b.boxScale+" "+filename;
 	command += "; zip -q "+zipname+" "+filename;
 
@@ -50,7 +50,7 @@ app.post("/",function(req,res){
         console.log("> Request for "+b.lat+" "+b.lng);
 	startTime = Date.now()
 	paramLog = startTime+"\t"+b.lat+"\t"+b.lng+
-		"\t"+b.boxSize+"\t"+b.boxScale+"\t"+
+		"\t"+b.boxWidth+"\t"+b.boxHeight+"\t"+b.boxScale+"\t"+
 		b.vScale+"\t"+b.rotation+"\t"+b.waterDrop+"\t"+b.baseHeight+"\t";
 
 	console.log(command);
