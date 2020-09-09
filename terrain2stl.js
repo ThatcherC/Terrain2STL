@@ -51,10 +51,10 @@ function initializeMap(){
   });
 
   var rectCorners = [
-    {lat: mapCenter.lat()-boxWidth/2, lng:mapCenter.lng()-boxHeight/2},
-    {lat: mapCenter.lat()-boxWidth/2, lng:mapCenter.lng()+boxHeight/2},
-    {lat: mapCenter.lat()+boxWidth/2, lng:mapCenter.lng()+boxHeight/2},
-    {lat: mapCenter.lat()+boxWidth/2, lng:mapCenter.lng()-boxHeight/2},
+    {lat: mapCenter.lat()-boxHeight/2, lng:mapCenter.lng()-boxWidth/2},
+    {lat: mapCenter.lat()-boxHeight/2, lng:mapCenter.lng()+boxWidth/2},
+    {lat: mapCenter.lat()+boxHeight/2, lng:mapCenter.lng()+boxWidth/2},
+    {lat: mapCenter.lat()+boxHeight/2, lng:mapCenter.lng()-boxWidth/2},
   ];
 
   rectangle = new google.maps.Polygon({
@@ -140,13 +140,13 @@ function initializeForm(){
 
 function centerToView(){
   mapCenter = map.getCenter();
-  var _lat = mapCenter.lat()+boxWidth/2;
-  var _lng = mapCenter.lng()-boxHeight/2;
+  var _lat = mapCenter.lat()+boxHeight/2;
+  var _lng = mapCenter.lng()-boxWidth/2;
 
   updateRectangle(
-    [ {lat: _lat-boxWidth, lng: _lng},
-      {lat: _lat-boxWidth, lng: _lng+boxHeight},
-      {lat: _lat, lng:_lng+boxHeight},
+    [ {lat: _lat-boxHeight, lng: _lng},
+      {lat: _lat-boxHeight, lng: _lng+boxWidth},
+      {lat: _lat, lng:_lng+boxWidth},
       {lat: _lat, lng: _lng},
     ]);
 }
@@ -180,8 +180,8 @@ function changeRotation(){
 
   var base = rectangle.getPath().getAt(3);
 
-  var rotLat = {lat: Math.sin(boxRotation)*boxWidth,lng:Math.cos(boxRotation)*boxWidth};
-  var rotLng = {lat: Math.cos(boxRotation)*boxHeight, lng:Math.sin(boxRotation)*boxHeight};
+  var rotLat = {lat: Math.sin(boxRotation)*boxHeight,lng:Math.cos(boxRotation)*boxWidth};
+  var rotLng = {lat: Math.cos(boxRotation)*boxHeight, lng:Math.sin(boxRotation)*boxWidth};
   updateRectangle(
     [ {lat: base.lat()+rotLat.lat, lng: base.lng()+rotLat.lng},
       {lat: base.lat()+rotLat.lat-rotLng.lat, lng: base.lng()+rotLat.lng+rotLng.lng},
@@ -208,8 +208,8 @@ function updateLatLng(){
   document.getElementById('c-lat').value = _lat;
   document.getElementById('c-lng').value = _lng;
   if(_lat && _lng){
-    updateRectangle([ {lat: _lat-boxWidth, lng: _lng},
-      {lat: _lat-boxWidth, lng: _lng+boxWidth},
+    updateRectangle([ {lat: _lat-boxHeight, lng: _lng},
+      {lat: _lat-boxHeight, lng: _lng+boxWidth},
       {lat: _lat, lng:_lng+boxWidth},
       {lat: _lat, lng: _lng},
     ]);
