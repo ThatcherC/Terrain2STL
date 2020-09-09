@@ -170,7 +170,7 @@ function changeSize(){
   boxWidth=minBoxWidth*widthSlider.value*boxScale/120;
   boxHeight=minBoxWidth*heightSlider.value*boxScale/120;
   widthLabel.innerHTML = widthSlider.value*boxScale;
-  heightLabel.innerHTML = heightLabel.value*boxScale;
+  heightLabel.innerHTML = heightSlider.value*boxScale;
   centerToView();
 }
 
