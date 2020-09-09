@@ -28,8 +28,8 @@ app.post("/",function(req,res){
 	var zipname  = "./stls/terrain-"+fileNum;
 	var filename = "./stls/rawmodel-"+fileNum+".stl";
 
-	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxHeight/3+" "
-			+b.boxWidth/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
+	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth/3+" "
+			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
 			+b.baseHeight+" "+b.boxScale+" "+filename;
 	command += "; zip -q "+zipname+" "+filename;
 
