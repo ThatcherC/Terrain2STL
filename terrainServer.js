@@ -28,6 +28,8 @@ app.post("/",function(req,res){
 	var zipname  = "./stls/terrain-"+fileNum;
 	var filename = "./stls/rawmodel-"+fileNum+".stl";
 
+	b.rotation=0;
+
 	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth/3+" "
 			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
 			+b.baseHeight+" "+b.boxScale+" "+filename;
