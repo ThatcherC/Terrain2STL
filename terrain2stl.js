@@ -169,8 +169,8 @@ function changeSize(){
 
   boxWidth=minBoxWidth*widthSlider.value*boxScale/120;
   boxHeight=minBoxWidth*heightSlider.value*boxScale/120;
-  widthLabel.innerHTML = widthSlider.value*boxScale;
-  heightLabel.innerHTML = heightSlider.value*boxScale;
+  widthLabel.innerHTML =  (widthSlider.value*boxScale /3600).toFixed(2)+"\xB0";
+  heightLabel.innerHTML = (heightSlider.value*boxScale/3600).toFixed(2)+"\xB0";
   centerToView();
 }
 
