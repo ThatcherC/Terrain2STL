@@ -18,6 +18,7 @@
 				<div class="col-md-4" id="controlbox">
 
 					<center><h1>STL Generator</h1></center>
+					<center><i>Now with adjustable rectangle shapes!</i></center></br>
 
 					<form id="paramForm" class="form-horizontal" action="gen" method="post" onsubmit="ga('send', 'event', 'Terrain2STL', 'Model');">
 
@@ -63,21 +64,28 @@
 					    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
 					      <div class="panel-body">
 									<div class="form-group">
-										<label class="control-label col-sm-6">Box Size:</label>
+										<label class="control-label col-sm-6">Box Width:</label>
 										<div class="col-sm-4">
-											<input name="boxSize" type="range" min="120" max="4920" step="240" value="120" onchange="changeSize()">
+											<input name="boxWidth" type="range" min="180" max="2700" step="240" value="120" onchange="changeSize()">
 										</div>
-										<div class="col-sm-2" id="boxSizeLabel">120</div>
+										<div class="col-sm-2" id="boxWidthLabel">0.05&deg</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-6">Box Height:</label>
+										<div class="col-sm-4">
+											<input name="boxHeight" type="range" min="180" max="2700" step="240" value="120" onchange="changeSize()">
+										</div>
+										<div class="col-sm-2" id="boxHeightLabel">0.05&deg</div>
 									</div>
 
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Scaling Factor:</label>
 										<div class="col-sm-4">
-											<input name="boxScale" type="range" min="1" max="10" step="1" value="1" onchange="changeSize()">
+											<input name="boxScale" type="range" min="1" max="12" step="1" value="1" onchange="changeSize()">
 										</div>
 										<div class="col-sm-2" id="boxScaleLabel">1</div>
 									</div>
-
+<!--
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Rotation (degrees)</label>
 										<div class="col-sm-4">
@@ -85,6 +93,7 @@
 										</div>
 										<div class="col-sm-2" id="rotationLabel">0</div>
 									</div>
+-->
 									<div class="form-group">
 										<label class="control-label col-sm-6">Vertical Scaling</label>
 										<div class="col-sm-4">

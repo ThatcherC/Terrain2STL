@@ -6,6 +6,7 @@ var lngBox;
 var mapCenter;
 var minBoxWidth = 0.03333; //width of box in degrees = 40 arc seconds
 var boxWidth = 0.03333;
+var boxHeight = 0.03333;
 var boxRotation = 0;
 var sizeSlider;
 var sizeLabel;
@@ -50,10 +51,10 @@ function initializeMap(){
   });
 
   var rectCorners = [
-    {lat: mapCenter.lat()-boxWidth/2, lng:mapCenter.lng()-boxWidth/2},
-    {lat: mapCenter.lat()-boxWidth/2, lng:mapCenter.lng()+boxWidth/2},
-    {lat: mapCenter.lat()+boxWidth/2, lng:mapCenter.lng()+boxWidth/2},
-    {lat: mapCenter.lat()+boxWidth/2, lng:mapCenter.lng()-boxWidth/2},
+    {lat: mapCenter.lat()-boxHeight/2, lng:mapCenter.lng()-boxWidth/2},
+    {lat: mapCenter.lat()-boxHeight/2, lng:mapCenter.lng()+boxWidth/2},
+    {lat: mapCenter.lat()+boxHeight/2, lng:mapCenter.lng()+boxWidth/2},
+    {lat: mapCenter.lat()+boxHeight/2, lng:mapCenter.lng()-boxWidth/2},
   ];
 
   rectangle = new google.maps.Polygon({
@@ -68,8 +69,10 @@ function initializeMap(){
     geodesic:true
   });
 
-  sizeSlider = document.getElementsByName("boxSize")[0];
-  sizeLabel = document.getElementById("boxSizeLabel");
+  widthSlider = document.getElementsByName("boxWidth")[0];
+  widthLabel = document.getElementById("boxWidthLabel");
+  heightSlider = document.getElementsByName("boxHeight")[0];
+  heightLabel = document.getElementById("boxHeightLabel");
   scaleSlider = document.getElementsByName("boxScale")[0];
   scaleLabel = document.getElementById("boxScaleLabel");
   rotationSlider = document.getElementsByName("rotation")[0];
@@ -99,7 +102,7 @@ function initializeForm(){
     event.preventDefault();
   });
 
-  
+
   function sendData(str) {
     $("#genButton").addClass("disabled");
     $("#genButton").html("<i>Generating...</i>");
@@ -110,7 +113,7 @@ function initializeForm(){
     XHR.addEventListener("load", function(event) {
       var modelNumber = event.target.responseText;
       var modelName   = "stls/terrain-"+modelNumber+".zip";
-      
+
       //make download button visible
       downloadButton.style = "visibility:visible";
       //give link the right href
@@ -137,12 +140,12 @@ function initializeForm(){
 
 function centerToView(){
   mapCenter = map.getCenter();
-  var _lat = mapCenter.lat()+boxWidth/2;
+  var _lat = mapCenter.lat()+boxHeight/2;
   var _lng = mapCenter.lng()-boxWidth/2;
 
   updateRectangle(
-    [ {lat: _lat-boxWidth, lng: _lng},
-      {lat: _lat-boxWidth, lng: _lng+boxWidth},
+    [ {lat: _lat-boxHeight, lng: _lng},
+      {lat: _lat-boxHeight, lng: _lng+boxWidth},
       {lat: _lat, lng:_lng+boxWidth},
       {lat: _lat, lng: _lng},
     ]);
@@ -164,8 +167,10 @@ function changeSize(){
   var boxScale = scaleSlider.value;
   scaleLabel.innerHTML = scaleSlider.value;
 
-  boxWidth=minBoxWidth*sizeSlider.value*boxScale/120;
-  sizeLabel.innerHTML = sizeSlider.value*boxScale;
+  boxWidth=minBoxWidth*widthSlider.value*boxScale/120;
+  boxHeight=minBoxWidth*heightSlider.value*boxScale/120;
+  widthLabel.innerHTML =  (widthSlider.value*boxScale /3600).toFixed(2)+"\xB0";
+  heightLabel.innerHTML = (heightSlider.value*boxScale/3600).toFixed(2)+"\xB0";
   centerToView();
 }
 
@@ -175,9 +180,8 @@ function changeRotation(){
 
   var base = rectangle.getPath().getAt(3);
 
-  var boxHeight = boxWidth;
-  var rotLat = {lat: Math.sin(boxRotation)*boxWidth,lng:Math.cos(boxRotation)*boxWidth};
-  var rotLng = {lat: Math.cos(boxRotation)*boxHeight, lng:Math.sin(boxRotation)*boxHeight};
+  var rotLat = {lat: Math.sin(boxRotation)*boxHeight,lng:Math.cos(boxRotation)*boxWidth};
+  var rotLng = {lat: Math.cos(boxRotation)*boxHeight, lng:Math.sin(boxRotation)*boxWidth};
   updateRectangle(
     [ {lat: base.lat()+rotLat.lat, lng: base.lng()+rotLat.lng},
       {lat: base.lat()+rotLat.lat-rotLng.lat, lng: base.lng()+rotLat.lng+rotLng.lng},
@@ -204,8 +208,8 @@ function updateLatLng(){
   document.getElementById('c-lat').value = _lat;
   document.getElementById('c-lng').value = _lng;
   if(_lat && _lng){
-    updateRectangle([ {lat: _lat-boxWidth, lng: _lng},
-      {lat: _lat-boxWidth, lng: _lng+boxWidth},
+    updateRectangle([ {lat: _lat-boxHeight, lng: _lng},
+      {lat: _lat-boxHeight, lng: _lng+boxWidth},
       {lat: _lat, lng:_lng+boxWidth},
       {lat: _lat, lng: _lng},
     ]);
