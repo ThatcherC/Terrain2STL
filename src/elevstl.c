@@ -149,19 +149,19 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 
 	//get zeroth line
 	getElevationLine(nextline, width, -height, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
-	tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
+	tris += writeLineWall(stl, nextline, width, cos(globalLat)/3, -((float)height)/3, 0);
 
 	for(int y = -height+1; y<=0; y++){
 		for(int x = 0; x<width; x++){
 			prevline[x] = nextline[x];
 		}
 		getElevationLine(nextline, width, y, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
-		tris += writeXStrip(stl, prevline, nextline, width, cos(globalLat), y-1, y);
+		tris += writeXStrip(stl, prevline, nextline, width, cos(globalLat)/3, ((float)(y-1))/3, ((float)y)/3);
 		fflush(stl);
 	}
 
 	//write other x wall
-	tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 1);
+	tris += writeLineWall(stl, nextline, width, cos(globalLat)/3, 0, 1.0/3.0);
 
 	//set the number of triangles in the header to tris
   setSTLtriangles(stl, tris);
