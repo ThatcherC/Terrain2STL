@@ -12,7 +12,7 @@ int getTile(char * filename, size_t len, float lat, float lng){
 	int tileLat = abs( (int)floor(lat) );
 	int tileLng = abs( (int)floor(lng) );
 
-	return snprintf(filename, len, "hgt_files/%c%02d%c%03d.hgt", ns, tileLat, ew, tileLng);
+	return snprintf(filename, len, "hgt_files_1a/%c%02d%c%03d.hgt", ns, tileLat, ew, tileLng);
 }
 
 //returns the 'index' of the tile that contains a certain coordinate
@@ -36,8 +36,8 @@ int getElevationLine(float* heights, int width, int nthLine, float startLat,floa
 	//let's go with mercator space for now (Terrain2STL style)
 	int y = nthLine;
 	for(int x = 0; x<width; x++){
-		float u = (float)y/1200;
-		float v = (float)x/1200;
+		float u = (float)y/3600;
+		float v = (float)x/3600;
 
 		u *= stepSize;
 		v *= stepSize;
@@ -53,12 +53,12 @@ int getElevationLine(float* heights, int width, int nthLine, float startLat,floa
 			for(int b = 0; b < 2; b++){ //
 
 				//interesting bit of code here.
-				//floor(...)/1200 as no distortion but cannot handle tile edges
+				//floor(...)/3600 as no distortion but cannot handle tile edges
 				//x+float() handles edges well but with distortion
-				//lat+(float)b/1200
-				float intlat = floor(lat*1200+b)/1200.0+0.000598907;	//magic number??
-				float intlng = floor(lng*1200+a)/1200.0;
-				//floor(lng*1200+a)/1200;
+				//lat+(float)b/3600
+				float intlat = floor(lat*3600+b)/3600.0+0.000598907;	//magic number??
+				float intlng = floor(lng*3600+a)/3600.0;
+				//floor(lng*3600+a)/3600;
 
 				if(getTileIndex(intlat, intlng)!=tileNumber || elfile == NULL){
 					tileNumber = getTileIndex(intlat, intlng);
@@ -71,8 +71,8 @@ int getElevationLine(float* heights, int width, int nthLine, float startLat,floa
 					}
 				}
 
-				int p = (int) (1201*(intlng-floor(intlng)));		//x or lng component
-				p += (int)(1201*(ceil(intlat)-intlat))* 1201;	//y or lat component
+				int p = (int) (3601*(intlng-floor(intlng)));		//x or lng component
+				p += (int)(3601*(ceil(intlat)-intlat))* 3601;	//y or lat component
 
 				if(elfile==NULL){  //if we can't open the file, return height = 0
 					h = 0;
@@ -91,10 +91,10 @@ int getElevationLine(float* heights, int width, int nthLine, float startLat,floa
 				elevations[a][b]= (float)h;
 			}
 		}
-		float fracLat = lat-floor(lat*1200)/1200;
-		float fracLng = lng-floor(lng*1200)/1200;
-		fracLat *= 1200;
-		fracLng *= 1200;
+		float fracLat = lat-floor(lat*3600)/3600;
+		float fracLng = lng-floor(lng*3600)/3600;
+		fracLat *= 3600;
+		fracLng *= 3600;
 		float westLng = elevations[0][0]*(1-fracLat)  +  elevations[0][1]*fracLat;
 		float eastLng = elevations[1][0]*(1-fracLat)  +  elevations[1][1]*fracLat;
 
