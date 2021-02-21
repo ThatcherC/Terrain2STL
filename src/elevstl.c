@@ -164,7 +164,7 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	tris += writeLineWall(stl, nextline, width, cos(globalLat)/3, 0, 1.0/3.0);
 
 	//set the number of triangles in the header to tris
-  setSTLtriangles(stl, tris);
+	setSTLtriangles(stl, tris);
 	fclose(stl);
 
 	//passing global lat as an xscale - only needed for
