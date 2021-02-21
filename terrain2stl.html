@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Terrain2STL</title>
+		<title>Terrain2STL - 1A</title>
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="//jthatch.com/bootstrap-custom.css">
 		<script type="text/javascript" src="terrain2stl.js"></script>
@@ -11,14 +11,14 @@
 	<body>
 		<div class="container-fluid">
 			<div class="page-header">
-				<h1>Terrain2STL <small>Create STL models of the surface of Earth</small></h1>
+				<h1>Terrain2STL-1A <small>Create STL <i>hi-res</i> models of the surface of Earth</small></h1>
 			</div>
 			<div class="row">
 				<div class="col-md-8"><div style="height:75%" id="gmap">Map didn't load</div></div>
 				<div class="col-md-4" id="controlbox">
 
 					<center><h1>STL Generator</h1></center>
-					<center><i>Now with adjustable rectangle shapes!</i></center></br>
+					<center><i>Now with 1 arcsecond horizontal resolution (3x better!)</i></center></br>
 
 					<form id="paramForm" class="form-horizontal" action="gen" method="post" onsubmit="ga('send', 'event', 'Terrain2STL', 'Model');">
 
@@ -171,8 +171,8 @@
 	      </br>
 	      <center>
 	        <small><i>
-	          Terrain2STL creates STL files using the <a href='http://www.cgiar-csi.org/data/srtm-90m-digital-elevation-database-v4-1'>SRTM3 dataset</a> from 2000,
-	          which has a resolution of about 90 meters on the equator.
+	          Terrain2STL-1A creates STL files using the <a href='https://lpdaac.usgs.gov/products/srtmgl1v003/'>SRTM1 dataset</a>,
+	          which has a resolution of about 30 meters on the equator.
 	        </i></small>
 	      </center>
 	    </div>
