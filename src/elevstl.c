@@ -163,7 +163,6 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	//write other x wall
 	tris += writeLineWall(stl, nextline, width, cos(globalLat)/3, 0, 1.0/3.0);
 
-
 	// add in the bottom of the model
 	float xScale = cos(globalLat);
 	struct _vect3 o =  {10,-10, 0};
