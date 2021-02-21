@@ -168,19 +168,19 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	float xScale = cos(globalLat);
 	struct _vect3 o =  {10,-10, 0};
 	for(int y = -height+1; y<=0; y++){
-		struct _vect3 lowerleft = {0,y-1, 0};
-		struct _vect3 upperleft = {0,y,   0};
-		struct _vect3 lowerright = {(width-1)*cos(globalLat),y-1, 0};
-		struct _vect3 upperright = {(width-1)*cos(globalLat),y,   0};
+		struct _vect3 lowerleft = {0,((float)y-1)/3, 0};
+		struct _vect3 upperleft = {0,((float)y)/3,   0};
+		struct _vect3 lowerright = {(width-1)*cos(globalLat)/3,((float)y-1)/3, 0};
+		struct _vect3 upperright = {(width-1)*cos(globalLat)/3,((float)y)/3,   0};
 		addTriangle(stl, createTriangle(lowerleft,upperleft,o));
 		addTriangle(stl, createTriangle(upperright,lowerright,o));
 		tris += 2;
 	}
 	for(int x = 0; x<width-1; x++){
-		struct _vect3 upperleft =  {x*xScale,0, 0};
-		struct _vect3 upperright = {(x+1)*xScale,0,   0};
-		struct _vect3 lowerleft = {x*xScale,-height, 0};
-		struct _vect3 lowerright =  {(x+1)*xScale,-height,   0};
+		struct _vect3 upperleft =  {x*xScale/3,0, 0};
+		struct _vect3 upperright = {(x+1)*xScale/3,0,   0};
+		struct _vect3 lowerleft = {x*xScale/3,((float)-height)/3, 0};
+		struct _vect3 lowerright =  {(x+1)*xScale/3,((float)-height)/3,   0};
 		addTriangle(stl, createTriangle(upperleft,upperright,o));
 		addTriangle(stl, createTriangle(lowerright,lowerleft,o));
 		tris += 2;
