@@ -30,8 +30,8 @@ app.post("/",function(req,res){
 
 	b.rotation=0;
 
-	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth/3+" "
-			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
+	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth+" "
+			+b.boxHeight+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
 			+b.baseHeight+" "+b.boxScale+" "+filename;
 	command += "; zip -q "+zipname+" "+filename;
 
