@@ -14,28 +14,63 @@ It will run at localhost:8080.
 
 A few .HGT files are included, but not the whole set. You can get the rest from [the USGS](http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/), or I could send you few.
 
+### Install
+Build the STL generator program with a simple `make`:
+```sh
+you@comp:~/.../Terrain2STL$ make
+```
+If that's successful, generate a test STL with
+```
+./celevstl 44.1928 -69.0851 40 40 1.7 0 1 3 1 test.stl
+```
+
+and you should be treated with a model of scenic Rockport harbor!
+
+The arguments here are:
+- Northwest corner latitude
+- Northwest corner longitude
+- Model width ("pixels")
+- Model height ("pixels")
+- Vertical scaling factor
+- Rotation angle (degrees)
+- Water drop (mm) (how much the ocean should be lowered in models)
+- Base height (mm) (how much extra height to add to the base of model)
+- Step size (hgt cells per model pixel)
+- Output file name
+
+#### Web Interface
+To run the web interface to Terrain2STL, you'll need Nodejs. With that installed, first run install all the necessary node packages with
+```
+you@comp:~/.../Terrain2STL$ npm install
+```
+Once all the packages are install, start up the server with
+```
+you@comp:~/.../Terrain2STL$ node terrainServer.js
+```
+and the website should be up `localhost:8080/`!
 
 ### To-Do List
 
-- [ ] Add a resolution slider
+- [x] Add a resolution slider
   ~~Box size is in multiples of 120, so allowable downscales are 2,3,4,5,6,8,..~~
   Actually DEM resolution is 1/3, allowable downscales  are 2,4,5,8
   Probably 1/8 resolution is minimum desirable
 - [ ] Draw the northern and southern boundaries of the data set
 - [ ] Add a negative version for molds
-- [ ] Make a manifold surface option (bigger file, but better performance)
+- [x] Make a manifold surface option (bigger file, but better performance)
 
-###Descriptions of Files
+### Descriptions of Files
 * `/hgt_files`
 
   * This directory contains some sample HGT files for testing. Included are Mt. Everest; Rockport, Maine; and San Franciso Bay.
   * The whole dataset is 40GB, so only a few files are included.
+  * This could also be a made a symbolic link to another directory that contains your collection of HGT files
 
 * `/src`
 
   * This is the source code for the part of the program that actually creates the STL files
 
-  * `/src/elevstl.cpp` - STL-creation program. Accept command line arguments
+  * `/src/elevstl.c` - STL-creation program. Accept command line arguments
 
 * `terrain2stl-proto.html`
 
