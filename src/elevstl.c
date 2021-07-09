@@ -145,6 +145,11 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 
 	int tris = 0;
 	FILE* stl = fopen(outputName, "w");
+	// fopen returns a null pointer if file can't be opened
+	if(stl==NULL){
+		fprintf(stderr, "Unable to open '%s' for output!\n", outputName);
+		exit(1);
+	}
 	startSTLfile(stl, 4);
 
 	//get zeroth line
