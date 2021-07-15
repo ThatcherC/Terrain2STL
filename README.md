@@ -49,6 +49,8 @@ you@comp:~/.../Terrain2STL$ node terrainServer.js
 ```
 and the website should be up `localhost:8080/`!
 
+To get the Google Maps view to load, you'll need to get a (free) Google Maps API key - see [here](https://developers.google.com/maps/documentation/javascript/get-api-key). Once you have your key, copy `example.include-maps.js` to `include-maps.js` and replace the `GOOGLE_API_KEY` string with your own API key.
+
 ### To-Do List
 
 - [x] Add a resolution slider
