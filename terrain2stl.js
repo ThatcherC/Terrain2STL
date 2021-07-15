@@ -128,7 +128,7 @@ function initializeForm(){
     });
 
     // Set up our request
-    XHR.open("POST", "/",true);
+    XHR.open("POST", "/gen",true);
     XHR.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
 
