@@ -12,6 +12,10 @@ You can also download everything here and start the server with:
 
 It will run at localhost:8080.
 
+To run without static file serving (only needed if you're using another static file server such as NGINX), start with static serving disable:
+
+```NOSTATIC=true node terrainServer.js```
+
 A few .HGT files are included, but not the whole set. You can get the rest from [the USGS](http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/), or I could send you few.
 
 ### Install

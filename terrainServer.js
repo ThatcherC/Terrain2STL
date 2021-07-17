@@ -1,11 +1,12 @@
 //Node server for hgt-to-stl program
 //Listens on port 8081
-var express = require('express');
-var bodyParser = require('body-parser');
-var fs = require('fs');
-var exec = require('child_process').exec;
-var config = require('./config');
-var queue = require("queue");
+const express = require('express');
+const bodyParser = require('body-parser');
+const fs = require('fs');
+const exec = require('child_process').exec;
+const config = require('./config');
+const queue = require("queue");
+const path = require('path');
 
 var app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -20,7 +21,13 @@ q.concurrency = 2;
 q.timeout=20000;
 q.autostart = true;
 
-app.post("/",function(req,res){
+// if NOSTATIC is not set, set up static file serving
+if(!process.env.NOSTATIC) {
+	console.log("Serving static files")
+	app.use(express.static(__dirname, {index: "terrain2stl.html"}));
+}
+
+app.post("/gen",function(req,res){
 	var b = req.body;
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
