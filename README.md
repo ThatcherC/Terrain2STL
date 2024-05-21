@@ -19,6 +19,11 @@ To run without static file serving (only needed if you're using another static f
 A few .HGT files are included, but not the whole set. You can get the rest from [the USGS](http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/), or I could send you few.
 
 ### Install
+
+#### Dependencies
+
+- Requires GDAL. I installed this this `sudo apt install libgdal-dev`, which installed 3.4.1
+
 Build the STL generator program with a simple `make`:
 ```sh
 you@comp:~/.../Terrain2STL$ make
