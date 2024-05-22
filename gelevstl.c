@@ -3,6 +3,39 @@
 
 #include <errno.h>
 
+// based on
+// https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
+GDALDatasetH makeMEMdatasetStrip(int width, void *dataBuffer) {
+
+  // TODO: check that databuffer == 0 or NULL -
+  // we're doing the allocation here so we want to make sure where not
+  // dropping a pointer to some already-allocated memory
+
+  int nBufXSize = width;
+  int nBufYSize = 1;
+  int nBandCount = 1;
+  GDALDataType eType = GDT_Float32; // let the output buffer be float32s - good for interpolation
+  int nDataTypeSize = GDALGetDataTypeSizeBytes(eType);
+
+  void *pData = CPLCalloc(nBufXSize * nBufYSize * nBandCount, nDataTypeSize);
+  char memdsetpath[1024];
+  sprintf(memdsetpath,
+          "MEM:::DATAPOINTER=0x%p,PIXELS=%d,LINES=%d,"
+          "BANDS=%d,DATATYPE=%s,PIXELOFFSET=%d,LINEOFFSET=%d",
+          pData, nBufXSize, nBufYSize, nBandCount, GDALGetDataTypeName(eType), nBandCount * nDataTypeSize,
+          nBufXSize * nBandCount * nDataTypeSize);
+
+  // Open Memory Dataset
+  GDALDatasetH hMemDset = GDALOpen(memdsetpath, GA_Update);
+
+  double adfGeoTransform[6];
+  // TODO implement geotransform
+  // Assign GeoTransform parameters,Omitted here.
+  //
+  GDALSetGeoTransform(hMemDset, adfGeoTransform);
+  GDALSetProjection(hMemDset, pszProjection); // TODO pick a projection
+}
+
 int main(int argc, const char *argv[]) {
 
   // ARGS
