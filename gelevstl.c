@@ -5,10 +5,14 @@
 
 int main(int argc, const char* argv[])
 {
+
+    // ARGS
     if (argc != 2) {
         return EINVAL;
     }
     const char* pszFilename = argv[1];
+
+    // opening input file
 
     GDALDatasetH  hDataset;
     GDALAllRegister();
@@ -19,6 +23,8 @@ int main(int argc, const char* argv[])
         printf("Unable to open file %s\n", pszFilename);
 		return 1;
     }
+
+    // printing input file info
 
     GDALDriverH   hDriver;
 double        adfGeoTransform[6];
@@ -39,6 +45,9 @@ if( GDALGetGeoTransform( hDataset, adfGeoTransform ) == CE_None )
     printf( "Pixel Size = (%.6f,%.6f)\n",
             adfGeoTransform[1], adfGeoTransform[5] );
 }
+
+
+
 
     return 0;
 }
