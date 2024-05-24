@@ -45,6 +45,24 @@ GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void *d
   return hMemDset;
 }
 
+void printDatasetInfo(GDALDatasetH hDataset) {
+
+  // printing input file info
+
+  GDALDriverH hDriver;
+  double adfGeoTransform[6];
+  hDriver = GDALGetDatasetDriver(hDataset);
+  printf("Driver: %s/%s\n", GDALGetDriverShortName(hDriver), GDALGetDriverLongName(hDriver));
+  printf("Size is %dx%dx%d\n", GDALGetRasterXSize(hDataset), GDALGetRasterYSize(hDataset),
+         GDALGetRasterCount(hDataset));
+  if (GDALGetProjectionRef(hDataset) != NULL)
+    printf("Projection is `%s'\n", GDALGetProjectionRef(hDataset));
+  if (GDALGetGeoTransform(hDataset, adfGeoTransform) == CE_None) {
+    printf("Origin = (%.6f,%.6f)\n", adfGeoTransform[0], adfGeoTransform[3]);
+    printf("Pixel Size = (%.6f,%.6f)\n", adfGeoTransform[1], adfGeoTransform[5]);
+  }
+}
+
 int main(int argc, const char *argv[]) {
 
   // ARGS
@@ -64,26 +82,14 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
-  // printing input file info
-
-  GDALDriverH hDriver;
-  double adfGeoTransform[6];
-  hDriver = GDALGetDatasetDriver(hDataset);
-  printf("Driver: %s/%s\n", GDALGetDriverShortName(hDriver), GDALGetDriverLongName(hDriver));
-  printf("Size is %dx%dx%d\n", GDALGetRasterXSize(hDataset), GDALGetRasterYSize(hDataset),
-         GDALGetRasterCount(hDataset));
-  if (GDALGetProjectionRef(hDataset) != NULL)
-    printf("Projection is `%s'\n", GDALGetProjectionRef(hDataset));
-  if (GDALGetGeoTransform(hDataset, adfGeoTransform) == CE_None) {
-    printf("Origin = (%.6f,%.6f)\n", adfGeoTransform[0], adfGeoTransform[3]);
-    printf("Pixel Size = (%.6f,%.6f)\n", adfGeoTransform[1], adfGeoTransform[5]);
-  }
-
   // create and open in-memory dataset
   GDT_Float32 *strip = calloc(10, sizeof(GDT_Float32));
   const char *inputProjection = GDALGetProjectionRef(hDataset);
 
   GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, (void *)strip);
+
+  printDatasetInfo(hDataset);
+  printDatasetInfo(outputStripDset);
 
   // warp code from: https://gdal.org/tutorials/warp_tut.html#a-simple-reprojection-case
 
