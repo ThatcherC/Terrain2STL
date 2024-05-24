@@ -23,7 +23,7 @@ GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void *d
   sprintf(memdsetpath,
           "MEM:::DATAPOINTER=0x%p,PIXELS=%d,LINES=%d,"
           "BANDS=%d,DATATYPE=%s,PIXELOFFSET=%d,LINEOFFSET=%d",
-          pData, nBufXSize, nBufYSize, nBandCount, GDALGetDataTypeName(eType), nBandCount * nDataTypeSize,
+          dataBuffer, nBufXSize, nBufYSize, nBandCount, GDALGetDataTypeName(eType), nBandCount * nDataTypeSize,
           nBufXSize * nBandCount * nDataTypeSize);
 
   // Open Memory Dataset
