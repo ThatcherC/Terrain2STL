@@ -1,8 +1,8 @@
-#include "cpl_conv.h" /* for CPLMalloc() */
-#include "gdal.h"
+#include "gdal_priv.h"
 #include "gdalwarper.h"
 
 #include <errno.h>
+#include <cstdio>
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
