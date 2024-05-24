@@ -74,10 +74,10 @@ int main(int argc, const char *argv[]) {
   }
 
   // create and open in-memory dataset
-  float *strip = calloc(10, sizeof(float));
+  GDT_Float32 *strip = calloc(10, sizeof(GDT_Float32));
   const char *inputProjection = GDALGetProjectionRef(hDataset);
 
-  GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, strip);
+  GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, (void *)strip);
 
   // warp code from: https://gdal.org/tutorials/warp_tut.html#a-simple-reprojection-case
 
