@@ -1,8 +1,8 @@
 #include "gdal_priv.h"
 #include "gdalwarper.h"
 
-#include <errno.h>
 #include <cstdio>
+#include <errno.h>
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
@@ -32,8 +32,8 @@ GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void *d
   double adfGeoTransform[6];
   // TODO: implement a correct geo transform here!!!!!!
   adfGeoTransform[0] = -69.9;
-  adfGeoTransform[3] =  44.9;
-  adfGeoTransform[1] =  0.000833;
+  adfGeoTransform[3] = 44.9;
+  adfGeoTransform[1] = 0.000833;
   adfGeoTransform[5] = -0.000833;
   adfGeoTransform[2] = 0;
   adfGeoTransform[4] = 0;
@@ -98,8 +98,8 @@ int main(int argc, const char *argv[]) {
   psWarpOptions->pfnProgress = GDALTermProgress; // TODO change this to minimize progress counter
 
   // Establish reprojection transformer.
-  psWarpOptions->pTransformerArg = GDALCreateGenImgProjTransformer(hDataset, GDALGetProjectionRef(hDataset), outputStripDset,
-                                                                   GDALGetProjectionRef(outputStripDset), FALSE, 0.0, 1);
+  psWarpOptions->pTransformerArg = GDALCreateGenImgProjTransformer(
+    hDataset, GDALGetProjectionRef(hDataset), outputStripDset, GDALGetProjectionRef(outputStripDset), FALSE, 0.0, 1);
   psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
 
   // Initialize and execute the warp operation.
@@ -110,8 +110,8 @@ int main(int argc, const char *argv[]) {
   GDALDestroyWarpOptions(psWarpOptions);
 
   // do something with the data in strip!
-  for(int i = 0; i < 10; i ++){
-	  printf("% 5.1lf  ", strip[i]);
+  for (int i = 0; i < 10; i++) {
+    printf("% 5.1lf  ", strip[i]);
   }
   printf("\n");
 
