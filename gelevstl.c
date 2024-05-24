@@ -30,8 +30,14 @@ GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void *d
   GDALDatasetH hMemDset = GDALOpen(memdsetpath, GA_Update);
 
   double adfGeoTransform[6];
-  // TODO implement geotransform
-  // Assign GeoTransform parameters,Omitted here.
+  // TODO: implement a correct geo transform here!!!!!!
+  adfGeoTransform[0] = -69.9;
+  adfGeoTransform[3] =  44.9;
+  adfGeoTransform[1] =  0.000833;
+  adfGeoTransform[5] = -0.000833;
+  adfGeoTransform[2] = 0;
+  adfGeoTransform[4] = 0;
+
   //
   GDALSetGeoTransform(hMemDset, adfGeoTransform);
   GDALSetProjection(hMemDset, inputProjection); // TODO pick a projection
