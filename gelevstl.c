@@ -6,11 +6,16 @@
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
-GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void *dataBuffer) {
+GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void **pData) {
 
-  // TODO: check that databuffer == 0 or NULL -
+  // check that databuffer point pData == 0 or NULL -
   // we're doing the allocation here so we want to make sure where not
   // dropping a pointer to some already-allocated memory
+  if (*pData != NULL) {
+    // todo - return an error or something more graceful
+    printf("Expected pData to be NULL! We'll allocate memory for it automatically.\n");
+    exit(1); // for now, quit
+  }
 
   int nBufXSize = width;
   int nBufYSize = 1;
@@ -18,12 +23,12 @@ GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void *d
   GDALDataType eType = GDT_Float32; // let the output buffer be float32s - good for interpolation
   int nDataTypeSize = GDALGetDataTypeSizeBytes(eType);
 
-  void *pData = CPLCalloc(nBufXSize * nBufYSize * nBandCount, nDataTypeSize);
+  *pData = CPLCalloc(nBufXSize * nBufYSize * nBandCount, nDataTypeSize);
   char memdsetpath[1024];
   sprintf(memdsetpath,
           "MEM:::DATAPOINTER=0x%p,PIXELS=%d,LINES=%d,"
           "BANDS=%d,DATATYPE=%s,PIXELOFFSET=%d,LINEOFFSET=%d",
-          dataBuffer, nBufXSize, nBufYSize, nBandCount, GDALGetDataTypeName(eType), nBandCount * nDataTypeSize,
+          *pData, nBufXSize, nBufYSize, nBandCount, GDALGetDataTypeName(eType), nBandCount * nDataTypeSize,
           nBufXSize * nBandCount * nDataTypeSize);
 
   // Open Memory Dataset
@@ -83,10 +88,10 @@ int main(int argc, const char *argv[]) {
   }
 
   // create and open in-memory dataset
-  GDT_Float32 *strip = calloc(10, sizeof(GDT_Float32));
+  float *strip = NULL;
   const char *inputProjection = GDALGetProjectionRef(hDataset);
 
-  GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, (void *)strip);
+  GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, (void **)&strip);
 
   printDatasetInfo(hDataset);
   printDatasetInfo(outputStripDset);
