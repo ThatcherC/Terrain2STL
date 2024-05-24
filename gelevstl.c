@@ -109,6 +109,12 @@ int main(int argc, const char *argv[]) {
   GDALDestroyGenImgProjTransformer(psWarpOptions->pTransformerArg);
   GDALDestroyWarpOptions(psWarpOptions);
 
+  // do something with the data in strip!
+  for(int i = 0; i < 10; i ++){
+	  printf("% 5.1lf  ", strip[i]);
+  }
+  printf("\n");
+
   // close in-memory dataset
   GDALClose(outputStripDset);
   CPLFree(strip);
