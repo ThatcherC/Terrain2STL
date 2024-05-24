@@ -79,6 +79,30 @@ int main(int argc, const char *argv[]) {
 
   GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, strip);
 
+  // warp code from: https://gdal.org/tutorials/warp_tut.html#a-simple-reprojection-case
+
+  GDALWarpOptions *psWarpOptions = GDALCreateWarpOptions();
+  psWarpOptions->hSrcDS = hSrcDS;
+  psWarpOptions->hDstDS = hDstDS;
+  psWarpOptions->nBandCount = 1;
+  psWarpOptions->panSrcBands = (int *)CPLMalloc(sizeof(int) * psWarpOptions->nBandCount);
+  psWarpOptions->panSrcBands[0] = 1;
+  psWarpOptions->panDstBands = (int *)CPLMalloc(sizeof(int) * psWarpOptions->nBandCount);
+  psWarpOptions->panDstBands[0] = 1;
+  psWarpOptions->pfnProgress = GDALTermProgress;
+
+  // Establish reprojection transformer.
+  psWarpOptions->pTransformerArg = GDALCreateGenImgProjTransformer(hSrcDS, GDALGetProjectionRef(hSrcDS), hDstDS,
+                                                                   GDALGetProjectionRef(hDstDS), FALSE, 0.0, 1);
+  psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
+
+  // Initialize and execute the warp operation.
+  GDALWarpOperation oOperation;
+  oOperation.Initialize(psWarpOptions);
+  oOperation.ChunkAndWarpImage(0, 0, GDALGetRasterXSize(hDstDS), GDALGetRasterYSize(hDstDS));
+  GDALDestroyGenImgProjTransformer(psWarpOptions->pTransformerArg);
+  GDALDestroyWarpOptions(psWarpOptions);
+
   // close in-memory dataset
   GDALClose(outputStripDset);
   CPLFree(strip);
