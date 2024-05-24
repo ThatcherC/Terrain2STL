@@ -1,11 +1,12 @@
 #include "cpl_conv.h" /* for CPLMalloc() */
 #include "gdal.h"
+#include "gdalwarper.h"
 
 #include <errno.h>
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
-GDALDatasetH makeMEMdatasetStrip(int width, const char * inputProjection, void *dataBuffer) {
+GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void *dataBuffer) {
 
   // TODO: check that databuffer == 0 or NULL -
   // we're doing the allocation here so we want to make sure where not
@@ -72,12 +73,13 @@ int main(int argc, const char *argv[]) {
     printf("Pixel Size = (%.6f,%.6f)\n", adfGeoTransform[1], adfGeoTransform[5]);
   }
 
-
-  float * strip = calloc(10, sizeof(float));
-  const char * inputProjection = GDALGetProjectionRef(hDataset);
+  // create and open in-memory dataset
+  float *strip = calloc(10, sizeof(float));
+  const char *inputProjection = GDALGetProjectionRef(hDataset);
 
   GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, strip);
 
+  // close in-memory dataset
   GDALClose(outputStripDset);
   CPLFree(strip);
   return 0;
