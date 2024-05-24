@@ -5,7 +5,7 @@
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
-GDALDatasetH makeMEMdatasetStrip(int width, void *dataBuffer) {
+GDALDatasetH makeMEMdatasetStrip(int width, const char * inputProjection, void *dataBuffer) {
 
   // TODO: check that databuffer == 0 or NULL -
   // we're doing the allocation here so we want to make sure where not
@@ -33,7 +33,9 @@ GDALDatasetH makeMEMdatasetStrip(int width, void *dataBuffer) {
   // Assign GeoTransform parameters,Omitted here.
   //
   GDALSetGeoTransform(hMemDset, adfGeoTransform);
-  GDALSetProjection(hMemDset, pszProjection); // TODO pick a projection
+  GDALSetProjection(hMemDset, inputProjection); // TODO pick a projection
+
+  return hMemDset;
 }
 
 int main(int argc, const char *argv[]) {
@@ -70,5 +72,13 @@ int main(int argc, const char *argv[]) {
     printf("Pixel Size = (%.6f,%.6f)\n", adfGeoTransform[1], adfGeoTransform[5]);
   }
 
+
+  float * strip = calloc(10, sizeof(float));
+  const char * inputProjection = GDALGetProjectionRef(hDataset);
+
+  GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, strip);
+
+  GDALClose(outputStripDset);
+  CPLFree(strip);
   return 0;
 }
