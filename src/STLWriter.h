@@ -1,6 +1,9 @@
+#ifndef STLWRITER_H
+#define STLWRITER_H
+
 #include <stdio.h>
 
-int voidCutoff;
+extern int voidCutoff;
 
 typedef struct _vect3 {
   float x;
@@ -25,3 +28,5 @@ void startSTLfile(FILE *, int);
 void setSTLtriangles(FILE *, int);
 
 //void writeSTLfromArray(const std::vector<float>&, int, int, float);
+
+#endif // #STLWRITER_H
