@@ -6,7 +6,8 @@
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
-GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void **pData) {
+GDALDatasetH makeMEMdatasetStrip(int width, int height, GDALDataType datatype, const char *inputProjection,
+                                 void **pData) {
 
   // check that databuffer point pData == 0 or NULL -
   // we're doing the allocation here so we want to make sure where not
@@ -18,9 +19,9 @@ GDALDatasetH makeMEMdatasetStrip(int width, const char *inputProjection, void **
   }
 
   int nBufXSize = width;
-  int nBufYSize = 1;
+  int nBufYSize = height;
   int nBandCount = 1;
-  GDALDataType eType = GDT_Float32; // let the output buffer be float32s - good for interpolation
+  GDALDataType eType = datatype; // let the output buffer be float32s - good for interpolation
   int nDataTypeSize = GDALGetDataTypeSizeBytes(eType);
 
   *pData = CPLCalloc(nBufXSize * nBufYSize * nBandCount, nDataTypeSize);
@@ -91,7 +92,7 @@ int main(int argc, const char *argv[]) {
   float *strip = NULL;
   const char *inputProjection = GDALGetProjectionRef(hDataset);
 
-  GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, inputProjection, (void **)&strip);
+  GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, 10, GDT_Float32, inputProjection, (void **)&strip);
 
   printDatasetInfo(hDataset);
   printDatasetInfo(outputStripDset);
