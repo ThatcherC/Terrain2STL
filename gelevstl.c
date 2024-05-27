@@ -1,8 +1,14 @@
 #include "gdal_priv.h"
 #include "gdalwarper.h"
 
+#include "src/STLWriter.h"
+#include "src/elevation.h"
 #include <cstdio>
 #include <errno.h>
+#include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
@@ -37,8 +43,8 @@ GDALDatasetH makeMEMdatasetStrip(int width, int height, GDALDataType datatype, c
 
   double adfGeoTransform[6];
   // TODO: implement a correct geo transform here!!!!!!
-  adfGeoTransform[0] = -69.9;
-  adfGeoTransform[3] = 44.9;
+  adfGeoTransform[0] = -69.093;
+  adfGeoTransform[3] = 44.22;
   adfGeoTransform[1] = 0.000833;
   adfGeoTransform[5] = -0.000833;
   adfGeoTransform[2] = 0;
@@ -69,6 +75,120 @@ void printDatasetInfo(GDALDatasetH hDataset) {
   }
 }
 
+// lh is lower heights, ie those along a strip with a lower y component
+// uh is upper height, those along a strip with a higher y component
+int writeXStrip(FILE *file, float *lh, float *uh, int width, float xScale, float lyval, float hyval) {
+  int numtris = 0;
+
+  // build left wall
+  struct _vect3 u = {0, hyval, uh[0]};
+  struct _vect3 l = {0, lyval, lh[0]};
+  struct _vect3 ub = {0, hyval, 0};
+  struct _vect3 lb = {0, lyval, 0};
+  addTriangle(file, createTriangle(u, ub, lb));
+  addTriangle(file, createTriangle(u, lb, l));
+  numtris += 2;
+
+  // build right wall
+  u = (struct _vect3){(width - 1) * xScale, hyval, uh[width - 1]};
+  l = (struct _vect3){(width - 1) * xScale, lyval, lh[width - 1]};
+  ub = (struct _vect3){(width - 1) * xScale, hyval, 0};
+  lb = (struct _vect3){(width - 1) * xScale, lyval, 0};
+  addTriangle(file, createTriangle(u, lb, ub));
+  addTriangle(file, createTriangle(u, l, lb));
+  numtris += 2;
+
+  int voidCutoff2 = 0;
+
+  for (int x = 1; x < width; x++) {
+    float ha = uh[x];
+    float hb = lh[x];     // d---a
+    float hc = lh[x - 1]; // |   |
+    float hd = uh[x - 1]; // c---b
+
+    if (ha > voidCutoff2 && hb > voidCutoff2 && hc > voidCutoff2 && hd > voidCutoff2) {
+      struct _vect3 a = {x * xScale, hyval, ha};
+      struct _vect3 b = {x * xScale, lyval, hb};
+      struct _vect3 c = {(x - 1) * xScale, lyval, hc};
+      struct _vect3 d = {(x - 1) * xScale, hyval, hd};
+
+      // choose where to split the square based on local curvature
+      if (fabs(hd - hb) < fabs(ha - hc)) {
+        addTriangle(file, createTriangle(a, d, b));
+        addTriangle(file, createTriangle(c, b, d));
+      } else {
+        addTriangle(file, createTriangle(a, d, c));
+        addTriangle(file, createTriangle(a, c, b));
+      }
+      numtris += 2;
+    }
+  }
+
+  return numtris;
+}
+
+void buffToSTL(int width, int height, float *buf, char *outputName, float globalLat) {
+
+  int tris = 0;
+  FILE *stl = fopen(outputName, "w");
+  // fopen returns a null pointer if file can't be opened
+  if (stl == NULL) {
+    fprintf(stderr, "Unable to open '%s' for output!\n", outputName);
+    exit(1);
+  }
+  startSTLfile(stl, 4);
+
+  // get zeroth line
+  // old line: getElevationLine(nextline, width, -height, lat, lng, scaleFactor, rot, waterDrop, baseHeight, stepSize);
+
+  // tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
+
+  float *prevline;
+  float *nextline = &buf[0];
+
+  for (int row = 0; row < height; row++) {
+    // for (int y = -height + 1; y <= 0; y++) {
+    int y = -height + 1 + row;
+    prevline = nextline;
+
+    // getElevationLine(nextline, width, y, lat, lng, scaleFactor, rot, waterDrop, baseHeight, stepSize);
+    nextline = &buf[row * width];
+    tris += writeXStrip(stl, prevline, nextline, width, cos(globalLat), y - 1, y);
+    fflush(stl);
+  }
+
+  // write other x wall
+  // tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 1);
+
+  // add in the bottom of the model
+  /*
+  float xScale = cos(globalLat);
+  struct _vect3 o = {10, -10, 0};
+  for (int y = -height + 1; y <= 0; y++) {
+    struct _vect3 lowerleft = {0, y - 1, 0};
+    struct _vect3 upperleft = {0, y, 0};
+    struct _vect3 lowerright = {(width - 1) * cos(globalLat), y - 1, 0};
+    struct _vect3 upperright = {(width - 1) * cos(globalLat), y, 0};
+    addTriangle(stl, createTriangle(lowerleft, upperleft, o));
+    addTriangle(stl, createTriangle(upperright, lowerright, o));
+    tris += 2;
+  }
+  for (int x = 0; x < width - 1; x++) {
+    struct _vect3 upperleft = {x * xScale, 0, 0};
+    struct _vect3 upperright = {(x + 1) * xScale, 0, 0};
+    struct _vect3 lowerleft = {x * xScale, -height, 0};
+    struct _vect3 lowerright = {(x + 1) * xScale, -height, 0};
+    addTriangle(stl, createTriangle(upperleft, upperright, o));
+    addTriangle(stl, createTriangle(lowerright, lowerleft, o));
+    tris += 2;
+  }
+  */
+
+  // set the number of triangles in the header to tris
+  setSTLtriangles(stl, tris);
+  fclose(stl);
+}
+
 int main(int argc, const char *argv[]) {
 
   // ARGS
@@ -76,6 +196,16 @@ int main(int argc, const char *argv[]) {
     return EINVAL;
   }
   const char *pszFilename = argv[1];
+
+  int outputWidth = 100;
+  int outputHeight = 200;
+
+  float userscale = 1; // TODO make this an arg!
+  float stepSize = 1;  // TODO make this an arg!
+                       // I think it refers to the stride of the output model in the widths of
+                       // SRTM 90m pixels
+  float verticalscale = 92.7;
+  float scaleFactor = (userscale / verticalscale) / ((float)stepSize);
 
   // opening input file
 
@@ -92,7 +222,8 @@ int main(int argc, const char *argv[]) {
   float *strip = NULL;
   const char *inputProjection = GDALGetProjectionRef(hDataset);
 
-  GDALDatasetH outputStripDset = makeMEMdatasetStrip(10, 10, GDT_Float32, inputProjection, (void **)&strip);
+  GDALDatasetH outputStripDset =
+    makeMEMdatasetStrip(outputWidth, outputHeight, GDT_Float32, inputProjection, (void **)&strip);
 
   printDatasetInfo(hDataset);
   printDatasetInfo(outputStripDset);
@@ -122,10 +253,17 @@ int main(int argc, const char *argv[]) {
   GDALDestroyWarpOptions(psWarpOptions);
 
   // do something with the data in strip!
-  for (int i = 0; i < 10; i++) {
+  /*
+  for (int i = 0; i < outputWidth; i++) {
     printf("% 5.1lf  ", strip[i]);
   }
   printf("\n");
+  */
+
+  for (int i = 0; i < outputWidth * outputHeight; i++) {
+    strip[i] = strip[i] * scaleFactor;
+  }
+  buffToSTL(outputWidth, outputHeight, strip, "test.stl", 45.0);
 
   // close in-memory dataset
   GDALClose(outputStripDset);
