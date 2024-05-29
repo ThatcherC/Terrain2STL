@@ -147,13 +147,11 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
   float *nextline = &buf[0];
 
   for (int row = 0; row < height; row++) {
-    // for (int y = -height + 1; y <= 0; y++) {
-    int y = -height + 1 + row;
     prevline = nextline;
 
     // getElevationLine(nextline, width, y, lat, lng, scaleFactor, rot, waterDrop, baseHeight, stepSize);
     nextline = &buf[row * width];
-    tris += writeXStrip(stl, prevline, nextline, width, cos(globalLat), y - 1, y);
+    tris += writeXStrip(stl, prevline, nextline, width, cos(globalLat), -row, -row-1);
     fflush(stl);
   }
 
