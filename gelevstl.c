@@ -193,6 +193,7 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
 int main(int argc, char **argv) {
 
   char pszFilename[100];
+  char pszShapeFilename[100];
 
   char opt;
   char *latlong;
@@ -206,6 +207,7 @@ int main(int argc, char **argv) {
                                   {"rows", required_argument, 0, 'r'},
                                   {"cols", required_argument, 0, 'c'},
                                   {"source", required_argument, 0, 's'}, // source DEM file
+                                  {"shape", required_argument, 0, 'p'},  // source shape vector file
                                   {0, 0, 0, 0}};
 
   while ((opt = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
@@ -223,6 +225,10 @@ int main(int argc, char **argv) {
     case 's':
       // TODO handle snprintf failure (case of very long source file name
       snprintf(pszFilename, 99, "%s", optarg);
+      break;
+    case 'p':
+      // TODO handle snprintf failure (case of very long source file name
+      snprintf(pszShapeFilename, 99, "%s", optarg);
       break;
     case 'r':
       rows = atoi(optarg);
@@ -260,13 +266,21 @@ int main(int argc, char **argv) {
   float scaleFactor = (userscale / verticalscale) / ((float)stepSize);
 
   // opening input file
-
   GDALDatasetH hDataset;
   GDALAllRegister();
   const GDALAccess eAccess = GA_ReadOnly;
   hDataset = GDALOpen(pszFilename, eAccess);
   if (hDataset == NULL) {
     printf("Unable to open file %s\n", pszFilename);
+    return 1;
+  }
+
+  // opening input shape file
+  GDALDatasetH hShapeDataset;
+  hShapeDataset = GDALOpenEx(pszShapeFilename, GDAL_OF_VECTOR, NULL, NULL, NULL);
+
+  if (hShapeDataset == NULL) {
+    printf("Unable to open file %s\n", pszShapeFilename);
     return 1;
   }
 
@@ -304,8 +318,26 @@ int main(int argc, char **argv) {
   GDALDestroyGenImgProjTransformer(psWarpOptions->pTransformerArg);
   GDALDestroyWarpOptions(psWarpOptions);
 
+  // create rasterization output raster
+  char *shape = NULL;
+  GDALDatasetH shapeRaster =
+    makeMEMdatasetStrip(lat, lng, outputWidth, outputHeight, GDT_Byte, inputProjection, (void **)&shape);
+
+  // create rasterization options
+  const char *rasterArgs[] = {"-burn", "1", "-l", "nz-lake-polygons-topo-1500k", NULL};
+  GDALRasterizeOptions *psOptions = GDALRasterizeOptionsNew((char **)rasterArgs, NULL);
+  GDALRasterizeOptionsSetProgress(psOptions, GDALTermProgress, nullptr);
+  int bUsageError = FALSE;
+  printf("Beginning vector burn\n");
+  GDALDatasetH hRetDS = GDALRasterize(NULL, shapeRaster, hShapeDataset, psOptions, &bUsageError);
+  if (bUsageError == TRUE) {
+    printf("Rasterization error!\n");
+    return 1;
+  }
+  GDALRasterizeOptionsFree(psOptions);
+
   for (int i = 0; i < outputWidth * outputHeight; i++) {
-    strip[i] = strip[i] * scaleFactor;
+    strip[i] = strip[i] * scaleFactor - shape[i] * 10;
   }
   buffToSTL(outputWidth, outputHeight, strip, "test.stl", 45.0);
 
