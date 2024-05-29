@@ -195,24 +195,38 @@ int main(int argc, char **argv) {
   char opt;
   char *latlong;
   double lat, lng = 0.0;
+  int rows, columns = 0;
+  ;
 
-  struct option long_options[] = {
-    {"north-west-corner", required_argument, 0, 'c'}, {"source", required_argument, 0, 's'}, {0, 0, 0, 0}};
+  bool cornerIsSet = false;
+
+  struct option long_options[] = {{"north-west-corner", required_argument, 0, 'o'}, // 'o' for origin
+                                  {"rows", required_argument, 0, 'r'},
+                                  {"cols", required_argument, 0, 'c'},
+                                  {"source", required_argument, 0, 's'}, // source DEM file
+                                  {0, 0, 0, 0}};
 
   while ((opt = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
 
     switch (opt) {
-    case 'c':
+    case 'o':
       latlong = optarg;
       if (sscanf(latlong, "%lf,%lf", &lat, &lng) != 2) {
         fprintf(stderr, "Invalid format for --north-west-corner: expected <lat>,<lng>\n");
         return 1;
       }
+      cornerIsSet = true;
       break;
     // Handle other options...
     case 's':
       // TODO handle snprintf failure (case of very long source file name
       snprintf(pszFilename, 99, "%s", optarg);
+      break;
+    case 'r':
+      rows = atoi(optarg);
+      break;
+    case 'c':
+      columns = atoi(optarg);
       break;
     default:
       printf("Usage: %s --north-west-corner <latitude>,<longitude> --source <input-file.dem> [other-options]\n",
@@ -221,15 +235,20 @@ int main(int argc, char **argv) {
     }
   }
 
-  if (lat == 0.0 || lng == 0.0) {
+  if (cornerIsSet == false) {
     fprintf(stderr, "Latitude and Longitude must be provided.\n");
+    return 1;
+  }
+
+  if (rows < 1 || columns < 1) {
+    fprintf(stderr, "Rows and columns but must be provided and greater than zero.\n");
     return 1;
   }
 
   printf("Latitude: %lf, Longitude: %lf\n", lat, lng);
 
-  int outputWidth = 100;
-  int outputHeight = 200;
+  int outputWidth = columns;
+  int outputHeight = rows;
 
   float userscale = 1; // TODO make this an arg!
   float stepSize = 1;  // TODO make this an arg!
