@@ -5,6 +5,7 @@
 #include "src/elevation.h"
 #include <cstdio>
 #include <errno.h>
+#include <getopt.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -12,8 +13,8 @@
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
-GDALDatasetH makeMEMdatasetStrip(int width, int height, GDALDataType datatype, const char *inputProjection,
-                                 void **pData) {
+GDALDatasetH makeMEMdatasetStrip(double northwestlat, double northwestlng, int width, int height, GDALDataType datatype,
+                                 const char *inputProjection, void **pData) {
 
   // check that databuffer point pData == 0 or NULL -
   // we're doing the allocation here so we want to make sure where not
@@ -43,8 +44,8 @@ GDALDatasetH makeMEMdatasetStrip(int width, int height, GDALDataType datatype, c
 
   double adfGeoTransform[6];
   // TODO: implement a correct geo transform here!!!!!!
-  adfGeoTransform[0] = -69.093;
-  adfGeoTransform[3] = 44.22;
+  adfGeoTransform[0] = northwestlng;
+  adfGeoTransform[3] = northwestlat;
   adfGeoTransform[1] = 0.000833;
   adfGeoTransform[5] = -0.000833;
   adfGeoTransform[2] = 0;
@@ -187,13 +188,45 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
   fclose(stl);
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, char **argv) {
 
-  // ARGS
-  if (argc != 2) {
-    return EINVAL;
+  char pszFilename[100];
+
+  char opt;
+  char *latlong;
+  double lat, lng = 0.0;
+
+  struct option long_options[] = {
+    {"north-west-corner", required_argument, 0, 'c'}, {"source", required_argument, 0, 's'}, {0, 0, 0, 0}};
+
+  while ((opt = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
+
+    switch (opt) {
+    case 'c':
+      latlong = optarg;
+      if (sscanf(latlong, "%lf,%lf", &lat, &lng) != 2) {
+        fprintf(stderr, "Invalid format for --north-west-corner: expected <lat>,<lng>\n");
+        return 1;
+      }
+      break;
+    // Handle other options...
+    case 's':
+      // TODO handle snprintf failure (case of very long source file name
+      snprintf(pszFilename, 99, "%s", optarg);
+      break;
+    default:
+      printf("Usage: %s --north-west-corner <latitude>,<longitude> --source <input-file.dem> [other-options]\n",
+             argv[0]);
+      return 1;
+    }
   }
-  const char *pszFilename = argv[1];
+
+  if (lat == 0.0 || lng == 0.0) {
+    fprintf(stderr, "Latitude and Longitude must be provided.\n");
+    return 1;
+  }
+
+  printf("Latitude: %lf, Longitude: %lf\n", lat, lng);
 
   int outputWidth = 100;
   int outputHeight = 200;
@@ -221,7 +254,7 @@ int main(int argc, const char *argv[]) {
   const char *inputProjection = GDALGetProjectionRef(hDataset);
 
   GDALDatasetH outputStripDset =
-    makeMEMdatasetStrip(outputWidth, outputHeight, GDT_Float32, inputProjection, (void **)&strip);
+    makeMEMdatasetStrip(lat, lng, outputWidth, outputHeight, GDT_Float32, inputProjection, (void **)&strip);
 
   printDatasetInfo(hDataset);
   printDatasetInfo(outputStripDset);
