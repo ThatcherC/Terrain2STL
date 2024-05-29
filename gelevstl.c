@@ -250,14 +250,6 @@ int main(int argc, const char *argv[]) {
   GDALDestroyGenImgProjTransformer(psWarpOptions->pTransformerArg);
   GDALDestroyWarpOptions(psWarpOptions);
 
-  // do something with the data in strip!
-  /*
-  for (int i = 0; i < outputWidth; i++) {
-    printf("% 5.1lf  ", strip[i]);
-  }
-  printf("\n");
-  */
-
   for (int i = 0; i < outputWidth * outputHeight; i++) {
     strip[i] = strip[i] * scaleFactor;
   }
