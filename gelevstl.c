@@ -1,4 +1,6 @@
 #include "gdal_priv.h"
+#include "gdal_utils.h"
+#include "ogrsf_frmts.h"
 #include "gdalwarper.h"
 
 #include "src/STLWriter.h"
@@ -99,7 +101,7 @@ int writeXStrip(FILE *file, float *lh, float *uh, int width, float xScale, float
   addTriangle(file, createTriangle(u, l, lb));
   numtris += 2;
 
-  int voidCutoff2 = 0;
+  int voidCutoff2 = -100;
 
   for (int x = 1; x < width; x++) {
     float ha = uh[x];
