@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int voidCutoff;
+extern int voidCutoff;
 
 typedef struct _vect3 {
   float x;
