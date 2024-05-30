@@ -7,5 +7,6 @@
 *.min.*
 elevstl
 celevstl
+gelevstl
 /stls/*
 include-maps.js
