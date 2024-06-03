@@ -87,6 +87,7 @@ function initializeMap(){
   google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
 
   initializeForm();
+  initAutocomplete();
 }
 
 //https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
@@ -214,5 +215,29 @@ function updateLatLng(){
       {lat: _lat, lng: _lng},
     ]);
     map.setCenter({lat: _lat, lng: _lng});
+    map.setZoom(6);
   }
+}
+
+function initAutocomplete() {
+  var autocomplete = new google.maps.places.Autocomplete(
+      document.getElementById('autocomplete'),
+      { types: ['geocode'] }
+  );
+  autocomplete.addListener('place_changed', function () {
+      var place = autocomplete.getPlace();
+
+      if (!place.geometry) {
+          console.error("Place details not available for input: " + place.name);
+          return;
+      }
+
+      var lat = place.geometry.location.lat();
+      var lng = place.geometry.location.lng();
+
+      document.getElementById('c-lat').value = lat;
+      document.getElementById('c-lng').value = lng;
+
+      updateLatLng();
+  });
 }
