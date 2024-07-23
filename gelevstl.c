@@ -238,10 +238,10 @@ int main(int argc, char **argv) {
   char *latlong;
   double lat, lng = 0.0;
   int rows, columns = 0;
-  double userscale;
+  double userscale = 1;
   double rot;
-  int stepSize = 1;
-  int waterDrop = -2; // millimeters
+  int stepsize = 1;
+  int waterDrop = 2; // millimeters
   int baseHeight = 2; // millimeters
 
   bool cornerIsSet = false;
@@ -289,6 +289,21 @@ int main(int argc, char **argv) {
     case 'c':
       columns = atoi(optarg);
       break;
+    case 'z':
+      stepsize = atoi(optarg);
+      break;
+    case 'v':
+      userscale = atof(optarg);
+      break;
+    case 'a': // rotation
+      //userscale = atof(optarg);
+      break;
+    case 'w':  // water drop
+      waterDrop = atoi(optarg);
+      break;
+    case 'b': // base height
+      //userscale = atof(optarg);
+      break;
     default:
       usage(argv[0]);
       return 1;
@@ -317,7 +332,7 @@ int main(int argc, char **argv) {
   // float true_verticalscale = 92.7;	//meters/arcsecond at equator
   // old vertical scale was 23.2
   double verticalscale = 92.7; // true_verticalscale gives models that are too flat to be interesting
-  double scaleFactor = (userscale / verticalscale) / ((double)stepSize);
+  double scaleFactor = (userscale / verticalscale) / ((double)stepsize);
 
   // opening input file
   GDALDatasetH hDataset;
@@ -391,7 +406,12 @@ int main(int argc, char **argv) {
   GDALRasterizeOptionsFree(psOptions);
 
   for (int i = 0; i < outputWidth * outputHeight; i++) {
-    strip[i] = strip[i] * scaleFactor - shape[i] * 10;
+    if (strip[i] == 0) {
+      strip[i] -= waterDrop / scaleFactor;
+    } else if (shape[i] != 0) { // shapefile waterdrop
+      strip[i] -= waterDrop / scaleFactor;
+    }
+    strip[i] = strip[i] * scaleFactor + baseHeight;
   }
   buffToSTL(outputWidth, outputHeight, strip, outputName, 45.0);
 
