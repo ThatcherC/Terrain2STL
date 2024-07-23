@@ -199,7 +199,6 @@ int main(int argc, char **argv) {
   char *latlong;
   double lat, lng = 0.0;
   int rows, columns = 0;
-  ;
 
   bool cornerIsSet = false;
 
@@ -208,6 +207,7 @@ int main(int argc, char **argv) {
                                   {"cols", required_argument, 0, 'c'},
                                   {"source", required_argument, 0, 's'}, // source DEM file
                                   {"shape", required_argument, 0, 'p'},  // source shape vector file
+                                  {"vscale", required_argument, 0, 'v'}, // vertical scale
                                   {0, 0, 0, 0}};
 
   while ((opt = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
