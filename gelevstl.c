@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
       columns = atoi(optarg);
       break;
     default:
-      printf("Usage: %s --north-west-corner <latitude>,<longitude> --source <input-file.dem> [other-options]\n",
+      printf("Usage: %s --north-west-corner <latitude>,<longitude> --source <input-file.dem> --shape <input-shapfile.shp>\n",
              argv[0]);
       return 1;
     }
