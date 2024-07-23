@@ -218,6 +218,16 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
   fclose(stl);
 }
 
+void usage(char *prog) {
+  printf("Usage: %s --north-west-corner <latitude>,<longitude>\n"
+         "    --source <input-file.dem> --shape <input-shapfile.shp>\n"
+         "    --rows <rows> --cols <columns> --stepsize <stepsize TODO>\n"
+         "    --vscale <vertical scale> --rotation <rotation>\n"
+         "    --waterdrop <water drop TODO units> --baseheight <base height mm>\n"
+         "    --output <output file name>\n",
+         prog);
+}
+
 int main(int argc, char **argv) {
 
   char pszFilename[100];
@@ -280,24 +290,20 @@ int main(int argc, char **argv) {
       columns = atoi(optarg);
       break;
     default:
-      printf("Usage: %s --north-west-corner <latitude>,<longitude>\n"
-             "    --source <input-file.dem> --shape <input-shapfile.shp>\n"
-             "    --rows <rows> --cols <columns> --stepsize <stepsize TODO>\n"
-             "    --vscale <vertical scale> --rotation <rotation>\n"
-             "    --waterdrop <water drop TODO units> --baseheight <base height mm>\n"
-             "    --output <output file name>\n",
-             argv[0]);
+      usage(argv[0]);
       return 1;
     }
   }
 
   if (cornerIsSet == false) {
     fprintf(stderr, "Latitude and Longitude must be provided.\n");
+    usage(argv[0]);
     return 1;
   }
 
   if (rows < 1 || columns < 1) {
     fprintf(stderr, "Rows and columns but must be provided and greater than zero.\n");
+    usage(argv[0]);
     return 1;
   }
 
