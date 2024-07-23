@@ -194,20 +194,31 @@ int main(int argc, char **argv) {
 
   char pszFilename[100];
   char pszShapeFilename[100];
+  char outputName[100] = {0};
 
   char opt;
   char *latlong;
   double lat, lng = 0.0;
   int rows, columns = 0;
+  double userscale;
+  double rot;
+  int stepSize = 1;
+  int waterDrop = -2; // millimeters
+  int baseHeight = 2; // millimeters
 
   bool cornerIsSet = false;
 
-  struct option long_options[] = {{"north-west-corner", required_argument, 0, 'o'}, // 'o' for origin
+  struct option long_options[] = {{"source", required_argument, 0, 's'},            // source DEM file
+                                  {"shape", required_argument, 0, 'p'},             // source shape vector file
+                                  {"north-west-corner", required_argument, 0, 'o'}, // 'o' for origin
                                   {"rows", required_argument, 0, 'r'},
                                   {"cols", required_argument, 0, 'c'},
-                                  {"source", required_argument, 0, 's'}, // source DEM file
-                                  {"shape", required_argument, 0, 'p'},  // source shape vector file
+                                  {"stepsize", required_argument, 0, 'z'},
                                   {"vscale", required_argument, 0, 'v'}, // vertical scale
+                                  {"rotation", required_argument, 0, 'a'},
+                                  {"waterdrop", required_argument, 0, 'w'},
+                                  {"baseheight", required_argument, 0, 'b'},
+                                  {"output", required_argument, 0, 'f'},
                                   {0, 0, 0, 0}};
 
   while ((opt = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
@@ -237,7 +248,12 @@ int main(int argc, char **argv) {
       columns = atoi(optarg);
       break;
     default:
-      printf("Usage: %s --north-west-corner <latitude>,<longitude> --source <input-file.dem> --shape <input-shapfile.shp>\n",
+      printf("Usage: %s --north-west-corner <latitude>,<longitude>\n"
+             "    --source <input-file.dem> --shape <input-shapfile.shp>\n"
+             "    --rows <rows> --cols <columns> --stepsize <stepsize TODO>\n"
+             "    --vscale <vertical scale> --rotation <rotation>\n"
+             "    --waterdrop <water drop TODO units> --baseheight <base height mm>\n"
+             "    --output <output file name>\n",
              argv[0]);
       return 1;
     }
@@ -258,12 +274,12 @@ int main(int argc, char **argv) {
   int outputWidth = columns;
   int outputHeight = rows;
 
-  float userscale = 1; // TODO make this an arg!
-  float stepSize = 1;  // TODO make this an arg!
-                       // I think it refers to the stride of the output model in the widths of
-                       // SRTM 90m pixels
-  float verticalscale = 92.7;
-  float scaleFactor = (userscale / verticalscale) / ((float)stepSize);
+  // I think it refers to the stride of the output model in the widths of
+  // SRTM 90m pixels
+  // float true_verticalscale = 92.7;	//meters/arcsecond at equator
+  // old vertical scale was 23.2
+  double verticalscale = 92.7; // true_verticalscale gives models that are too flat to be interesting
+  double scaleFactor = (userscale / verticalscale) / ((double)stepSize);
 
   // opening input file
   GDALDatasetH hDataset;
