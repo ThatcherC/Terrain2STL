@@ -167,27 +167,22 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
   }
   startSTLfile(stl, 4);
 
-  // get zeroth line
-  // old line: getElevationLine(nextline, width, -height, lat, lng, scaleFactor, rot, waterDrop, baseHeight, stepSize);
-
   float *prevline;
-  float *nextline = &buf[0];
+  float *nextline = &buf[0]; // get zeroth line
 
-  // tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
-  tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 0);
+  // write first x wall
+  tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 1);
 
   for (int row = 0; row < height; row++) {
     prevline = nextline;
 
-    // getElevationLine(nextline, width, y, lat, lng, scaleFactor, rot, waterDrop, baseHeight, stepSize);
     nextline = &buf[row * width];
     tris += writeXStrip(stl, nextline, prevline, width, cos(globalLat), -row - 1, -row);
     fflush(stl);
   }
 
   // write other x wall
-  // tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 1);
-  tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 1);
+  tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
 
   // add in the bottom of the model
   /*
