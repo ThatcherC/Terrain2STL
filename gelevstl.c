@@ -130,6 +130,32 @@ int writeXStrip(FILE *file, float *lh, float *uh, int width, float xScale, float
   return numtris;
 }
 
+int writeLineWall(FILE *file, float *heights, int width, float xScale, float yval, int flipNormal) {
+  int numtris = 0;
+
+  for (int i = 1; i < width; i++) {
+    if (heights[i] > voidCutoff && heights[i - 1] > voidCutoff) {
+      struct _vect3 a = {i * xScale, yval, heights[i]};
+      struct _vect3 b = {(i - 1) * xScale, yval, heights[i - 1]};
+
+      struct _vect3 w = {i * xScale, yval, 0};
+      struct _vect3 z = {(i - 1) * xScale, yval, 0};
+
+      if (flipNormal) {
+        addTriangle(file, createTriangle(z, b, a)); // model walls
+        addTriangle(file, createTriangle(a, w, z));
+      } else {
+        addTriangle(file, createTriangle(b, z, a)); // model walls
+        addTriangle(file, createTriangle(w, a, z));
+      }
+
+      numtris += 2;
+    }
+  }
+
+  return numtris;
+}
+
 void buffToSTL(int width, int height, float *buf, char *outputName, float globalLat) {
 
   int tris = 0;
@@ -144,10 +170,11 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
   // get zeroth line
   // old line: getElevationLine(nextline, width, -height, lat, lng, scaleFactor, rot, waterDrop, baseHeight, stepSize);
 
-  // tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
-
   float *prevline;
   float *nextline = &buf[0];
+
+  // tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
+  tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 0);
 
   for (int row = 0; row < height; row++) {
     prevline = nextline;
@@ -160,6 +187,7 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
 
   // write other x wall
   // tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 1);
+  tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 1);
 
   // add in the bottom of the model
   /*
