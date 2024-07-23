@@ -48,7 +48,7 @@ GDALDatasetH makeMEMdatasetStrip(double northwestlat, double northwestlng, int w
   // TODO: implement a correct geo transform here!!!!!!
   adfGeoTransform[0] = northwestlng;
   adfGeoTransform[3] = northwestlat;
-  adfGeoTransform[1] = 0.000833;
+  adfGeoTransform[1] = 0.000833; // TODO add stepsize here
   adfGeoTransform[5] = -0.000833;
   adfGeoTransform[2] = 0;
   adfGeoTransform[4] = 0;
@@ -289,13 +289,13 @@ int main(int argc, char **argv) {
       userscale = atof(optarg);
       break;
     case 'a': // rotation
-      //userscale = atof(optarg);
+      // userscale = atof(optarg);
       break;
-    case 'w':  // water drop
+    case 'w': // water drop
       waterDrop = atoi(optarg);
       break;
     case 'b': // base height
-      //userscale = atof(optarg);
+      // userscale = atof(optarg);
       break;
     default:
       usage(argv[0]);
