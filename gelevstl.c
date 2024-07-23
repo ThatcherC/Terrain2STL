@@ -1,7 +1,7 @@
 #include "gdal_priv.h"
 #include "gdal_utils.h"
-#include "ogrsf_frmts.h"
 #include "gdalwarper.h"
+#include "ogrsf_frmts.h"
 
 #include "src/STLWriter.h"
 #include "src/elevation.h"
@@ -234,11 +234,11 @@ int main(int argc, char **argv) {
       break;
     // Handle other options...
     case 's':
-      // TODO handle snprintf failure (case of very long source file name
+      // TODO handle snprintf failure (case of very long source file name)
       snprintf(pszFilename, 99, "%s", optarg);
       break;
     case 'p':
-      // TODO handle snprintf failure (case of very long source file name
+      // TODO handle snprintf failure (case of very long shape file name)
       snprintf(pszShapeFilename, 99, "%s", optarg);
       break;
     case 'f':
