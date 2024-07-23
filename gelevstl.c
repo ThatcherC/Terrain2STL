@@ -241,6 +241,10 @@ int main(int argc, char **argv) {
       // TODO handle snprintf failure (case of very long source file name
       snprintf(pszShapeFilename, 99, "%s", optarg);
       break;
+    case 'f':
+      // TODO handle snprintf failure (case of very long output file name)
+      snprintf(outputName, 99, "%s", optarg);
+      break;
     case 'r':
       rows = atoi(optarg);
       break;
@@ -355,7 +359,7 @@ int main(int argc, char **argv) {
   for (int i = 0; i < outputWidth * outputHeight; i++) {
     strip[i] = strip[i] * scaleFactor - shape[i] * 10;
   }
-  buffToSTL(outputWidth, outputHeight, strip, "test.stl", 45.0);
+  buffToSTL(outputWidth, outputHeight, strip, outputName, 45.0);
 
   // close in-memory dataset
   GDALClose(outputStripDset);
