@@ -217,8 +217,8 @@ void usage(char *prog) {
   printf("Usage: %s --north-west-corner <latitude>,<longitude>\n"
          "    --source <input-file.dem> --shape <input-shapfile.shp>\n"
          "    --rows <rows> --cols <columns> --stepsize <stepsize TODO>\n"
-         "    --vscale <vertical scale> --rotation <rotation>\n"
-         "    --waterdrop <water drop TODO units> --baseheight <base height mm>\n"
+         "    [--vscale <vertical scale> = 0] [--rotation <rotation (deg)> = 0]\n"
+         "    [--waterdrop <water drop (mm)> = 2] [--baseheight <base height (mm)> = 3]\n"
          "    --output <output file name>\n",
          prog);
 }
@@ -236,8 +236,8 @@ int main(int argc, char **argv) {
   double userscale = 1;
   double rot;
   int stepsize = 1;
-  int waterDrop = 2; // millimeters
-  int baseHeight = 2; // millimeters
+  int waterDrop = 2;  // millimeters
+  int baseHeight = 3; // millimeters
 
   bool cornerIsSet = false;
 
