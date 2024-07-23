@@ -185,16 +185,15 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
   tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
 
   // add in the bottom of the model
-  /*
   float xScale = cos(globalLat);
-  struct _vect3 o = {10, -10, 0};
+  struct _vect3 center = {width / 2, -height / 2, 0};
   for (int y = -height + 1; y <= 0; y++) {
     struct _vect3 lowerleft = {0, y - 1, 0};
     struct _vect3 upperleft = {0, y, 0};
     struct _vect3 lowerright = {(width - 1) * cos(globalLat), y - 1, 0};
     struct _vect3 upperright = {(width - 1) * cos(globalLat), y, 0};
-    addTriangle(stl, createTriangle(lowerleft, upperleft, o));
-    addTriangle(stl, createTriangle(upperright, lowerright, o));
+    addTriangle(stl, createTriangle(lowerleft, upperleft, center));
+    addTriangle(stl, createTriangle(upperright, lowerright, center));
     tris += 2;
   }
   for (int x = 0; x < width - 1; x++) {
@@ -202,11 +201,10 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
     struct _vect3 upperright = {(x + 1) * xScale, 0, 0};
     struct _vect3 lowerleft = {x * xScale, -height, 0};
     struct _vect3 lowerright = {(x + 1) * xScale, -height, 0};
-    addTriangle(stl, createTriangle(upperleft, upperright, o));
-    addTriangle(stl, createTriangle(lowerright, lowerleft, o));
+    addTriangle(stl, createTriangle(upperleft, upperright, center));
+    addTriangle(stl, createTriangle(lowerright, lowerleft, center));
     tris += 2;
   }
-  */
 
   // set the number of triangles in the header to tris
   setSTLtriangles(stl, tris);
