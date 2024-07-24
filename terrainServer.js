@@ -28,7 +28,7 @@ if(!process.env.NOSTATIC) {
 	app.use(express.static(__dirname, {index: "terrain2stl.html"}));
 }
 
-app.post("/gen",function(req,res){
+app.post("/",function(req,res){
 	var b = req.body;
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
