@@ -34,14 +34,14 @@ app.post("/",function(req,res){
 
 	var fileNum  = counter;
 	var zipname  = "./stls/terrain-"+fileNum;
-	var filename = "./stls/rawmodel-"+fileNum+".stl";
+	var filename = "./stls/terrain-"+fileNum+".stl";
 
 //b.rotation=0;
 
 	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth/3+" "
 			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
 			+b.baseHeight+" "+b.boxScale+" "+filename;
-	command += "; zip -q "+zipname+" "+filename;
+	command += "; zip --quiet --junk-paths "+zipname+" "+filename;
 
         console.log("> Request for "+b.lat+" "+b.lng);
 	startTime = Date.now()
