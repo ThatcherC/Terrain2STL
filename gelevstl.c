@@ -338,6 +338,7 @@ int main(int argc, char **argv) {
   }
 
   // opening input shape file
+  // TODO handle case where shapefile name pszShapeFilename isn't set!
   GDALDatasetH hShapeDataset;
   hShapeDataset = GDALOpenEx(pszShapeFilename, GDAL_OF_VECTOR, NULL, NULL, NULL);
 
