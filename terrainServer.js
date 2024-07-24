@@ -1,5 +1,4 @@
 //Node server for hgt-to-stl program
-//Listens on port 8081
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
@@ -12,7 +11,9 @@ var app = express();
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-app.listen(8080);
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT);
 var counter = 0;
 
 //initialization from https://www.npmjs.com/package/task-queue
@@ -27,7 +28,7 @@ if(!process.env.NOSTATIC) {
 	app.use(express.static(__dirname, {index: "terrain2stl.html"}));
 }
 
-app.post("/gen",function(req,res){
+app.post("/",function(req,res){
 	var b = req.body;
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
@@ -41,20 +42,6 @@ app.post("/gen",function(req,res){
 			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
 			+b.baseHeight+" "+b.boxScale+" "+filename;
 	command += "; zip -q "+zipname+" "+filename;
-
-	/*
-	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
-			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale+" > "+filename;
-	command += "; zip -q "+zipname+" "+filename;
-
-	var cfilename = "./stls/crawmodel-"+fileNum+".stl";
-	var czipname  = "./stls/cterrain-"+fileNum;
-
-        command += "; ./celevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
-                        +b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale;
-	command += "; mv out.stl "+cfilename;
-        command += "; zip -q "+czipname+" "+cfilename;
-	*/
 
         console.log("> Request for "+b.lat+" "+b.lng);
 	startTime = Date.now()
