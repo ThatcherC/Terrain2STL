@@ -43,20 +43,6 @@ app.post("/",function(req,res){
 			+b.baseHeight+" "+b.boxScale+" "+filename;
 	command += "; zip -q "+zipname+" "+filename;
 
-	/*
-	var command = "./elevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
-			+b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale+" > "+filename;
-	command += "; zip -q "+zipname+" "+filename;
-
-	var cfilename = "./stls/crawmodel-"+fileNum+".stl";
-	var czipname  = "./stls/cterrain-"+fileNum;
-
-        command += "; ./celevstl "+b.lat+" "+b.lng+" "+b.boxSize/3+" "
-                        +b.boxSize/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "+b.baseHeight+" "+b.boxScale;
-	command += "; mv out.stl "+cfilename;
-        command += "; zip -q "+czipname+" "+cfilename;
-	*/
-
         console.log("> Request for "+b.lat+" "+b.lng);
 	startTime = Date.now()
 	paramLog = startTime+"\t"+b.lat+"\t"+b.lng+
