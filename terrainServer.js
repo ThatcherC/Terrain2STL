@@ -1,5 +1,4 @@
 //Node server for hgt-to-stl program
-//Listens on port 8081
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
@@ -12,7 +11,9 @@ var app = express();
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-app.listen(8080);
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT);
 var counter = 0;
 
 //initialization from https://www.npmjs.com/package/task-queue
