@@ -289,7 +289,7 @@ int main(int argc, char **argv) {
       columns = atoi(optarg);
       break;
     case 'z':
-      stepsize_arcseconds = atoi(optarg);
+      stepsize_arcseconds = atof(optarg);
       break;
     case 'v':
       userscale = atof(optarg);
@@ -330,8 +330,9 @@ int main(int argc, char **argv) {
   // SRTM 90m pixels
   // float true_verticalscale = 92.7;	//meters/arcsecond at equator
   // old vertical scale was 23.2
-  double verticalscale = 92.7; // true_verticalscale gives models that are too flat to be interesting
-  double scaleFactor = (userscale / verticalscale) / stepsize;
+  double verticalscale_m_per_arcsecond = 92.7; // 6371000 m / 360 / 3600 = 92.7 meters per arcsecond at the equator
+  double meters_per_step = verticalscale_m_per_arcsecond * stepsize_arcseconds;
+  double scaleFactor = userscale * (1.0 / meters_per_step);
 
   // opening input file
   GDALDatasetH hDataset;
