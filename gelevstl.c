@@ -424,7 +424,7 @@ int main(int argc, char **argv) {
     }
     strip[i] = strip[i] * scaleFactor + baseHeight;
   }
-  buffToSTL(outputWidth, outputHeight, strip, outputName, 45.0);
+  buffToSTL(outputWidth, outputHeight, strip, outputName, lat*3.14159/180);
 
   // close in-memory dataset
   GDALClose(outputStripDset);
