@@ -15,8 +15,8 @@
 
 // based on
 // https://gdal.org/api/gdal_alg.html#_CPPv423GDALRasterizeGeometries12GDALDatasetHiPKiiPK12OGRGeometryH19GDALTransformerFuncPvPKd12CSLConstList16GDALProgressFuncPv
-GDALDatasetH makeMEMdatasetStrip(double northwestlat, double northwestlng, int width, int height, GDALDataType datatype,
-                                 const char *inputProjection, void **pData) {
+GDALDatasetH makeMEMdatasetStrip(double northwestlat, double northwestlng, int width, int height, double pixel_height_deg,
+		                 GDALDataType datatype, const char *inputProjection, void **pData) {
 
   // check that databuffer point pData == 0 or NULL -
   // we're doing the allocation here so we want to make sure where not
@@ -46,10 +46,11 @@ GDALDatasetH makeMEMdatasetStrip(double northwestlat, double northwestlng, int w
 
   double adfGeoTransform[6];
   // TODO: implement a correct geo transform here!!!!!!
+  // TODO: implement rotation
   adfGeoTransform[0] = northwestlng;
   adfGeoTransform[3] = northwestlat;
-  adfGeoTransform[1] = 0.000833; // TODO add stepsize here
-  adfGeoTransform[5] = -0.000833;
+  adfGeoTransform[1] = +pixel_height_deg;
+  adfGeoTransform[5] = -pixel_height_deg;
   adfGeoTransform[2] = 0;
   adfGeoTransform[4] = 0;
 
@@ -214,12 +215,15 @@ void buffToSTL(int width, int height, float *buf, char *outputName, float global
 void usage(char *prog) {
   printf("Usage: %s --north-west-corner <latitude>,<longitude>\n"
          "    --source <input-file.dem> --shape <input-shapfile.shp>\n"
-         "    --rows <rows> --cols <columns> --stepsize <stepsize TODO>\n"
+         "    --rows <rows> --cols <columns> --stepsize <stepsize (arcseconds)>\n"
          "    [--vscale <vertical scale> = 0] [--rotation <rotation (deg)> = 0]\n"
          "    [--waterdrop <water drop (mm)> = 2] [--baseheight <base height (mm)> = 3]\n"
          "    --output <output file name>\n",
          prog);
 }
+
+// degrees per arcsecond : 1/3600
+#define ARCSECONDS_TO_DEG 0.0002777777777777778
 
 int main(int argc, char **argv) {
 
@@ -233,7 +237,7 @@ int main(int argc, char **argv) {
   int rows, columns = 0;
   double userscale = 1;
   double rot;
-  int stepsize = 1;
+  double stepsize_arcseconds = 3;
   int waterDrop = 2;  // millimeters
   int baseHeight = 3; // millimeters
 
@@ -285,7 +289,7 @@ int main(int argc, char **argv) {
       columns = atoi(optarg);
       break;
     case 'z':
-      stepsize = atoi(optarg);
+      stepsize_arcseconds = atoi(optarg);
       break;
     case 'v':
       userscale = atof(optarg);
@@ -327,7 +331,7 @@ int main(int argc, char **argv) {
   // float true_verticalscale = 92.7;	//meters/arcsecond at equator
   // old vertical scale was 23.2
   double verticalscale = 92.7; // true_verticalscale gives models that are too flat to be interesting
-  double scaleFactor = (userscale / verticalscale) / ((double)stepsize);
+  double scaleFactor = (userscale / verticalscale) / stepsize;
 
   // opening input file
   GDALDatasetH hDataset;
@@ -354,8 +358,11 @@ int main(int argc, char **argv) {
   float *strip = NULL;
   const char *inputProjection = GDALGetProjectionRef(hDataset);
 
+  // TODO: use custom stepsize here
+  // 0.00083333 = 1/1200, the resolution in degrees of the STRM dataset
+  double deg_per_pixel = stepsize_arcseconds * ARCSECONDS_TO_DEG;
   GDALDatasetH outputStripDset =
-    makeMEMdatasetStrip(lat, lng, outputWidth, outputHeight, GDT_Float32, inputProjection, (void **)&strip);
+    makeMEMdatasetStrip(lat, lng, outputWidth, outputHeight, 0.00083333, GDT_Float32, inputProjection, (void **)&strip);
 
   printDatasetInfo(hDataset);
   printDatasetInfo(outputStripDset);
