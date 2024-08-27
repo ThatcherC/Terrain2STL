@@ -363,7 +363,7 @@ int main(int argc, char **argv) {
   // 0.00083333 = 1/1200, the resolution in degrees of the STRM dataset
   double deg_per_pixel = stepsize_arcseconds * ARCSECONDS_TO_DEG;
   GDALDatasetH outputStripDset =
-    makeMEMdatasetStrip(lat, lng, outputWidth, outputHeight, 0.00083333, GDT_Float32, inputProjection, (void **)&strip);
+    makeMEMdatasetStrip(lat, lng, outputWidth, outputHeight, deg_per_pixel, GDT_Float32, inputProjection, (void **)&strip);
 
   printDatasetInfo(hDataset);
   printDatasetInfo(outputStripDset);
@@ -396,7 +396,7 @@ int main(int argc, char **argv) {
   char *shape = NULL;
   if (shapefileIsSet) {
     GDALDatasetH shapeRaster =
-      makeMEMdatasetStrip(lat, lng, outputWidth, outputHeight, GDT_Byte, inputProjection, (void **)&shape);
+      makeMEMdatasetStrip(lat, lng, outputWidth, outputHeight, deg_per_pixel, GDT_Byte, inputProjection, (void **)&shape);
 
     // create rasterization options
     // TODO: remove hard-coded polygons file name
