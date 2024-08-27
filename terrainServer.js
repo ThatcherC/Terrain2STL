@@ -73,3 +73,7 @@ app.post("/",function(req,res){
 var datetime = new Date();
 console.log("terrainServer.js starting at:");
 console.log(datetime);
+
+app.listen(PORT, () =>{
+    console.log("Server listening on Port", PORT);
+})
