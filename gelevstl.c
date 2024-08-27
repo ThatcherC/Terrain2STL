@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
   char pszShapeFilename[100];
   char outputName[100] = {0};
 
-  char opt;
+  int opt;
   char *latlong;
   double lat, lng = 0.0;
   int rows, columns = 0;
