@@ -13,7 +13,6 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 const PORT = process.env.PORT || 8080;
 
-app.listen(PORT);
 var counter = 0;
 
 //initialization from https://www.npmjs.com/package/task-queue
