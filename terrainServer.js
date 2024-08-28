@@ -35,11 +35,26 @@ app.post("/",function(req,res){
 	var zipname  = "./stls/terrain-"+fileNum;
 	var filename = "./stls/terrain-"+fileNum+".stl";
 
-//b.rotation=0;
+	var vScale = b.vScale;
+	var rotation = b.rotation;
+	var waterDrop = b.waterDrop;
+	var baseHeight = b.baseHeight;
+	var boxScale = b.boxScale;
 
-	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth/3+" "
-			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
-			+b.baseHeight+" "+b.boxScale+" "+filename;
+	// TODO: rename boxHeight and boxWidth to include their units (pixels) in the HTML and JS
+	var rows = b.boxHeight;
+	var cols = b.boxWidth;
+	
+	// Some overrides for unimplement features
+	// TODO remove!
+	rotation = 0;
+
+	var command = "./gelevstl --source srtm3_hgt_index.vrt --shape nz-lakes/nz-lake-polygons-topo-1500k.shp " +
+		"--north-west-corner  " + b.lat + "," + b.lng + " " +
+		"--rows " + rows + " --cols " + cols + " " +
+		"--stepsize " + boxScale + " --vscale " + vScale + " --rotation " + rotation + " " +
+		"--waterdrop " + waterDrop + " --baseheight " + baseHeight + " " +
+		"--output " + filename;
 	command += "; zip --quiet --junk-paths "+zipname+" "+filename;
 
         console.log("> Request for "+b.lat+" "+b.lng);

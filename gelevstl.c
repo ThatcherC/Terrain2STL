@@ -332,7 +332,8 @@ int main(int argc, char **argv) {
   // old vertical scale was 23.2
   double verticalscale_m_per_arcsecond = 92.7; // 6371000 m / 360 / 3600 = 92.7 meters per arcsecond at the equator
   double meters_per_step = verticalscale_m_per_arcsecond * stepsize_arcseconds;
-  double scaleFactor = userscale * (1.0 / meters_per_step);
+  double scaleFactor = userscale * (1.0 / meters_per_step) * 3; // x3 to match old Terrain2STL scaling... I think most accurate to not have the x3 TODO
+
 
   // opening input file
   GDALDatasetH hDataset;
