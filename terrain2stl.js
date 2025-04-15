@@ -21,6 +21,31 @@ var waterDropLabel;
 var baseHeightSlider;
 var baseHeightLabel;
 
+function initializePage(){
+  initializeControls();
+  initializeMap();
+  initializeForm();
+}
+
+function initializeControls(){
+  latBox = document.getElementById("c-lat");
+  lngBox = document.getElementById("c-lng");
+
+  widthSlider = document.getElementsByName("boxWidth")[0];
+  widthLabel = document.getElementById("boxWidthLabel");
+  heightSlider = document.getElementsByName("boxHeight")[0];
+  heightLabel = document.getElementById("boxHeightLabel");
+  scaleSlider = document.getElementsByName("boxScale")[0];
+  scaleLabel = document.getElementById("boxScaleLabel");
+  rotationSlider = document.getElementsByName("rotation")[0];
+  rotationLabel = document.getElementById("rotationLabel");
+  vScaleSlider = document.getElementsByName("vScale")[0];
+  vScaleLabel = document.getElementById("vScaleLabel");
+  waterDropSlider = document.getElementsByName("waterDrop")[0];
+  waterDropLabel = document.getElementById("waterDropLabel");
+  baseHeightSlider = document.getElementsByName("baseHeight")[0];
+  baseHeightLabel = document.getElementById("baseHeightLabel");
+}  
 
 function initializeMap(){
   mapCenter = new google.maps.LatLng(44.191442, -69.074608);
@@ -37,9 +62,6 @@ function initializeMap(){
     mapTypeId:google.maps.MapTypeId.TERRAIN,
     gestureHandling: 'greedy'
   };
-
-  latBox = document.getElementById("c-lat");
-  lngBox = document.getElementById("c-lng");
 
   google.maps.visualRefresh = true;
   map = new google.maps.Map(document.getElementById("webmap"),
@@ -69,24 +91,7 @@ function initializeMap(){
     geodesic:true
   });
 
-  widthSlider = document.getElementsByName("boxWidth")[0];
-  widthLabel = document.getElementById("boxWidthLabel");
-  heightSlider = document.getElementsByName("boxHeight")[0];
-  heightLabel = document.getElementById("boxHeightLabel");
-  scaleSlider = document.getElementsByName("boxScale")[0];
-  scaleLabel = document.getElementById("boxScaleLabel");
-  rotationSlider = document.getElementsByName("rotation")[0];
-  rotationLabel = document.getElementById("rotationLabel");
-  vScaleSlider = document.getElementsByName("vScale")[0];
-  vScaleLabel = document.getElementById("vScaleLabel");
-  waterDropSlider = document.getElementsByName("waterDrop")[0];
-  waterDropLabel = document.getElementById("waterDropLabel");
-  baseHeightSlider = document.getElementsByName("baseHeight")[0];
-  baseHeightLabel = document.getElementById("baseHeightLabel");
-
   google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
-
-  initializeForm();
 }
 
 //https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
