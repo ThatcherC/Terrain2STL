@@ -42,7 +42,7 @@ function initializeMap(){
   lngBox = document.getElementById("c-lng");
 
   google.maps.visualRefresh = true;
-  map = new google.maps.Map(document.getElementById("gmap"),
+  map = new google.maps.Map(document.getElementById("webmap"),
     mapOptions);
   //addMoonMaps(map);
 
