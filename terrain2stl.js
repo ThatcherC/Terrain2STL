@@ -21,6 +21,8 @@ var waterDropLabel;
 var baseHeightSlider;
 var baseHeightLabel;
 
+initializePage();
+
 function initializePage(){
   initializeControls();
   initializeMap();
