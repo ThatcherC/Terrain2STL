@@ -50,6 +50,8 @@ function initializeControls(){
 }  
 
 function initializeMap(){
+
+  /*
   mapCenter = new google.maps.LatLng(44.191442, -69.074608);
 
   var mapOptions = {
@@ -73,14 +75,30 @@ function initializeMap(){
   google.maps.event.addListener(map, 'maptypeid_changed', function() {
     console.log(map.getMapTypeId());
   });
+  */
 
-  var rectCorners = [
-    {lat: mapCenter.lat()-boxHeight/2, lng:mapCenter.lng()-boxWidth/2},
-    {lat: mapCenter.lat()-boxHeight/2, lng:mapCenter.lng()+boxWidth/2},
-    {lat: mapCenter.lat()+boxHeight/2, lng:mapCenter.lng()+boxWidth/2},
-    {lat: mapCenter.lat()+boxHeight/2, lng:mapCenter.lng()-boxWidth/2},
-  ];
+  map = L.map('webmap').setView([44.191442, -69.074608], 6);
 
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      minZoom: 3,
+      maxZoom: 13,
+      zoomDelta: 0.1,
+      // TODO: switch to another (paid?) tile provider!
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+  var c = map.getCenter()
+  var rectCorners = rectanglePoints(c.lat, c.lng,boxWidth)
+
+  // TODO: make the rectangle geodesic somehow!
+  rectangle = L.polygon(rectCorners, {color: 'Tomato',draggable: true}).addTo(map);
+
+  function f(){
+    console.log(rectangle.getLatLngs())
+  }
+
+  rectangle.on('dragend', f) 
+  /*
   rectangle = new google.maps.Polygon({
     strokeColor: '#FF0000',
     strokeOpacity: 0.8,
@@ -92,8 +110,8 @@ function initializeMap(){
     draggable:true,
     geodesic:true
   });
+  */
 
-  google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
 }
 
 //https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
@@ -142,6 +160,17 @@ function initializeForm(){
     // The data sent is what the user provided in the form
     XHR.send(str);
   }
+}
+
+function rectanglePoints(centerlat, centerlng, boxsize){
+  var _lat = centerlat+boxHeight/2;
+  var _lng = centerlng-boxWidth/2;
+
+  return  [ [_lat-boxHeight, _lng],
+            [_lat-boxHeight, _lng+boxWidth],
+            [_lat, _lng+boxWidth],
+            [_lat, _lng],
+          ]
 }
 
 
