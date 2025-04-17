@@ -4,9 +4,19 @@
 		<title>Terrain2STL</title>
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="//jthatch.com/bootstrap-custom.css">
-		<script type="text/javascript" src="terrain2stl.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 		<script type="text/javascript" src="bootstrap.min.js"></script>
+
+
+		<!-- Leaflet CSS and JS-->
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+			integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+			crossorigin=""/>
+		 <!-- Make sure you put this AFTER Leaflet's CSS -->
+		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+			integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+			crossorigin=""></script>
+
 	</head>
 	<body>
 		<div class="container-fluid">
@@ -185,6 +195,7 @@
 
 		</div>
 
+		<script type="text/javascript" src="terrain2stl.js"></script>
 
 		<script async defer src="include-maps.js"></script>
 	</body>
