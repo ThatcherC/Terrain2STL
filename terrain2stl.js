@@ -94,11 +94,7 @@ function initializeMap(){
   // TODO: make the rectangle geodesic somehow!
   rectangle = L.polygon(rectCorners, {color: 'Tomato',draggable: true}).addTo(map);
 
-  function f(){
-    console.log(rectangle.getLatLngs())
-  }
-
-  rectangle.on('dragend', f) 
+  rectangle.on('dragend', postDrag) 
   /*
   rectangle = new google.maps.Polygon({
     strokeColor: '#FF0000',
@@ -177,8 +173,8 @@ function rectanglePoints(centerlat, centerlng, boxsize){
 
 function centerToView(){
   mapCenter = map.getCenter();
-  var _lat = mapCenter.lat()+boxHeight/2;
-  var _lng = mapCenter.lng()-boxWidth/2;
+  var _lat = mapCenter.lat + boxHeight/2;
+  var _lng = mapCenter.lng - boxWidth/2;
 
   updateRectangle(
     [ {lat: _lat-boxHeight, lng: _lng},
@@ -189,13 +185,13 @@ function centerToView(){
 }
 
 function updateRectangle(corners){
-  rectangle.setPath(corners);
+  rectangle.setLatLngs(corners);
   postDrag();
 }
 
 function postDrag(){		//called after rectangle is dragged
-  var _lat = rectangle.getPath().getAt(3).lat();
-  var _lng = rectangle.getPath().getAt(3).lng();
+  var _lat = rectangle.getLatLngs()[0][3].lat;
+  var _lng = rectangle.getLatLngs()[0][3].lng;
   latBox.value = _lat.toFixed(4);
   lngBox.value = _lng.toFixed(4);
 }
@@ -215,15 +211,15 @@ function changeRotation(){
   rotationLabel.innerHTML = rotationSlider.value;
   boxRotation = rotationSlider.value*Math.PI/180;
 
-  var base = rectangle.getPath().getAt(3);
+  var base = rectangle.getLatLngs()[0][3];
 
   var rotLat = {lat: Math.sin(boxRotation)*boxHeight,lng:Math.cos(boxRotation)*boxWidth};
   var rotLng = {lat: Math.cos(boxRotation)*boxHeight, lng:Math.sin(boxRotation)*boxWidth};
   updateRectangle(
-    [ {lat: base.lat()+rotLat.lat, lng: base.lng()+rotLat.lng},
-      {lat: base.lat()+rotLat.lat-rotLng.lat, lng: base.lng()+rotLat.lng+rotLng.lng},
-      {lat: base.lat()-rotLng.lat, lng:base.lng()+rotLng.lng},
-      {lat: base.lat(), lng: base.lng()},
+    [ {lat: base.lat+rotLat.lat, lng: base.lng+rotLat.lng},
+      {lat: base.lat+rotLat.lat-rotLng.lat, lng: base.lng+rotLat.lng+rotLng.lng},
+      {lat: base.lat-rotLng.lat, lng:base.lng+rotLng.lng},
+      {lat: base.lat, lng: base.lng},
     ]);
 }
 
