@@ -21,7 +21,8 @@ var waterDropLabel;
 var baseHeightSlider;
 var baseHeightLabel;
 
-initializePage();
+// Initialize the application
+document.addEventListener('DOMContentLoaded', initializePage);
 
 function initializePage(){
   initializeControls();
