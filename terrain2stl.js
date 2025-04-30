@@ -80,13 +80,14 @@ function initializeMap(){
 
   map = L.map('webmap').setView([44.191442, -69.074608], 6);
 
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      minZoom: 3,
-      maxZoom: 13,
-      zoomDelta: 0.1,
-      // TODO: switch to another (paid?) tile provider!
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+  osmlayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    minZoom: 3,
+    maxZoom: 13,
+    zoomDelta: 0.1,
+    // NOTE: Only use OSM tiles for dev! Use a paid provider for prod
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  })
+  .addTo(map);
 
   var c = map.getCenter()
   var rectCorners = rectanglePoints(c.lat, c.lng,boxWidth)
