@@ -51,33 +51,6 @@ function initializeControls(){
 }  
 
 function initializeMap(){
-
-  /*
-  mapCenter = new google.maps.LatLng(44.191442, -69.074608);
-
-  var mapOptions = {
-    center: mapCenter,
-    zoom: 6,
-    minZoom: 3,
-    maxZoom: 13,
-    streetViewControl: false,
-    mapTypeControlOptions: {
-      mapTypeIds: [google.maps.MapTypeId.TERRAIN,"moon-visible","moon-elevation","mars-visible","mars-elevation"]
-    },
-    mapTypeId:google.maps.MapTypeId.TERRAIN,
-    gestureHandling: 'greedy'
-  };
-
-  google.maps.visualRefresh = true;
-  map = new google.maps.Map(document.getElementById("webmap"),
-    mapOptions);
-  //addMoonMaps(map);
-
-  google.maps.event.addListener(map, 'maptypeid_changed', function() {
-    console.log(map.getMapTypeId());
-  });
-  */
-
   map = L.map('webmap').setView([44.191442, -69.074608], 6);
 
   osmlayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -92,23 +65,9 @@ function initializeMap(){
   var c = map.getCenter()
   var rectCorners = rectanglePoints(c.lat, c.lng,boxWidth)
 
-  // TODO: make the rectangle geodesic somehow!
   rectangle = L.polygon(rectCorners, {color: 'Tomato',draggable: true}).addTo(map);
 
   rectangle.on('dragend', postDrag) 
-  /*
-  rectangle = new google.maps.Polygon({
-    strokeColor: '#FF0000',
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: '#FF0000',
-    fillOpacity: 0.35,
-    map: map,
-    paths: rectCorners,
-    draggable:true,
-    geodesic:true
-  });
-  */
 
 }
 
