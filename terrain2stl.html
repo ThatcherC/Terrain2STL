@@ -5,8 +5,39 @@
 		<link rel="stylesheet" href="//jthatch.com/bootstrap-custom.css">
 		<script type="text/javascript" src="terrain2stl.js"></script>
 		<!-- <script type="text/javascript" src="moonmaps.js"></script> -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-		<script type="text/javascript" src="bootstrap.min.js"></script>
+		<style>
+			/* Enhanced accordion styles */
+			.panel-collapse {
+			max-height: 0;
+			overflow: hidden;
+			/*transition: max-height 1s ease;*/
+			display: block; /* Ensure it's always a block, just with 0 height */
+			}
+
+			.panel-collapse.show {
+			max-height: 2000px; /* Much larger value to accommodate any content */
+			overflow: visible; /* Allow content to be visible when expanded */
+			}
+
+			/* If you have deeply nested content, you might need this */
+			.panel-collapse .panel-body {
+			padding: 15px;
+			display: block;
+			}
+
+			/* Make sure collapsed panels don't show content */
+			.panel-collapse:not(.show) {
+			visibility: hidden;
+			height: 0;
+			padding: 0;
+			margin: 0;
+			}
+
+			.panel-collapse.show {
+			visibility: visible;
+			height: auto;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="container-fluid">
@@ -26,12 +57,12 @@
 						<div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingOne">
 					      <h4 class="panel-title">
-					        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
+					        <a role="button" data-target="#collapseZero" href="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
 					          Location
 					        </a>
 					      </h4>
 					    </div>
-					    <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero">
+					    <div id="collapseZero" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="headingZero">
 					      <div class="panel-body">
 									<h4>Northwest Corner Coordinates</h4>
 
@@ -56,7 +87,7 @@
 						<div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingOne">
 					      <h4 class="panel-title">
-					        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					        <a role="button" data-target="#collapseOne" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
 					          Model Details
 					        </a>
 					      </h4>
@@ -106,7 +137,7 @@
 						<div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingFive">
 					      <h4 class="panel-title">
-					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+					        <a class="collapsed" role="button" data-target="#collapseFive" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
 					          Water and Base Settings
 					        </a>
 					      </h4>
@@ -134,7 +165,7 @@
 						<div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingThree">
 					      <h4 class="panel-title">
-					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+					        <a class="collapsed" role="button" data-target="#collapseFour" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
 					          Instructions
 					        </a>
 					      </h4>
@@ -185,6 +216,46 @@
 
 		</div>
 
+		<script>
+			// Accordion functionality
+			document.addEventListener('DOMContentLoaded', function() {
+				// Get all accordion panel headings
+				const accordionLinks = document.querySelectorAll('.panel-title a');
+				
+				// Add click event listener to each heading
+				accordionLinks.forEach(function(link) {
+					link.addEventListener('click', function(e) {
+						e.preventDefault();
+						
+						// Get the target panel
+						const targetId = this.getAttribute('data-target');
+						const targetPanel = document.querySelector(targetId);
+						
+						// If it's a multi-collapse accordion, uncomment this to close others
+						if (!this.parentElement.parentElement.parentElement.hasAttribute('aria-multiselectable') || 
+							this.parentElement.parentElement.parentElement.getAttribute('aria-multiselectable') !== 'true') {
+							// Close all other panels
+							document.querySelectorAll('.panel-collapse.show').forEach(function(panel) {
+								if (panel.id !== targetId.substring(1)) {
+									panel.classList.remove('show');
+									// Find the related link and add collapsed class
+									const relatedLink = document.querySelector(`a[data-target="#${panel.id}"]`);
+									if (relatedLink && !relatedLink.classList.contains('collapsed')) {
+										relatedLink.classList.add('collapsed');
+									}
+								}
+							});
+						}
+						
+						// Toggle the target panel
+						targetPanel.classList.toggle('show');
+						
+						// Toggle the collapsed class on the link
+						this.classList.toggle('collapsed');
+					});
+				});
+			});
+		</script>
 
 		<script async defer src="include-maps.js"></script>
 	</body>
