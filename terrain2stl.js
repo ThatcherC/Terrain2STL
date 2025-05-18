@@ -90,36 +90,40 @@ function initializeMap(){
 }
 
 //https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
-function initializeForm(){
+function initializeForm() {
   var form = document.getElementById("paramForm");
   var downloadButton = document.getElementById("downloadbtn");
-  //var downloadLink   = document.getElementById("downloadlink");
-
-  $( "form" ).submit(function( event ) {
-    var str = $( this ).serialize();
-    //console.log( str );
-    sendData(str);
+  var genButton = document.getElementById("genButton");
+  
+  // Replace jQuery form submit handler with vanilla JS
+  form.addEventListener("submit", function(event) {
+    // Create URL-encoded form data string manually instead of jQuery serialize
+    const formData = new FormData(form);
+    const serializedData = new URLSearchParams(formData).toString();
+    
+    sendData(serializedData);
     event.preventDefault();
   });
 
-
   function sendData(str) {
-    $("#genButton").addClass("disabled");
-    $("#genButton").html("<i>Generating...</i>");
-    downloadButton.style = "visibility:hidden";
+    genButton.classList.add("disabled");
+    genButton.innerHTML = "<i>Generating...</i>";
+    
+    downloadButton.style.visibility = "hidden";
     var XHR = new XMLHttpRequest();
 
     // Define what happens on successful data submission
     XHR.addEventListener("load", function(event) {
       var modelNumber = event.target.responseText;
-      var modelName   = "stls/terrain-"+modelNumber+".zip";
+      var modelName = "stls/terrain-" + modelNumber + ".zip";
 
-      //make download button visible
-      downloadButton.style = "visibility:visible";
-      //give link the right href
+      // Make download button visible
+      downloadButton.style.visibility = "visible";
+      // Set the href attribute
       downloadButton.href = modelName;
-      $("#genButton").removeClass("disabled");
-      $("#genButton").html("Generate Model");
+      
+      genButton.classList.remove("disabled");
+      genButton.innerHTML = "Generate Model";
     });
 
     // Define what happens in case of error
@@ -128,9 +132,8 @@ function initializeForm(){
     });
 
     // Set up our request
-    XHR.open("POST", "gen",true);
+    XHR.open("POST", "gen", true);
     XHR.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
 
     // The data sent is what the user provided in the form
     XHR.send(str);
