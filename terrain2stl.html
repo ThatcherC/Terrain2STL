@@ -199,7 +199,11 @@
 		</div>
 
 		<script>
-			// Accordion functionality
+			// Accordion functionality adapted from W3Schools
+			//   https://www.w3schools.com/howto/howto_js_accordion.asp
+			// I've added some CSS to keep on panel open upon load
+			// https://keithjgrant.com/posts/2023/04/transitioning-to-height-auto/ mentions the scroll height trick
+			//   - it seems necessary for smooth height adjustments
 			document.addEventListener('DOMContentLoaded', function() {
 				var acc = document.querySelectorAll('.panel-title a');
 				var i;
@@ -211,27 +215,22 @@
 
 					// Get the target panel
 					const targetId = this.getAttribute('data-target');
-
-					console.log(targetId);
-					console.log(document.querySelector(targetId))
 					const targetPanel = document.querySelector(targetId).children[0];
 					
 					var panel = targetPanel;
 
-					console.log(panel);
-
 					document.querySelectorAll('.panel-body').forEach(function(panel) {
 						if (panel.id !== targetId.substring(1)) {
-							//panel.style.maxHeight = null
+							panel.style.maxHeight = null
 							panel.classList.remove("shown");
 						}
 					});
 
 					if (panel.style.maxHeight) {
-						//panel.style.maxHeight = null;
+						panel.style.maxHeight = null;
 						panel.classList.remove("shown");
 					} else {
-						//panel.style.maxHeight = panel.scrollHeight + "px";
+						panel.style.maxHeight = parseInt(panel.scrollHeight) + 20 + "px";
 						panel.classList.add("shown");
 					} 
 				});
