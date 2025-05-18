@@ -14,6 +14,12 @@
 				overflow: hidden;
 				transition: max-height 0.2s ease-out;
 			}
+
+			.panel-body.shown {
+				padding: 10 18px;
+				max-height: max-content;
+				transition: max-height 0.2s ease-out;
+			}
 		</style>
 	</head>
 	<body>
@@ -40,7 +46,7 @@
 					      </h4>
 					    </div>
 					    <div id="collapseZero" class="panel-collapse" role="tabpanel" aria-labelledby="headingZero">
-					      <div class="panel-body" show>
+					      <div class="panel-body shown">
 									<h4>Northwest Corner Coordinates</h4>
 
 
@@ -217,15 +223,17 @@
 
 					document.querySelectorAll('.panel-body').forEach(function(panel) {
 						if (panel.id !== targetId.substring(1)) {
-							panel.style.maxHeight = null
+							//panel.style.maxHeight = null
+							panel.classList.remove("shown");
 						}
 					});
 
 					if (panel.style.maxHeight) {
-						panel.style.maxHeight = null;
-						panel.removeAttribute("show");
+						//panel.style.maxHeight = null;
+						panel.classList.remove("shown");
 					} else {
-						panel.style.maxHeight = panel.scrollHeight + "px";
+						//panel.style.maxHeight = panel.scrollHeight + "px";
+						panel.classList.add("shown");
 					} 
 				});
 				}
