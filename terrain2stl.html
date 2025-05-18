@@ -7,35 +7,12 @@
 		<!-- <script type="text/javascript" src="moonmaps.js"></script> -->
 		<style>
 			/* Enhanced accordion styles */
-			.panel-collapse {
-			max-height: 0;
-			overflow: hidden;
-			/*transition: max-height 1s ease;*/
-			display: block; /* Ensure it's always a block, just with 0 height */
-			}
-
-			.panel-collapse.show {
-			max-height: 2000px; /* Much larger value to accommodate any content */
-			overflow: visible; /* Allow content to be visible when expanded */
-			}
-
-			/* If you have deeply nested content, you might need this */
-			.panel-collapse .panel-body {
-			padding: 15px;
-			display: block;
-			}
-
-			/* Make sure collapsed panels don't show content */
-			.panel-collapse:not(.show) {
-			visibility: hidden;
-			height: 0;
-			padding: 0;
-			margin: 0;
-			}
-
-			.panel-collapse.show {
-			visibility: visible;
-			height: auto;
+			.panel-body {
+				padding: 0 18px;
+				background-color: white;
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.2s ease-out;
 			}
 		</style>
 	</head>
@@ -62,8 +39,8 @@
 					        </a>
 					      </h4>
 					    </div>
-					    <div id="collapseZero" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="headingZero">
-					      <div class="panel-body">
+					    <div id="collapseZero" class="panel-collapse" role="tabpanel" aria-labelledby="headingZero">
+					      <div class="panel-body" show>
 									<h4>Northwest Corner Coordinates</h4>
 
 
@@ -92,7 +69,7 @@
 					        </a>
 					      </h4>
 					    </div>
-					    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+					    <div id="collapseOne" class="panel-collapse" role="tabpanel" aria-labelledby="headingOne">
 					      <div class="panel-body">
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Width:</label>
@@ -142,7 +119,7 @@
 					        </a>
 					      </h4>
 					    </div>
-							<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+							<div id="collapseFive" class="panel-collapse" role="tabpanel" aria-labelledby="headingFive">
 					      <div class="panel-body">
 									<div class="form-group">
 										<label class="control-label col-sm-6">Water Drop (mm):</label>
@@ -170,7 +147,7 @@
 					        </a>
 					      </h4>
 					    </div>
-							<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+							<div id="collapseFour" class="panel-collapse" role="tabpanel" aria-labelledby="headingOne">
 					      <div class="panel-body">
 
 									<div id="inst">
@@ -219,41 +196,39 @@
 		<script>
 			// Accordion functionality
 			document.addEventListener('DOMContentLoaded', function() {
-				// Get all accordion panel headings
-				const accordionLinks = document.querySelectorAll('.panel-title a');
-				
-				// Add click event listener to each heading
-				accordionLinks.forEach(function(link) {
-					link.addEventListener('click', function(e) {
-						e.preventDefault();
-						
-						// Get the target panel
-						const targetId = this.getAttribute('data-target');
-						const targetPanel = document.querySelector(targetId);
-						
-						// If it's a multi-collapse accordion, uncomment this to close others
-						if (!this.parentElement.parentElement.parentElement.hasAttribute('aria-multiselectable') || 
-							this.parentElement.parentElement.parentElement.getAttribute('aria-multiselectable') !== 'true') {
-							// Close all other panels
-							document.querySelectorAll('.panel-collapse.show').forEach(function(panel) {
-								if (panel.id !== targetId.substring(1)) {
-									panel.classList.remove('show');
-									// Find the related link and add collapsed class
-									const relatedLink = document.querySelector(`a[data-target="#${panel.id}"]`);
-									if (relatedLink && !relatedLink.classList.contains('collapsed')) {
-										relatedLink.classList.add('collapsed');
-									}
-								}
-							});
+				var acc = document.querySelectorAll('.panel-title a');
+				var i;
+
+				for (i = 0; i < acc.length; i++) {
+				acc[i].addEventListener("click", function(e) {
+					e.preventDefault();
+					this.classList.toggle("active");
+
+					// Get the target panel
+					const targetId = this.getAttribute('data-target');
+
+					console.log(targetId);
+					console.log(document.querySelector(targetId))
+					const targetPanel = document.querySelector(targetId).children[0];
+					
+					var panel = targetPanel;
+
+					console.log(panel);
+
+					document.querySelectorAll('.panel-body').forEach(function(panel) {
+						if (panel.id !== targetId.substring(1)) {
+							panel.style.maxHeight = null
 						}
-						
-						// Toggle the target panel
-						targetPanel.classList.toggle('show');
-						
-						// Toggle the collapsed class on the link
-						this.classList.toggle('collapsed');
 					});
+
+					if (panel.style.maxHeight) {
+						panel.style.maxHeight = null;
+						panel.removeAttribute("show");
+					} else {
+						panel.style.maxHeight = panel.scrollHeight + "px";
+					} 
 				});
+				}
 			});
 		</script>
 
