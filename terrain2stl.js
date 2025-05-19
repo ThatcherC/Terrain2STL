@@ -51,6 +51,8 @@ function initializeControls(){
 }  
 
 function initializeMap(){
+  console.debug("Initializing map!")
+  console.trace()
   map = L.map('webmap').setView([44.191442, -69.074608], 6);
 
   osmlayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -69,39 +71,142 @@ function initializeMap(){
 
   rectangle.on('dragend', postDrag) 
 
+  initializeForm();
+
+  ingestURLParams();
+  updateLatLng();
+  changeSize();
+  changeRotation();
+  changeVScale();
+  changeWaterDrop();
+  changeBaseHeight();
+}
+
+// set form values from any URL parameters that may be present
+function ingestURLParams(){
+  // Get URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+			
+  // Get form element
+  const form = document.getElementById('paramForm');
+  
+  // If no form is found, exit
+  if (!form) return;
+  
+  // Get all form inputs, selects, and textareas
+  // const formElements = form.querySelectorAll('input, select, textarea');
+  const formElements = form.querySelectorAll('input');
+
+  // Keep track of which update functions we'll need to call
+  const functionsToCall = new Set();
+  
+  // Loop through all form elements
+  formElements.forEach(function(element) {
+    // Try to match by name attribute first
+    let paramName = element.name;
+
+    // If no name, try id attribute (removing any prefix like 'c-')
+    if (!paramName && element.id) {
+    paramName = element.id.replace(/^[a-z]-/i, '');
+    }
+    
+    // Skip elements without a usable identifier
+    if (!paramName) return;
+    
+    // Check if this parameter exists in the URL
+    if (urlParams.has(paramName)) {
+    // Set the value
+    element.value = urlParams.get(paramName);
+    
+    // Trigger change event
+    const event = new Event('change');
+    element.dispatchEvent(event);
+    
+    }
+  });
+}
+
+// Function to generate a shareable URL with modified form parameters
+function createShareableURL() {
+  // Get the form element
+  const form = document.getElementById('paramForm');
+  if (!form) return;
+  
+  // Create a new URLSearchParams object
+  const shareParams = new URLSearchParams();
+  
+  // Get all form inputs, selects, and textareas
+  const formElements = form.querySelectorAll('input');
+  
+  // Loop through all form elements
+  formElements.forEach(function(element) {
+    // Skip buttons and submit inputs
+    if (element.type === 'button' || element.type === 'submit') return;
+    
+    // Get element name or ID
+    let paramName = element.name;
+    
+    // Skip elements without a usable identifier
+    if (!paramName) return;
+    
+    // Get current value and default value
+    const currentValue = element.value;
+    const defaultValue = element.defaultValue;
+    
+    // Only add parameter if value is different from default
+    if (currentValue !== defaultValue) {
+      shareParams.append(paramName, currentValue);
+    }
+  });
+  
+  // Build the URL
+  const url = new URL(window.location.href);
+  // Clear existing search parameters
+  url.search = '';
+  
+  // Only add the search parameters if we have any
+  if (shareParams.toString()) {
+    url.search = shareParams.toString();
+  }
+  
+  return url.href;
 }
 
 //https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
-function initializeForm(){
+function initializeForm() {
   var form = document.getElementById("paramForm");
   var downloadButton = document.getElementById("downloadbtn");
-  //var downloadLink   = document.getElementById("downloadlink");
-
-  $( "form" ).submit(function( event ) {
-    var str = $( this ).serialize();
-    //console.log( str );
-    sendData(str);
+  var genButton = document.getElementById("genButton");
+  
+  // Replace jQuery form submit handler with vanilla JS
+  form.addEventListener("submit", function(event) {
+    // Create URL-encoded form data string manually instead of jQuery serialize
+    const formData = new FormData(form);
+    const serializedData = new URLSearchParams(formData).toString();
+    
+    sendData(serializedData);
     event.preventDefault();
   });
 
-
   function sendData(str) {
-    $("#genButton").addClass("disabled");
-    $("#genButton").html("<i>Generating...</i>");
-    downloadButton.style = "visibility:hidden";
+    genButton.classList.add("disabled");
+    genButton.innerHTML = "<i>Generating...</i>";
+    
+    downloadButton.style.visibility = "hidden";
     var XHR = new XMLHttpRequest();
 
     // Define what happens on successful data submission
     XHR.addEventListener("load", function(event) {
       var modelNumber = event.target.responseText;
-      var modelName   = "stls/terrain-"+modelNumber+".zip";
+      var modelName = "stls/terrain-" + modelNumber + ".zip";
 
-      //make download button visible
-      downloadButton.style = "visibility:visible";
-      //give link the right href
+      // Make download button visible
+      downloadButton.style.visibility = "visible";
+      // Set the href attribute
       downloadButton.href = modelName;
-      $("#genButton").removeClass("disabled");
-      $("#genButton").html("Generate Model");
+      
+      genButton.classList.remove("disabled");
+      genButton.innerHTML = "Generate Model";
     });
 
     // Define what happens in case of error
@@ -110,9 +215,8 @@ function initializeForm(){
     });
 
     // Set up our request
-    XHR.open("POST", "gen",true);
+    XHR.open("POST", "gen", true);
     XHR.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
 
     // The data sent is what the user provided in the form
     XHR.send(str);

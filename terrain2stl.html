@@ -1,12 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Terrain2STL</title>
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="//jthatch.com/bootstrap-custom.css">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-		<script type="text/javascript" src="bootstrap.min.js"></script>
-
 
 		<!-- Leaflet CSS and JS-->
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -19,6 +16,22 @@
 		<script src="Path.Drag.js/src/Path.Drag.js"></script>
 
 		<script type="text/javascript" src="terrain2stl.js"></script>
+		<!-- <script type="text/javascript" src="moonmaps.js"></script> -->
+		<style>
+			/* Enhanced accordion styles */
+			.panel-body {
+				padding: 0 18px;
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.2s ease-out;
+			}
+
+			.panel-body.shown {
+				padding: 10 18px;
+				max-height: max-content;
+				transition: max-height 0.2s ease-out;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="container-fluid">
@@ -40,13 +53,13 @@
 						<div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingOne">
 					      <h4 class="panel-title">
-					        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
+					        <a role="button" data-target="#collapseZero" href="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
 					          Location
 					        </a>
 					      </h4>
 					    </div>
-					    <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero">
-					      <div class="panel-body">
+					    <div id="collapseZero" class="panel-collapse" role="tabpanel" aria-labelledby="headingZero">
+					      <div class="panel-body shown">
 									<h4>Northwest Corner Coordinates</h4>
 
 
@@ -70,12 +83,12 @@
 						<div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingOne">
 					      <h4 class="panel-title">
-					        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					        <a role="button" data-target="#collapseOne" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
 					          Model Details
 					        </a>
 					      </h4>
 					    </div>
-					    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+					    <div id="collapseOne" class="panel-collapse" role="tabpanel" aria-labelledby="headingOne">
 					      <div class="panel-body">
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Width:</label>
@@ -95,7 +108,7 @@
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Scaling Factor:</label>
 										<div class="col-sm-4">
-											<input name="boxScale" type="range" min="1" max="12" step="1" value="1" onchange="changeSize()">
+											<input name="boxScale" type="range" min="1" max="20" step="1" value="1" onchange="changeSize()">
 										</div>
 										<div class="col-sm-2" id="boxScaleLabel">1</div>
 									</div>
@@ -120,12 +133,12 @@
 						<div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingFive">
 					      <h4 class="panel-title">
-					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+					        <a class="collapsed" role="button" data-target="#collapseFive" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
 					          Water and Base Settings
 					        </a>
 					      </h4>
 					    </div>
-							<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+							<div id="collapseFive" class="panel-collapse" role="tabpanel" aria-labelledby="headingFive">
 					      <div class="panel-body">
 									<div class="form-group">
 										<label class="control-label col-sm-6">Water Drop (mm):</label>
@@ -148,20 +161,20 @@
 						<div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingThree">
 					      <h4 class="panel-title">
-					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+					        <a class="collapsed" role="button" data-target="#collapseFour" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
 					          Instructions
 					        </a>
 					      </h4>
 					    </div>
-							<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+							<div id="collapseFour" class="panel-collapse" role="tabpanel" aria-labelledby="headingOne">
 					      <div class="panel-body">
 
 									<div id="inst">
 										<h2 align='center' style="margin-top:-10">Instructions</h2></br>
 										<ul style="margin-top:-20">
-											<li>Select the area you want an STL of using the red box</li>
-											<li>'Center to View' will move the box. It's also draggable</li>
-											<li>Rotate and resize the box as needed</li>
+											<li>Select the region for your STL model using the red box</li>
+											<li>Rotate and resize the box using the sliders in the 'Model Details' tab</li>
+											<li>Drag the selection box to move it, or use the 'Center to View' button</li>
 											<li>Z-Scale exaggerates the vertical scale of models</li>
 											<li>Water drop lowers the height of the oceans for emphasis</li>
 											<li>Don't worry about the box skewing with rotations - the model will be accurate to the real terrain</li>
@@ -198,5 +211,45 @@
 	    </div>
 
 		</div>
+
+		<script>
+			// Accordion functionality adapted from W3Schools
+			//   https://www.w3schools.com/howto/howto_js_accordion.asp
+			// I've added some CSS to keep on panel open upon load
+			// https://keithjgrant.com/posts/2023/04/transitioning-to-height-auto/ mentions the scroll height trick
+			//   - it seems necessary for smooth height adjustments
+			document.addEventListener('DOMContentLoaded', function() {
+				var acc = document.querySelectorAll('.panel-title a');
+				var i;
+
+				for (i = 0; i < acc.length; i++) {
+				acc[i].addEventListener("click", function(e) {
+					e.preventDefault();
+					this.classList.toggle("active");
+
+					// Get the target panel
+					const targetId = this.getAttribute('data-target');
+					const targetPanel = document.querySelector(targetId).children[0];
+					
+					var panel = targetPanel;
+
+					document.querySelectorAll('.panel-body').forEach(function(panel) {
+						if (panel.id !== targetId.substring(1)) {
+							panel.style.maxHeight = null
+							panel.classList.remove("shown");
+						}
+					});
+
+					if (panel.style.maxHeight) {
+						panel.style.maxHeight = null;
+						panel.classList.remove("shown");
+					} else {
+						panel.style.maxHeight = parseInt(panel.scrollHeight) + 20 + "px";
+						panel.classList.add("shown");
+					} 
+				});
+				}
+			});
+		</script>
 	</body>
 </html>
