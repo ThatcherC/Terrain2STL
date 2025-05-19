@@ -141,6 +141,52 @@ function ingestURLParams(){
   });
 }
 
+// Function to generate a shareable URL with modified form parameters
+function createShareableURL() {
+  // Get the form element
+  const form = document.getElementById('paramForm');
+  if (!form) return;
+  
+  // Create a new URLSearchParams object
+  const shareParams = new URLSearchParams();
+  
+  // Get all form inputs, selects, and textareas
+  const formElements = form.querySelectorAll('input');
+  
+  // Loop through all form elements
+  formElements.forEach(function(element) {
+    // Skip buttons and submit inputs
+    if (element.type === 'button' || element.type === 'submit') return;
+    
+    // Get element name or ID
+    let paramName = element.name;
+    
+    // Skip elements without a usable identifier
+    if (!paramName) return;
+    
+    // Get current value and default value
+    const currentValue = element.value;
+    const defaultValue = element.defaultValue;
+    
+    // Only add parameter if value is different from default
+    if (currentValue !== defaultValue) {
+      shareParams.append(paramName, currentValue);
+    }
+  });
+  
+  // Build the URL
+  const url = new URL(window.location.href);
+  // Clear existing search parameters
+  url.search = '';
+  
+  // Only add the search parameters if we have any
+  if (shareParams.toString()) {
+    url.search = shareParams.toString();
+  }
+  
+  return url.href;
+}
+
 //https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
 function initializeForm() {
   var form = document.getElementById("paramForm");
