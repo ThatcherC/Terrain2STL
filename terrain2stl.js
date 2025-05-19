@@ -120,8 +120,6 @@ function ingestURLParams(){
     // Try to match by name attribute first
     let paramName = element.name;
 
-    console.log(paramName)
-    
     // If no name, try id attribute (removing any prefix like 'c-')
     if (!paramName && element.id) {
     paramName = element.id.replace(/^[a-z]-/i, '');
