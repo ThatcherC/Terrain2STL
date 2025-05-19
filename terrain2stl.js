@@ -87,6 +87,60 @@ function initializeMap(){
   google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
 
   initializeForm();
+
+  ingestURLParams();
+  updateLatLng();
+  changeSize();
+  changeRotation();
+  changeVScale();
+  changeWaterDrop();
+  changeBaseHeight();
+}
+
+// set form values from any URL parameters that may be present
+function ingestURLParams(){
+  // Get URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+			
+  // Get form element
+  const form = document.getElementById('paramForm');
+  
+  // If no form is found, exit
+  if (!form) return;
+  
+  // Get all form inputs, selects, and textareas
+  // const formElements = form.querySelectorAll('input, select, textarea');
+  const formElements = form.querySelectorAll('input');
+
+  // Keep track of which update functions we'll need to call
+  const functionsToCall = new Set();
+  
+  // Loop through all form elements
+  formElements.forEach(function(element) {
+    // Try to match by name attribute first
+    let paramName = element.name;
+
+    console.log(paramName)
+    
+    // If no name, try id attribute (removing any prefix like 'c-')
+    if (!paramName && element.id) {
+    paramName = element.id.replace(/^[a-z]-/i, '');
+    }
+    
+    // Skip elements without a usable identifier
+    if (!paramName) return;
+    
+    // Check if this parameter exists in the URL
+    if (urlParams.has(paramName)) {
+    // Set the value
+    element.value = urlParams.get(paramName);
+    
+    // Trigger change event
+    const event = new Event('change');
+    element.dispatchEvent(event);
+    
+    }
+  });
 }
 
 //https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript#Sending_form_data
