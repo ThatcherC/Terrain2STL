@@ -178,7 +178,15 @@ function initializeForm() {
   var downloadButton = document.getElementById("downloadbtn");
   var genButton = document.getElementById("genButton");
   
-  // Replace jQuery form submit handler with vanilla JS
+  // block the input's form "press enter to submit form" behavior
+  form.addEventListener("keypress", (e) => {
+    var key = e.key || 0;
+    console.log(key)
+    if (key == "Enter") {
+      e.preventDefault();
+    }
+  })
+  
   form.addEventListener("submit", function(event) {
     // Create URL-encoded form data string manually instead of jQuery serialize
     const formData = new FormData(form);
