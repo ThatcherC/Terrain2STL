@@ -51,8 +51,6 @@ function initializeControls(){
 }  
 
 function initializeMap(){
-  console.debug("Initializing map!")
-  console.trace()
   map = L.map('webmap').setView([44.191442, -69.074608], 6);
 
   osmlayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
