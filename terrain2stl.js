@@ -92,6 +92,8 @@ function initializeMap(){
   changeVScale();
   changeWaterDrop();
   changeBaseHeight();
+
+  map.setCenter(rectangle.getPath().getAt(3));
 }
 
 // set form values from any URL parameters that may be present
