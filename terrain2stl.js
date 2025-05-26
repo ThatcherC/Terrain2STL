@@ -195,7 +195,6 @@ function initializeForm() {
   // block the input's form "press enter to submit form" behavior
   form.addEventListener("keypress", (e) => {
     var key = e.key || 0;
-    console.log(key)
     if (key == "Enter") {
       e.preventDefault();
     }
