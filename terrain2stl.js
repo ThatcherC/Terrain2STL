@@ -87,14 +87,13 @@ function initializeMap(){
   google.maps.event.addListener(rectangle, 'dragend', postDrag);	//call function after rect is dragged
 
   initializeForm();
-
   ingestURLParams();
-  updateLatLng();
-  changeSize();
-  changeRotation();
+  updateSelection();
   changeVScale();
   changeWaterDrop();
   changeBaseHeight();
+
+  map.setCenter(rectangle.getPath().getAt(3));
 }
 
 // set form values from any URL parameters that may be present
@@ -196,7 +195,6 @@ function initializeForm() {
   // block the input's form "press enter to submit form" behavior
   form.addEventListener("keypress", (e) => {
     var key = e.key || 0;
-    console.log(key)
     if (key == "Enter") {
       e.preventDefault();
     }
@@ -247,17 +245,23 @@ function initializeForm() {
 }
 
 
+// TODO! UPdate this to use the new function
 function centerToView(){
   mapCenter = map.getCenter();
   var _lat = mapCenter.lat()+boxHeight/2;
   var _lng = mapCenter.lng()-boxWidth/2;
 
+  latBox.value = _lat;
+  lngBox.value = _lng;
+  updateSelection()
+  /*
   updateRectangle(
     [ {lat: _lat-boxHeight, lng: _lng},
       {lat: _lat-boxHeight, lng: _lng+boxWidth},
       {lat: _lat, lng:_lng+boxWidth},
       {lat: _lat, lng: _lng},
     ]);
+    */
 }
 
 function updateRectangle(corners){
@@ -272,33 +276,6 @@ function postDrag(){		//called after rectangle is dragged
   lngBox.value = _lng.toFixed(4);
 }
 
-function changeSize(){
-  var boxScale = scaleSlider.value;
-  scaleLabel.innerHTML = scaleSlider.value;
-
-  boxWidth=minBoxWidth*widthSlider.value*boxScale/120;
-  boxHeight=minBoxWidth*heightSlider.value*boxScale/120;
-  widthLabel.innerHTML =  (widthSlider.value*boxScale /3600).toFixed(2)+"\xB0";
-  heightLabel.innerHTML = (heightSlider.value*boxScale/3600).toFixed(2)+"\xB0";
-  centerToView();
-}
-
-function changeRotation(){
-  rotationLabel.innerHTML = rotationSlider.value;
-  boxRotation = rotationSlider.value*Math.PI/180;
-
-  var base = rectangle.getPath().getAt(3);
-
-  var rotLat = {lat: Math.sin(boxRotation)*boxHeight,lng:Math.cos(boxRotation)*boxWidth};
-  var rotLng = {lat: Math.cos(boxRotation)*boxHeight, lng:Math.sin(boxRotation)*boxWidth};
-  updateRectangle(
-    [ {lat: base.lat()+rotLat.lat, lng: base.lng()+rotLat.lng},
-      {lat: base.lat()+rotLat.lat-rotLng.lat, lng: base.lng()+rotLat.lng+rotLng.lng},
-      {lat: base.lat()-rotLng.lat, lng:base.lng()+rotLng.lng},
-      {lat: base.lat(), lng: base.lng()},
-    ]);
-}
-
 function changeVScale(){
   vScaleLabel.innerHTML = vScaleSlider.value;
 }
@@ -311,17 +288,36 @@ function changeBaseHeight(){
   baseHeightLabel.innerHTML = baseHeightSlider.value;
 }
 
-function updateLatLng(){
+function updateSelection(){
+
+
+  var boxScale = scaleSlider.value;
+  boxRotation = rotationSlider.value*Math.PI/180;
   var _lat = Math.min(Math.max(parseFloat(document.getElementById('c-lat').value),-69),69);
   var _lng = Math.min(Math.max(parseFloat(document.getElementById('c-lng').value),-179),180);
+
+
   document.getElementById('c-lat').value = _lat;
   document.getElementById('c-lng').value = _lng;
+  scaleLabel.innerHTML = scaleSlider.value;  
+  rotationLabel.innerHTML = rotationSlider.value;
+
+  boxWidth=minBoxWidth*widthSlider.value*boxScale/120;
+  boxHeight=minBoxWidth*heightSlider.value*boxScale/120;
+  widthLabel.innerHTML =  (widthSlider.value*boxScale /3600).toFixed(2)+"\xB0";
+  heightLabel.innerHTML = (heightSlider.value*boxScale/3600).toFixed(2)+"\xB0";
+
+  var base = rectangle.getPath().getAt(3);
+
+  var rotLat = {lat: Math.sin(boxRotation)*boxHeight,lng:Math.cos(boxRotation)*boxWidth};
+  var rotLng = {lat: Math.cos(boxRotation)*boxHeight, lng:Math.sin(boxRotation)*boxWidth};
+
   if(_lat && _lng){
-    updateRectangle([ {lat: _lat-boxHeight, lng: _lng},
-      {lat: _lat-boxHeight, lng: _lng+boxWidth},
-      {lat: _lat, lng:_lng+boxWidth},
-      {lat: _lat, lng: _lng},
-    ]);
-    map.setCenter({lat: _lat, lng: _lng});
+    updateRectangle(
+      [ {lat: _lat+rotLat.lat, lng: _lng+rotLat.lng},
+        {lat: _lat+rotLat.lat-rotLng.lat, lng: _lng+rotLat.lng+rotLng.lng},
+        {lat: _lat-rotLng.lat, lng:_lng+rotLng.lng},
+        {lat: _lat, lng: _lng},
+      ]);
   }
 }

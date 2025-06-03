@@ -20,6 +20,10 @@
 				max-height: max-content;
 				transition: max-height 0.2s ease-out;
 			}
+
+			.btn {
+				margin-bottom: 10px;
+			}
 		</style>
 	</head>
 	<body>
@@ -34,7 +38,7 @@
 					<center><h1>STL Generator</h1></center>
 					<center><i>Now with adjustable rectangle shapes!</i></center></br>
 
-					<form id="paramForm" class="form-horizontal" action="gen" method="post">
+					<form id="paramForm" class="form-horizontal" action="gen" onchange="updateSelection()" method="post">
 
 					<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 						<div class="panel panel-default">
@@ -53,13 +57,13 @@
 										<div class="form-group">
 											<label class="col-sm-3 control-label">Latitude: </label>
 											<div class="col-sm-4">
-												<input class="form-control" value=44.2 name="lat" id="c-lat" onchange="updateLatLng()">
+												<input class="form-control" value=44.2 name="lat" id="c-lat">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="col-sm-3 control-label">Longitude: </label>
 											<div class="col-sm-4">
-												<input class="form-control" value=-69.09 name="lng" id="c-lng" onchange="updateLatLng()"></br>
+												<input class="form-control" value=-69.09 name="lng" id="c-lng"></br>
 											</div>
 										</div>
 
@@ -80,14 +84,14 @@
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Width:</label>
 										<div class="col-sm-4">
-											<input name="boxWidth" type="range" min="60" max="2700" step="60" value="120" onchange="changeSize()">
+											<input name="boxWidth" type="range" min="60" max="2700" step="60" value="120">
 										</div>
 										<div class="col-sm-2" id="boxWidthLabel">0.05&deg</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Height:</label>
 										<div class="col-sm-4">
-											<input name="boxHeight" type="range" min="60" max="2700" step="60" value="120" onchange="changeSize()">
+											<input name="boxHeight" type="range" min="60" max="2700" step="60" value="120">
 										</div>
 										<div class="col-sm-2" id="boxHeightLabel">0.05&deg</div>
 									</div>
@@ -95,14 +99,14 @@
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Scaling Factor:</label>
 										<div class="col-sm-4">
-											<input name="boxScale" type="range" min="1" max="20" step="1" value="1" onchange="changeSize()">
+											<input name="boxScale" type="range" min="1" max="20" step="1" value="1">
 										</div>
 										<div class="col-sm-2" id="boxScaleLabel">1</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-sm-6">Box Rotation (degrees)</label>
 										<div class="col-sm-4">
-											<input name="rotation" type="range" min="-90" max="90" step="1" value="0" onchange="changeRotation()">
+											<input name="rotation" type="range" min="-90" max="90" step="1" value="0">
 										</div>
 										<div class="col-sm-2" id="rotationLabel">0</div>
 									</div>
