@@ -65,7 +65,7 @@ function initializeMap(){
   var c = map.getCenter()
   var rectCorners = rectanglePoints(c.lat, c.lng,boxWidth)
 
-  rectangle = L.polygon(rectCorners, {color: 'Tomato',draggable: true}).addTo(map);
+  rectangle = L.polygon(rectCorners, {color: 'Tomato',draggable: true, geodesic: true}).addTo(map);
 
   rectangle.on('dragend', postDrag) 
 
