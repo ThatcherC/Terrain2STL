@@ -50,9 +50,20 @@ function initializeControls(){
   baseHeightLabel = document.getElementById("baseHeightLabel");
 }  
 
-function initializeMap(){
-  map = L.map('webmap').setView([44.191442, -69.074608], 6);
+function hillshadecolor(values){
+  gray = values[0]
+  //alpha = Math.abs(gray - 182) > 8 ? 0.1 : 0;
+  //return `rgba(${gray},${gray},${gray},${alpha})`;
+  color = Math.abs(gray - 182) > 8 ? `rgb(${gray},${gray},${gray})` : null;
+  return color;
+}
 
+function initializeMap(){
+  map = L.map('webmap', {
+          minZoom: 3,
+          maxZoom: 12,
+        }).setView([44.191442, -69.074608], 6);
+  /*
   osmlayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     minZoom: 3,
     maxZoom: 13,
@@ -61,6 +72,39 @@ function initializeMap(){
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   })
   .addTo(map);
+  */
+
+	L.maplibreGL({
+		style: 'https://tiles.openfreemap.org/styles/liberty',
+		minZoom: 3,
+		maxZoom: 12
+	}).addTo(map)
+
+	var url_to_geotiff_file = "https://hillshades.us-east-1.linodeobjects.com/srtm-hillshade-web-mercator-cog-unset-q60.tif"
+
+        // from https://github.com/GeoTIFF/georaster-layer-for-leaflet-example/blob/42c4d84b8734c6747cba7a0e221fc6f6d260f6f1/examples/load-cog-via-url-param.html#L43C1-L63C12
+        parseGeoraster(url_to_geotiff_file).then(georaster => {
+          /*
+              GeoRasterLayer is an extension of GridLayer,
+              which means can use GridLayer options like opacity.
+
+              Just make sure to include the georaster option!
+
+              http://leafletjs.com/reference-1.2.0.html#gridlayer
+          */
+          var layer = new GeoRasterLayer({
+              attribution: "jthatch.com SRTM hillshade",
+              georaster,
+	      opacity: 0.2,
+	      //opacity: 0.1,
+	      pixelValuesToColorFn: hillshadecolor,
+	      resolution: 512
+          });
+          layer.addTo(map);
+	  layer.getContainer().classList.add('georaster-hillshade');
+        });
+
+
 
   var c = map.getCenter()
   var rectCorners = rectanglePoints(c.lat, c.lng,boxWidth)
@@ -287,7 +331,7 @@ function updateSelection(){
 
   var boxScale = scaleSlider.value;
   boxRotation = rotationSlider.value*Math.PI/180;
-  var _lat = Math.min(Math.max(parseFloat(document.getElementById('c-lat').value),-69),69);
+  var _lat = Math.min(Math.max(parseFloat(document.getElementById('c-lat').value),-69),84);
   var _lng = Math.min(Math.max(parseFloat(document.getElementById('c-lng').value),-179),180);
 
 
