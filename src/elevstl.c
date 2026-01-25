@@ -2,8 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/time.h>
 #include "STLWriter.h"
 #include "elevation.h"
+
+// Timing utilities
+static double getTimeMs(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
+}
+
+static double timeReadingHGT = 0;
+static double timeWritingSTL = 0;
 
 
 // gcc elevstl.c STLWriter.c elevation.c -o celevstl -lm
@@ -152,24 +163,39 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	}
 	startSTLfile(stl, 4);
 
+	double t0;
+
 	//get zeroth line
+	t0 = getTimeMs();
 	getElevationLine(nextline, width, -height, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
+	timeReadingHGT += getTimeMs() - t0;
+
+	t0 = getTimeMs();
 	tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
+	timeWritingSTL += getTimeMs() - t0;
 
 	for(int y = -height+1; y<=0; y++){
 		for(int x = 0; x<width; x++){
 			prevline[x] = nextline[x];
 		}
+		t0 = getTimeMs();
 		getElevationLine(nextline, width, y, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
+		timeReadingHGT += getTimeMs() - t0;
+
+		t0 = getTimeMs();
 		tris += writeXStrip(stl, prevline, nextline, width, cos(globalLat), y-1, y);
 		fflush(stl);
+		timeWritingSTL += getTimeMs() - t0;
 	}
 
 	//write other x wall
+	t0 = getTimeMs();
 	tris += writeLineWall(stl, nextline, width, cos(globalLat), 0, 1);
+	timeWritingSTL += getTimeMs() - t0;
 
 
 	// add in the bottom of the model
+	t0 = getTimeMs();
 	float xScale = cos(globalLat);
 	struct _vect3 o =  {10,-10, 0};
 	for(int y = -height+1; y<=0; y++){
@@ -190,10 +216,17 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 		addTriangle(stl, createTriangle(lowerright,lowerleft,o));
 		tris += 2;
 	}
+	timeWritingSTL += getTimeMs() - t0;
 
 	//set the number of triangles in the header to tris
-  setSTLtriangles(stl, tris);
+	setSTLtriangles(stl, tris);
 	fclose(stl);
+
+	// Print timing results
+	printf("\nTiming breakdown:\n");
+	printf("  Reading HGT files: %.2f ms\n", timeReadingHGT);
+	printf("  Writing STL file:  %.2f ms\n", timeWritingSTL);
+	printf("  Total:             %.2f ms\n", timeReadingHGT + timeWritingSTL);
 
 	//passing global lat as an xscale - only needed for
 	//writeSTLfromArray(hList,width,height,globalLat);
