@@ -22,7 +22,7 @@ static double timeWritingSTL = 0;
 float globalLat = 0;
 const float  PI=3.14159265358979f;
 
-int writeLineWall(FILE * file, float * heights, int width, float xScale, float yval, int flipNormal){
+int writeLineWall(STLWriter *writer, float * heights, int width, float xScale, float yval, int flipNormal){
 	int numtris = 0;
 
 	for(int i = 1; i <width; i++){
@@ -34,11 +34,11 @@ int writeLineWall(FILE * file, float * heights, int width, float xScale, float y
 			struct _vect3 z = {(i-1)*xScale, yval, 0};
 
 			if(flipNormal){
-				addTriangle(file, createTriangle(z,b,a));			//model walls
-				addTriangle(file, createTriangle(a,w,z));
+				addTriangleBuffered(writer, createTriangle(z,b,a));			//model walls
+				addTriangleBuffered(writer, createTriangle(a,w,z));
 			}else{
-				addTriangle(file, createTriangle(b,z,a));			//model walls
-				addTriangle(file, createTriangle(w,a,z));
+				addTriangleBuffered(writer, createTriangle(b,z,a));			//model walls
+				addTriangleBuffered(writer, createTriangle(w,a,z));
 			}
 
 			numtris += 2;
@@ -50,7 +50,7 @@ int writeLineWall(FILE * file, float * heights, int width, float xScale, float y
 
 //lh is lower heights, ie those along a strip with a lower y component
 //uh is upper height, those along a strip with a higher y component
-int writeXStrip(FILE * file, float * lh, float * uh, int width, float xScale, float lyval, float hyval){
+int writeXStrip(STLWriter *writer, float * lh, float * uh, int width, float xScale, float lyval, float hyval){
 	int numtris = 0;
 
 	//build left wall
@@ -58,8 +58,8 @@ int writeXStrip(FILE * file, float * lh, float * uh, int width, float xScale, fl
 	struct _vect3 l =  {0,lyval, lh[0]};
 	struct _vect3 ub = {0,hyval,  0};
 	struct _vect3 lb = {0,lyval,  0};
-	addTriangle(file, createTriangle(u,ub,lb));
-	addTriangle(file, createTriangle(u,lb,l));
+	addTriangleBuffered(writer, createTriangle(u,ub,lb));
+	addTriangleBuffered(writer, createTriangle(u,lb,l));
 	numtris += 2;
 
 	//build right wall
@@ -67,8 +67,8 @@ int writeXStrip(FILE * file, float * lh, float * uh, int width, float xScale, fl
 	l =  (struct _vect3){(width-1)*xScale,lyval, lh[width-1]};
 	ub = (struct _vect3){(width-1)*xScale,hyval,  0};
 	lb = (struct _vect3){(width-1)*xScale,lyval,  0};
-	addTriangle(file, createTriangle(u,lb,ub));
-	addTriangle(file, createTriangle(u,l,lb));
+	addTriangleBuffered(writer, createTriangle(u,lb,ub));
+	addTriangleBuffered(writer, createTriangle(u,l,lb));
 	numtris += 2;
 
 	for(int x = 1; x < width; x++){
@@ -85,11 +85,11 @@ int writeXStrip(FILE * file, float * lh, float * uh, int width, float xScale, fl
 
 			//choose where to split the square based on local curvature
 			if( fabs(hd-hb) < fabs(ha-hc) ){
-				addTriangle(file, createTriangle(a,d,b));
-				addTriangle(file, createTriangle(c,b,d));
+				addTriangleBuffered(writer, createTriangle(a,d,b));
+				addTriangleBuffered(writer, createTriangle(c,b,d));
 			}else{
-				addTriangle(file, createTriangle(a,d,c));
-				addTriangle(file, createTriangle(a,c,b));
+				addTriangleBuffered(writer, createTriangle(a,d,c));
+				addTriangleBuffered(writer, createTriangle(a,c,b));
 			}
 			numtris += 2;
 		}
@@ -155,13 +155,16 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	}
 
 	int tris = 0;
-	FILE* stl = fopen(outputName, "w");
+	FILE* stlFile = fopen(outputName, "wb");
 	// fopen returns a null pointer if file can't be opened
-	if(stl==NULL){
+	if(stlFile==NULL){
 		fprintf(stderr, "Unable to open '%s' for output!\n", outputName);
 		exit(1);
 	}
-	startSTLfile(stl, 4);
+
+	// Create buffered writer
+	STLWriter *stl = stlwriter_create(stlFile);
+	startSTLfileBuffered(stl);
 
 	double t0;
 
@@ -184,7 +187,6 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 
 		t0 = getTimeMs();
 		tris += writeXStrip(stl, prevline, nextline, width, cos(globalLat), y-1, y);
-		fflush(stl);
 		timeWritingSTL += getTimeMs() - t0;
 	}
 
@@ -203,8 +205,8 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 		struct _vect3 upperleft = {0,y,   0};
 		struct _vect3 lowerright = {(width-1)*cos(globalLat),y-1, 0};
 		struct _vect3 upperright = {(width-1)*cos(globalLat),y,   0};
-		addTriangle(stl, createTriangle(lowerleft,upperleft,o));
-		addTriangle(stl, createTriangle(upperright,lowerright,o));
+		addTriangleBuffered(stl, createTriangle(lowerleft,upperleft,o));
+		addTriangleBuffered(stl, createTriangle(upperright,lowerright,o));
 		tris += 2;
 	}
 	for(int x = 0; x<width-1; x++){
@@ -212,15 +214,16 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 		struct _vect3 upperright = {(x+1)*xScale,0,   0};
 		struct _vect3 lowerleft = {x*xScale,-height, 0};
 		struct _vect3 lowerright =  {(x+1)*xScale,-height,   0};
-		addTriangle(stl, createTriangle(upperleft,upperright,o));
-		addTriangle(stl, createTriangle(lowerright,lowerleft,o));
+		addTriangleBuffered(stl, createTriangle(upperleft,upperright,o));
+		addTriangleBuffered(stl, createTriangle(lowerright,lowerleft,o));
 		tris += 2;
 	}
 	timeWritingSTL += getTimeMs() - t0;
 
-	//set the number of triangles in the header to tris
-	setSTLtriangles(stl, tris);
-	fclose(stl);
+	// Finalize and close
+	finalizeSTLfileBuffered(stl);
+	stlwriter_free(stl);
+	fclose(stlFile);
 
 	// Print timing results
 	printf("\nTiming breakdown:\n");

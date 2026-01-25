@@ -1,10 +1,90 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "STLWriter.h"
 
 
 int voidCutoff = 0;
 char endTag[2] = {0,0};
+
+// ============== Buffered Writer Implementation ==============
+
+// fwrite-like interface: write to buffer instead of file
+size_t bufwrite(const void *ptr, size_t size, size_t count, STLWriter *w) {
+    size_t bytes = size * count;
+
+    // Flush if this write would overflow
+    if (w->pos + bytes > w->capacity) {
+        stlwriter_flush(w);
+    }
+
+    memcpy(w->buffer + w->pos, ptr, bytes);
+    w->pos += bytes;
+    return count;
+}
+
+STLWriter *stlwriter_create(FILE *file) {
+    STLWriter *w = (STLWriter *)malloc(sizeof(STLWriter));
+    w->file = file;
+    w->buffer = (char *)malloc(STL_BUFFER_SIZE);
+    w->pos = 0;
+    w->capacity = STL_BUFFER_SIZE;
+    w->triCount = 0;
+    return w;
+}
+
+void stlwriter_flush(STLWriter *w) {
+    if (w->pos > 0) {
+        fwrite(w->buffer, 1, w->pos, w->file);
+        w->pos = 0;
+    }
+}
+
+void stlwriter_free(STLWriter *w) {
+    if (w) {
+        free(w->buffer);
+        free(w);
+    }
+}
+
+void addTriangleBuffered(STLWriter *w, triangle t) {
+    // normal vector
+    bufwrite(&t.normal.x, sizeof(float), 1, w);
+    bufwrite(&t.normal.y, sizeof(float), 1, w);
+    bufwrite(&t.normal.z, sizeof(float), 1, w);
+
+    // vertices (9 floats: a.x,a.y,a.z, b.x,b.y,b.z, c.x,c.y,c.z)
+    bufwrite(&t.a.x, sizeof(float), 9, w);
+
+    // attribute byte count (2 bytes, unused)
+    bufwrite(endTag, 1, 2, w);
+
+    w->triCount++;
+}
+
+void startSTLfileBuffered(STLWriter *w) {
+    // Write 80-byte header
+    char header[80];
+    memset(header, 't', 80);
+    bufwrite(header, 1, 80, w);
+
+    // Write placeholder for triangle count (will update at end)
+    uint32_t placeholder = 0;
+    bufwrite(&placeholder, 4, 1, w);
+}
+
+void finalizeSTLfileBuffered(STLWriter *w) {
+    // Flush any remaining data
+    stlwriter_flush(w);
+
+    // Go back and write the actual triangle count
+    fseek(w->file, 80, SEEK_SET);
+    uint32_t count = (uint32_t)w->triCount;
+    fwrite(&count, 4, 1, w->file);
+}
+
+// ============== Original (unbuffered) Implementation ==============
 
 //Determines the normal vector of a triangle from three vertices
 vect3 normalOf(vect3 p1, vect3 p2, vect3 p3){
