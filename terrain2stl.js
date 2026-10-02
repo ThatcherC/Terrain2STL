@@ -113,7 +113,6 @@ function initializeMap(){
 
   rectangle.on('dragend', postDrag) 
 
-  initializeForm();
   ingestURLParams();
   updateSelection();
   changeVScale();
