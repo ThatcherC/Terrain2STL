@@ -29,6 +29,11 @@ if(!process.env.NOSTATIC) {
 	app.use(express.static(__dirname, {index: "terrain2stl.html"}));
 }
 
+// append a line to a log file without blocking; failures are reported but not fatal
+function appendLog(file, line) {
+	fs.promises.appendFile(file, line).catch(err => console.log("> Error!: "+err));
+}
+
 // numeric fields expected in the POST body
 const PARAMS = ["lat", "lng", "boxWidth", "boxHeight", "vScale", "rotation",
 	"waterDrop", "baseHeight", "boxScale"];
@@ -79,12 +84,8 @@ app.post("/gen",function(req,res){
 				 //res.type("application/zip");
 				 //res.download(zipname+".zip");
 				const logString = paramLog+Date.now()+"\n";
-				fs.appendFile("logs/params.log", logString,function(err){
-					if(err) console.log("> Error!: "+err);
-				});
-				fs.appendFile("logs/commands.log", command+"\n", function(err){
-					if(err) console.log("> Error!: "+err);
-				});
+				if(config.logParams) appendLog(config.paramLogPath, logString);
+				if(config.logCommands) appendLog(config.commandLogPath, command+"\n");
 				cb();
 			})
 		})});
