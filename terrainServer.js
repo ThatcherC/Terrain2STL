@@ -1,11 +1,11 @@
 //Node server for hgt-to-stl program
-const express = require('express');
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const execFile = require('child_process').execFile;
-const config = require('./config');
-const queue = require("queue");
-const path = require('path');
+import express from 'express';
+import bodyParser from 'body-parser';
+import fs from 'node:fs';
+import { execFile } from 'node:child_process';
+import path from 'node:path';
+import queue from 'queue';
+import config from './config.js';
 
 var app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -26,7 +26,7 @@ q.autostart = true;
 // if NOSTATIC is not set, set up static file serving
 if(!process.env.NOSTATIC) {
 	console.log("Serving static files")
-	app.use(express.static(__dirname, {index: "terrain2stl.html"}));
+	app.use(express.static(import.meta.dirname, {index: "terrain2stl.html"}));
 }
 
 // append a line to a log file without blocking; failures are reported but not fatal

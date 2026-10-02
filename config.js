@@ -1,4 +1,4 @@
-module.exports = 
+export default
 {
 	"logRequests":true,			//Allows logging of http requests (IP, time)
 	"requestLogPath":"logs/requests.log",	//Where to log requests
