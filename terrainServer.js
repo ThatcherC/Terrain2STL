@@ -25,8 +25,17 @@ q.autostart = true;
 // if NOSTATIC is not set, set up static file serving
 if(!process.env.NOSTATIC) {
 	console.log("Serving static files")
-	app.use(express.static(import.meta.dirname, {index: "terrain2stl.html"}));
+	app.use(express.static(path.join(import.meta.dirname, "public"),
+		{index: "terrain2stl.html", dotfiles: "deny"}));
 }
+
+// serve finished models from STLPATH, which may be outside the app directory
+app.get("/stls/:name", (req, res) => {
+	if (!/^terrain-\d+\.zip$/.test(req.params.name)) return res.sendStatus(404);
+	res.download(path.join(STLPATH, req.params.name), err => {
+		if (err && !res.headersSent) res.sendStatus(404);
+	});
+});
 
 // append a line to a log file without blocking; failures are reported but not fatal
 function appendLog(file, line) {
