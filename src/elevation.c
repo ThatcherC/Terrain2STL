@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-int getTile(char * filename, size_t len, float lat, float lng){
+int getTile(char * filename, char * demDirectory, size_t len, float lat, float lng){
 	char ns = lat>=0 ? 'N' : 'S'; //Positive is north
 	char ew = lng>=0 ? 'E' : 'W';	//Positive is east
 
 	int tileLat = abs( (int)floor(lat) );
 	int tileLng = abs( (int)floor(lng) );
 
-	return snprintf(filename, len, "hgt_files/%c%02d%c%03d.hgt", ns, tileLat, ew, tileLng);
+	return snprintf(filename, len, "%s/%c%02d%c%03d.hgt", demDirectory, ns, tileLat, ew, tileLng);
 }
 
 //returns the 'index' of the tile that contains a certain coordinate
@@ -27,7 +27,7 @@ FILE * elfile;
 
 //width and heigth are in 'pixels'
 //heights must be able to accomodate width-many values
-int getElevationLine(float* heights, int width, int nthLine, float startLat,float startLng, float vscale,float rot, int waterDrop, int baseHeight, int stepSize){
+int getElevationLine(float* heights, char * demDirectory, int width, int nthLine, float startLat,float startLng, float vscale,float rot, int waterDrop, int baseHeight, int stepSize){
 	int h;
 	char number [2];
 
@@ -62,7 +62,7 @@ int getElevationLine(float* heights, int width, int nthLine, float startLat,floa
 
 				if(getTileIndex(intlat, intlng)!=tileNumber || elfile == NULL){
 					tileNumber = getTileIndex(intlat, intlng);
-					getTile(tileName, 100, intlat, intlng);
+					getTile(tileName, demDirectory, 100, intlat, intlng);
 
 					if(elfile != NULL) fclose(elfile);
 					#warning "Handle the case where we can't open the file - return zeros for ocean elev"

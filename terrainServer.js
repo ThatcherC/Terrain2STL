@@ -42,7 +42,7 @@ app.post("/",function(req,res){
 
 	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth/3+" "
 			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
-			+b.baseHeight+" "+b.boxScale+" "+filename;
+			+b.baseHeight+" "+b.boxScale+" "+DEMPATH+" "+filename;
 	command += "; zip --quiet --junk-paths "+zipname+" "+filename;
 
         console.log("> Request for "+b.lat+" "+b.lng);

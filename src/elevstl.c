@@ -92,9 +92,9 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 //width and height are in units of steps or maybe degrees??
 //rot is in degrees
 {
-	if(argc!=11){
-		printf("Got %d arguments, expected 10:\n", argc-1);
-		printf("%s lat long width height verticalscale rot waterDrop baseHeight stepSize outputname\n", argv[0]);
+	if(argc!=12){
+		printf("Got %d arguments, expected 11:\n", argc-1);
+		printf("%s lat long width height verticalscale rot waterDrop baseHeight stepSize dem_directory outputname\n", argv[0]);
 		return -1;
 	}
 	float lat;
@@ -126,7 +126,8 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 
 	stepSize = atoi(argv[9]);
 
-	char * outputName = argv[10];
+	char * demDirectory = argv[10];
+	char * outputName = argv[11];
 
 	printf("Step size: %d units\n", stepSize);
 
@@ -153,14 +154,14 @@ int main(int argc, char **argv)			//lat, long, width, height, verticalscale, rot
 	startSTLfile(stl, 4);
 
 	//get zeroth line
-	getElevationLine(nextline, width, -height, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
+	getElevationLine(nextline, demDirectory, width, -height, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
 	tris += writeLineWall(stl, nextline, width, cos(globalLat), -height, 0);
 
 	for(int y = -height+1; y<=0; y++){
 		for(int x = 0; x<width; x++){
 			prevline[x] = nextline[x];
 		}
-		getElevationLine(nextline, width, y, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
+		getElevationLine(nextline, demDirectory, width, y, lat, lng, scaleFactor, rot, waterDrop,baseHeight, stepSize);
 		tris += writeXStrip(stl, prevline, nextline, width, cos(globalLat), y-1, y);
 		fflush(stl);
 	}
