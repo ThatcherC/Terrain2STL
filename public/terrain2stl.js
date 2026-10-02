@@ -50,12 +50,13 @@ function initializeControls(){
   baseHeightLabel = document.getElementById("baseHeightLabel");
 }  
 
+const TILE_CACHE_LIMIT = 200; // ~50 MB of 256px tile canvases
+
 function hillshadecolor(values){
-  gray = values[0]
+  const gray = values[0]
   //alpha = Math.abs(gray - 182) > 8 ? 0.1 : 0;
   //return `rgba(${gray},${gray},${gray},${alpha})`;
-  color = Math.abs(gray - 182) > 8 ? `rgb(${gray},${gray},${gray})` : null;
-  return color;
+  return Math.abs(gray - 182) > 8 ? `rgb(${gray},${gray},${gray})` : null;
 }
 
 function initializeMap(){
@@ -98,7 +99,21 @@ function initializeMap(){
 	      opacity: 0.2,
 	      //opacity: 0.1,
 	      pixelValuesToColorFn: hillshadecolor,
-	      resolution: 512
+	      // one sample per screen pixel of a 256px tile; the 107 m/px data is
+	      // coarser than that at most zooms, so higher values just burn CPU
+	      resolution: 256
+          });
+          // georaster-layer-for-leaflet 4.1.2 shares one tile cache across all
+          // instances (see georaster-tile-cache-fixes.md); give this layer its own
+          layer.clearCache();
+          // set after construction: initialize() may overwrite keepBuffer
+          layer.options.keepBuffer = 4;
+          // the cache is never pruned; keep only the newest tiles
+          map.on('moveend zoomend', () => {
+            const keys = Object.keys(layer.cache || {});
+            for (const k of keys.slice(0, keys.length - TILE_CACHE_LIMIT)) {
+              delete layer.cache[k];
+            }
           });
           layer.addTo(map);
 	  layer.getContainer().classList.add('georaster-hillshade');
