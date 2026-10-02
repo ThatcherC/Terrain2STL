@@ -2,7 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const exec = require('child_process').exec;
+const execFile = require('child_process').execFile;
 const config = require('./config');
 const queue = require("queue");
 const path = require('path');
@@ -30,9 +30,25 @@ if(!process.env.NOSTATIC) {
 	app.use(express.static(__dirname, {index: "terrain2stl.html"}));
 }
 
-app.post("/",function(req,res){
-	var b = req.body;
+// numeric fields expected in the POST body
+const PARAMS = ["lat", "lng", "boxWidth", "boxHeight", "vScale", "rotation",
+	"waterDrop", "baseHeight", "boxScale"];
+
+app.post("/gen",function(req,res){
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
+
+	// parse every parameter as a number so nothing else reaches the command line
+	var b = {};
+	for (const name of PARAMS) {
+		const raw = req.body[name];
+		const value = (typeof raw === "string" && raw.trim() !== "") || typeof raw === "number"
+			? Number(raw) : NaN;
+		if (!Number.isFinite(value)) {
+			res.status(400).end("Invalid parameter: " + name);
+			return;
+		}
+		b[name] = value;
+	}
 
 	var fileNum  = counter;
 	var zipname  = path.join(STLPATH, "terrain-"+fileNum);
@@ -40,10 +56,11 @@ app.post("/",function(req,res){
 
 //b.rotation=0;
 
-	var command = "./celevstl "+b.lat+" "+b.lng+" "+b.boxWidth/3+" "
-			+b.boxHeight/3+" "+b.vScale+" "+b.rotation+" "+b.waterDrop+" "
-			+b.baseHeight+" "+b.boxScale+" "+DEMPATH+" "+filename;
-	command += "; zip --quiet --junk-paths "+zipname+" "+filename;
+	// arguments are passed directly to the programs (no shell involved)
+	const stlArgs = [b.lat, b.lng, b.boxWidth/3, b.boxHeight/3, b.vScale, b.rotation,
+		b.waterDrop, b.baseHeight, b.boxScale, DEMPATH, filename].map(String);
+	const zipArgs = ["--quiet", "--junk-paths", zipname, filename];
+	const command = "./celevstl " + stlArgs.join(" ") + "; zip " + zipArgs.join(" ");
 
         console.log("> Request for "+b.lat+" "+b.lng);
 	startTime = Date.now()
@@ -54,7 +71,10 @@ app.post("/",function(req,res){
 	console.log(command);
 
 	q.push(function(cb){
-			exec(command, function(error,stdout,stderr){
+		execFile("./celevstl", stlArgs, function(stlError, stlStdout, stlStderr){
+			// zip runs regardless of celevstl's result, as the old "; zip" did
+			execFile("zip", zipArgs, function(error, stdout, zipStderr){
+				const stderr = stlStderr + zipStderr;
 				 console.log(stderr||"STL "+fileNum+ " created");
 				 res.end(String(fileNum));
 				 //res.type("application/zip");
@@ -67,7 +87,8 @@ app.post("/",function(req,res){
 					if(err) console.log("> Error!: "+err);
 				});
 				cb();
-			})});
+			})
+		})});
 	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
 });
