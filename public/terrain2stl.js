@@ -217,6 +217,7 @@ function initializeForm() {
   var form = document.getElementById("paramForm");
   var downloadButton = document.getElementById("downloadbtn");
   var genButton = document.getElementById("genButton");
+  var genError = document.getElementById("genError");
   
   // block the input's form "press enter to submit form" behavior
   form.addEventListener("keypress", (e) => {
@@ -240,25 +241,33 @@ function initializeForm() {
     genButton.innerHTML = "<i>Generating...</i>";
     
     downloadButton.style.visibility = "hidden";
+    genError.textContent = "";
     var XHR = new XMLHttpRequest();
 
-    // Define what happens on successful data submission
+    // Define what happens when the server responds
     XHR.addEventListener("load", function(event) {
-      var modelNumber = event.target.responseText;
-      var modelName = "stls/terrain-" + modelNumber + ".zip";
+      if (XHR.status === 200) {
+        var modelNumber = event.target.responseText;
+        var modelName = "stls/terrain-" + modelNumber + ".zip";
 
-      // Make download button visible
-      downloadButton.style.visibility = "visible";
-      // Set the href attribute
-      downloadButton.href = modelName;
-      
-      genButton.classList.remove("disabled");
-      genButton.innerHTML = "Generate Model";
+        // Make download button visible
+        downloadButton.style.visibility = "visible";
+        // Set the href attribute
+        downloadButton.href = modelName;
+      } else {
+        genError.textContent = XHR.responseText || "Something went wrong. Please try again.";
+      }
     });
 
-    // Define what happens in case of error
+    // Define what happens if the request couldn't be sent
     XHR.addEventListener("error", function(event) {
-      console.log('Oops! Something went wrong.');
+      genError.textContent = "Couldn't reach the server. Please try again.";
+    });
+
+    // Reset the button after success or failure
+    XHR.addEventListener("loadend", function(event) {
+      genButton.classList.remove("disabled");
+      genButton.innerHTML = "Generate Model";
     });
 
     // Set up our request

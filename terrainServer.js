@@ -42,21 +42,35 @@ function appendLog(file, line) {
 	fs.promises.appendFile(file, line).catch(err => console.log("> Error!: "+err));
 }
 
-// numeric fields expected in the POST body
-const PARAMS = ["lat", "lng", "boxWidth", "boxHeight", "vScale", "rotation",
-	"waterDrop", "baseHeight", "boxScale"];
+// numeric fields expected in the POST body and their allowed [min, max]
+// ranges, matching the inputs in public/terrain2stl.html
+const PARAMS = {
+	lat:        [-69, 84],
+	lng:        [-179, 180],
+	boxWidth:   [60, 2700],
+	boxHeight:  [60, 2700],
+	boxScale:   [1, 20],
+	rotation:   [-90, 90],
+	vScale:     [0.5, 4],
+	waterDrop:  [0, 5],
+	baseHeight: [1, 10],
+};
 
 app.post("/gen",function(req,res){
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
 	// parse every parameter as a number so nothing else reaches the command line
 	const b = {};
-	for (const name of PARAMS) {
+	for (const [name, [min, max]] of Object.entries(PARAMS)) {
 		const raw = req.body[name];
 		const value = (typeof raw === "string" && raw.trim() !== "") || typeof raw === "number"
 			? Number(raw) : NaN;
 		if (!Number.isFinite(value)) {
 			res.status(400).end("Invalid parameter: " + name);
+			return;
+		}
+		if (value < min || value > max) {
+			res.status(400).end(`Parameter ${name} must be between ${min} and ${max}`);
 			return;
 		}
 		b[name] = value;
@@ -82,19 +96,26 @@ app.post("/gen",function(req,res){
 
 	console.log(command);
 
+	// log the job and reply exactly once, whether it succeeded or failed
+	function finish(cb, error, stderr) {
+		if (error) {
+			console.log("> Model "+fileNum+" failed: "+(stderr || error.message));
+			res.status(500).end("Model generation failed");
+		} else {
+			console.log(stderr||"STL "+fileNum+ " created");
+			res.end(String(fileNum));
+		}
+		const logString = paramLog+Date.now()+"\n";
+		if(config.logParams) appendLog(config.paramLogPath, logString);
+		if(config.logCommands) appendLog(config.commandLogPath, command+"\n");
+		cb();
+	}
+
 	q.push(function(cb){
 		execFile("./celevstl", stlArgs, function(stlError, stlStdout, stlStderr){
-			// zip runs regardless of celevstl's result, as the old "; zip" did
-			execFile("zip", zipArgs, function(error, stdout, zipStderr){
-				const stderr = stlStderr + zipStderr;
-				 console.log(stderr||"STL "+fileNum+ " created");
-				 res.end(String(fileNum));
-				 //res.type("application/zip");
-				 //res.download(zipname+".zip");
-				const logString = paramLog+Date.now()+"\n";
-				if(config.logParams) appendLog(config.paramLogPath, logString);
-				if(config.logCommands) appendLog(config.commandLogPath, command+"\n");
-				cb();
+			if (stlError) return finish(cb, stlError, stlStderr);
+			execFile("zip", zipArgs, function(zipError, zipStdout, zipStderr){
+				finish(cb, zipError, stlStderr + zipStderr);
 			})
 		})});
 	counter++;
