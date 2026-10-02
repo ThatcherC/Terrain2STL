@@ -1,24 +1,23 @@
 //Node server for hgt-to-stl program
 import express from 'express';
-import bodyParser from 'body-parser';
 import fs from 'node:fs';
 import { execFile } from 'node:child_process';
 import path from 'node:path';
 import queue from 'queue';
 import config from './config.js';
 
-var app = express();
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+const app = express();
+app.use(express.json()); // support json encoded bodies
+app.use(express.urlencoded({ extended: true })); // support encoded bodies
 
 const PORT = process.env.PORT || 8080;
 const DEMPATH = process.env.DEMPATH || "./hgt_files/";
 const STLPATH = process.env.STLPATH || "./stls";
 
-var counter = 0;
+let counter = 0;
 
 //initialization from https://www.npmjs.com/package/queue
-var q = queue()
+const q = queue()
 q.concurrency = 2;
 q.timeout=20000;
 q.autostart = true;
@@ -42,7 +41,7 @@ app.post("/gen",function(req,res){
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
 	// parse every parameter as a number so nothing else reaches the command line
-	var b = {};
+	const b = {};
 	for (const name of PARAMS) {
 		const raw = req.body[name];
 		const value = (typeof raw === "string" && raw.trim() !== "") || typeof raw === "number"
@@ -54,9 +53,9 @@ app.post("/gen",function(req,res){
 		b[name] = value;
 	}
 
-	var fileNum  = counter;
-	var zipname  = path.join(STLPATH, "terrain-"+fileNum);
-	var filename = path.join(STLPATH, "terrain-"+fileNum+".stl");
+	const fileNum  = counter;
+	const zipname  = path.join(STLPATH, "terrain-"+fileNum);
+	const filename = path.join(STLPATH, "terrain-"+fileNum+".stl");
 
 //b.rotation=0;
 
@@ -95,7 +94,7 @@ app.post("/gen",function(req,res){
 
 app.listen(PORT);
 
-var datetime = new Date();
+const datetime = new Date();
 console.log("terrainServer.js starting at:");
 console.log(datetime);
 
