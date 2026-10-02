@@ -63,8 +63,8 @@ app.post("/gen",function(req,res){
 	const command = "./celevstl " + stlArgs.join(" ") + "; zip " + zipArgs.join(" ");
 
         console.log("> Request for "+b.lat+" "+b.lng);
-	startTime = Date.now()
-	paramLog = startTime+"\t"+b.lat+"\t"+b.lng+
+	const startTime = Date.now()
+	const paramLog = startTime+"\t"+b.lat+"\t"+b.lng+
 		"\t"+b.boxHeight+"\t"+b.boxWidth+"\t"+b.boxScale+"\t"+
 		b.vScale+"\t"+b.rotation+"\t"+b.waterDrop+"\t"+b.baseHeight+"\t";
 
@@ -79,7 +79,7 @@ app.post("/gen",function(req,res){
 				 res.end(String(fileNum));
 				 //res.type("application/zip");
 				 //res.download(zipname+".zip");
-				logString = paramLog+Date.now()+"\n";
+				const logString = paramLog+Date.now()+"\n";
 				fs.appendFile("logs/params.log", logString,function(err){
 					if(err) console.log("> Error!: "+err);
 				});
