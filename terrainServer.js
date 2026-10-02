@@ -15,7 +15,6 @@ const PORT = process.env.PORT || 8080;
 const DEMPATH = process.env.DEMPATH || "./hgt_files/";
 const STLPATH = process.env.STLPATH || "./stls";
 
-app.listen(PORT);
 var counter = 0;
 
 //initialization from https://www.npmjs.com/package/queue
@@ -92,6 +91,8 @@ app.post("/gen",function(req,res){
 	counter++;
 	//res.render("preview.ejs",{filename:"/test.stl",width:b.boxSize/3,height:b.boxSize/3});
 });
+
+app.listen(PORT);
 
 var datetime = new Date();
 console.log("terrainServer.js starting at:");
