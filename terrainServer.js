@@ -18,7 +18,7 @@ const STLPATH = process.env.STLPATH || "./stls";
 app.listen(PORT);
 var counter = 0;
 
-//initialization from https://www.npmjs.com/package/task-queue
+//initialization from https://www.npmjs.com/package/queue
 var q = queue()
 q.concurrency = 2;
 q.timeout=20000;
