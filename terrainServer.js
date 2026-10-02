@@ -12,6 +12,8 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 const PORT = process.env.PORT || 8080;
+const DEMPATH = process.env.DEMPATH || "./hgt_files/";
+const STLPATH = process.env.STLPATH || "./stls";
 
 app.listen(PORT);
 var counter = 0;
@@ -33,8 +35,8 @@ app.post("/",function(req,res){
 	//lat, long, width, height, verticalscale, rot, waterDrop, baseHeight
 
 	var fileNum  = counter;
-	var zipname  = "./stls/terrain-"+fileNum;
-	var filename = "./stls/terrain-"+fileNum+".stl";
+	var zipname  = path.join(STLPATH, "terrain-"+fileNum);
+	var filename = path.join(STLPATH, "terrain-"+fileNum+".stl");
 
 //b.rotation=0;
 
@@ -73,3 +75,7 @@ app.post("/",function(req,res){
 var datetime = new Date();
 console.log("terrainServer.js starting at:");
 console.log(datetime);
+
+console.log("Port: " + PORT);
+console.log("DEM Path: " + DEMPATH);
+console.log("STL Path: " + STLPATH);
