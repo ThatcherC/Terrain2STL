@@ -25,7 +25,7 @@ you@comp:~/.../Terrain2STL$ make
 ```
 If that's successful, generate a test STL with
 ```
-./celevstl 44.1928 -69.0851 40 40 1.7 0 1 3 1 test.stl
+./celevstl 44.1928 -69.0851 40 40 1.7 0 1 3 1 hgt_files test.stl
 ```
 
 and you should be treated with a model of scenic Rockport harbor!
@@ -40,6 +40,7 @@ The arguments here are:
 - Water drop (mm) (how much the ocean should be lowered in models)
 - Base height (mm) (how much extra height to add to the base of model)
 - Step size (hgt cells per model pixel)
+- Path to directory with DEM files in HGT format
 - Output file name
 
 #### Web Interface
