@@ -52,11 +52,21 @@ function initializeControls(){
 
 const TILE_CACHE_LIMIT = 200; // ~50 MB of 256px tile canvases
 
+// gdaldem hillshade -alt 45 shades flat ground (and ocean) to 182. Rather than
+// cutting out a band around 182 (which also holes ridge crests, since they're
+// locally flat), draw shadows as black and lit slopes as white with opacity
+// growing smoothly with distance from flat.
+const HILLSHADE_FLAT = 182;
+const HILLSHADE_DEADBAND = 2;   // absorbs JPEG noise on truly flat ground
+const HILLSHADE_DARK_RANGE = 120; // gray values below flat to reach full shadow
+const HILLSHADE_LIGHT_RANGE = 50; // gray values above flat to reach full highlight
+
 function hillshadecolor(values){
-  const gray = values[0]
-  //alpha = Math.abs(gray - 182) > 8 ? 0.1 : 0;
-  //return `rgba(${gray},${gray},${gray},${alpha})`;
-  return Math.abs(gray - 182) > 8 ? `rgb(${gray},${gray},${gray})` : null;
+  const d = values[0] - HILLSHADE_FLAT;
+  const dist = Math.abs(d) - HILLSHADE_DEADBAND;
+  if (dist <= 0) return null;
+  const alpha = Math.min(1, dist / (d < 0 ? HILLSHADE_DARK_RANGE : HILLSHADE_LIGHT_RANGE));
+  return d < 0 ? `rgba(0,0,0,${alpha.toFixed(2)})` : `rgba(255,255,255,${alpha.toFixed(2)})`;
 }
 
 function initializeMap(){
@@ -81,7 +91,7 @@ function initializeMap(){
 		maxZoom: 12
 	}).addTo(map)
 
-	var url_to_geotiff_file = "https://hillshades.us-east-1.linodeobjects.com/srtm-hillshade-web-mercator-cog-unset-q60.tif"
+	var url_to_geotiff_file = "https://hillshades.us-east-1.linodeobjects.com/srtm-hillshade-wm-cog-v2.tif"
 
         // from https://github.com/GeoTIFF/georaster-layer-for-leaflet-example/blob/42c4d84b8734c6747cba7a0e221fc6f6d260f6f1/examples/load-cog-via-url-param.html#L43C1-L63C12
         parseGeoraster(url_to_geotiff_file).then(georaster => {
@@ -96,8 +106,8 @@ function initializeMap(){
           var layer = new GeoRasterLayer({
               attribution: "jthatch.com SRTM hillshade",
               georaster,
-	      opacity: 0.2,
-	      //opacity: 0.1,
+	      // pixels carry their own alpha now, so this is higher than the old 0.2
+	      opacity: 0.35,
 	      pixelValuesToColorFn: hillshadecolor,
 	      // one sample per screen pixel of a 256px tile; the 107 m/px data is
 	      // coarser than that at most zooms, so higher values just burn CPU
